@@ -34,7 +34,7 @@
   "dependencies": {
     "@hoox-sh/hoox-shared": "workspace:*",
     "@opentui/core": "0.5.1",
-    "@opentui/react": "0.5.1",
+    "@opentui/react": "0.5.3",
     "immer": "^11.1.8",
     "react": "^19.2.6",
     "smol-toml": "^1.6.1",
