@@ -1,28 +1,45 @@
+# CodeQL advanced setup.
+# Default setup cannot check out worker submodules or apply our path filters.
+#
+# Analyzes:
+#   - javascript-typescript  first-party TS/JS (packages, workers, scripts)
+#   - python                 pyne-worker first-party source
+#   - actions                GitHub Actions workflows
+#
+# JS/TS/Python/Actions use build-mode: none (source extraction). A bun build
+# is not required and would only add time.
+
 name: "CodeQL"
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: [main]
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ["main", "master"]
+    branches: [main]
   schedule:
     - cron: "37 19 * * 0"
+  workflow_dispatch:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
+      packages: read
       security-events: write
 
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript"]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+        include:
+          - language: javascript-typescript
+            build-mode: none
+          - language: python
+            build-mode: none
+          - language: actions
+            build-mode: none
 
     steps:
       - name: Checkout repository
@@ -43,22 +60,13 @@ jobs:
             || echo "::warning::Some submodules could not be initialized due to token permissions. Continuing."
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4.37.6
+        uses: github/codeql-action/init@v4.37.7
         with:
           languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
           config-file: ./.github/codeql-config.yml
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Build for CodeQL
-        run: |
-          bun install --frozen-lockfile
-          bun run build
-
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4.37.6
+        uses: github/codeql-action/analyze@v4.37.7
         with:
-          category: "/language:${{matrix.language}}"
+          category: "/language:${{ matrix.language }}"
