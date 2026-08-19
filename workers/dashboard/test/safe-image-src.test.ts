@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { parseSafeImageSrc } from "../src/components/agent/vision-upload";
+import { parseSafeImageSrc } from "../src/lib/safe-image-src";
 
 describe("parseSafeImageSrc", () => {
   it("accepts http(s) and normalizes via URL", () => {
@@ -32,5 +32,10 @@ describe("parseSafeImageSrc", () => {
     expect(parseSafeImageSrc("")).toBeNull();
     expect(parseSafeImageSrc("  ")).toBeNull();
     expect(parseSafeImageSrc("/relative.png")).toBeNull();
+  });
+
+  it("returns encodeURI of the scheme-checked URL", () => {
+    const raw = "https://example.com/chart.png";
+    expect(parseSafeImageSrc(raw)).toBe(encodeURI(raw));
   });
 });
