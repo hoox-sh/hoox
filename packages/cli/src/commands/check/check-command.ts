@@ -167,11 +167,17 @@ async function runConfigChecks(
     name: "Global config",
     success: globalErrors.length === 0,
     errors: globalErrors,
-    warnings: global.cloudflare_api_token
-      ? []
-      : [
-          "global.cloudflare_api_token uses <USE_WRANGLER_SECRET_PUT> placeholder — set via wrangler secret",
-        ],
+    warnings: (() => {
+      const token = global.cloudflare_api_token ?? "";
+      const isPlaceholder =
+        !token ||
+        token.startsWith("<") ||
+        /USE_CLOUDFLARE_API_TOKEN|USE_WRANGLER_SECRET_PUT/i.test(token);
+      if (isPlaceholder) return [];
+      return [
+        "global.cloudflare_api_token is stored in wrangler.jsonc — rotate that token and use CLOUDFLARE_API_TOKEN (or wrangler login) instead",
+      ];
+    })(),
   });
 
   // Check that each worker has a path

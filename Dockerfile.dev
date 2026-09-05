@@ -7,7 +7,7 @@
 #   docker compose --profile workers build
 # =============================================================================
 
-ARG BUN_VERSION=1.3.14
+ARG BUN_VERSION=1.4.1
 FROM oven/bun:${BUN_VERSION}
 
 # Non-root `bun` user from the official image. WORKDIR is chowned so compose
@@ -34,6 +34,14 @@ RUN --mount=type=cache,id=bun-cache-dev,target=/home/bun/.bun/install/cache,uid=
 
 # Remaining source. Install layer above is reused when only app code changes.
 COPY --chown=bun:bun . .
+
+# Pre-build shared so the image works without a host bind-mount. Compose
+# bind-mounts ./packages and hides this layer — the entrypoint rebuilds
+# if dist is missing after the mount.
+RUN bun run build:shared
+
+COPY --chmod=755 --chown=bun:bun scripts/docker-entrypoint-dev.sh /app/scripts/docker-entrypoint-dev.sh
+ENTRYPOINT ["/app/scripts/docker-entrypoint-dev.sh"]
 
 # Dev ports used on the hoox-net bridge. Only hoox:8787 and dashboard:8794
 # are published to the host (see docker-compose.yml).

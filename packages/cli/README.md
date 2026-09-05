@@ -4,7 +4,9 @@
 
 > Hoox CLI — manage Cloudflare Workers, infrastructure, secrets, and deployments.
 
-> **Runtime requirement:** Bun ≥ 1.2. The bin shebang and bundle target are Bun-only; `npm install -g` will install the package but the CLI will not run under Node.js.
+> **Runtime requirement:** Bun ≥ 1.2. The bin shebang and bundle target are Bun-only.
+>
+> **`npm install -g @hoox-sh/hoox-cli` will fail** on current publishes: the tarball ships `optionalDependencies["@hoox-sh/hoox-tui"] = "workspace:*"`, which npm cannot resolve. Use **Bun only**: `bun add -g @hoox-sh/hoox-cli`.
 
 **v0.11.x** — monorepo auto-detect + remember (run `hx` from any directory), Linear Rail banner, quieter secrets check, operator security plane (`doctor --security`, `tunnel check`), PYNE (`hoox pyne`), schema validate/generate, wrangler **4.x**.
 
@@ -39,7 +41,7 @@
 bun add -g @hoox-sh/hoox-cli
 ```
 
-> The CLI is a Bun bundle — `npm install -g` will not produce a working binary.
+> Do not use npm for a global install. It aborts on `workspace:*` in optionalDependencies, and even a successful extract would not run under Node.
 
 ### Local Development
 

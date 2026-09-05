@@ -89,6 +89,28 @@ console.log(
 replaceDependencies(packageJson.dependencies);
 replaceDependencies(packageJson.devDependencies);
 replaceDependencies(packageJson.peerDependencies);
+replaceDependencies(packageJson.optionalDependencies);
+
+// npm cannot resolve leftover workspace:* (optionalDependencies included).
+// Drop any that still could not be rewritten so `npm install -g` does not abort.
+for (const key of [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies",
+] as const) {
+  const deps = packageJson[key] as Record<string, string> | undefined;
+  if (!deps) continue;
+  for (const [name, version] of Object.entries(deps)) {
+    if (version === "workspace:*") {
+      delete deps[name];
+      console.log(`  ${name}: dropped unresolved workspace:* from ${key}`);
+    }
+  }
+  if (deps && Object.keys(deps).length === 0) {
+    delete packageJson[key];
+  }
+}
 
 // Write back the modified package.json atomically (write to temp, then rename)
 // to avoid TOCTOU races with concurrent editors/CI tools.

@@ -143,12 +143,21 @@ Guides: [Installation](https://docs.hoox.sh/docs/enduser/getting-started/install
 ## Quick path (edge)
 
 ```bash
+# Bun only — `npm install -g @hoox-sh/hoox-cli` aborts (workspace:* optionalDependency).
+# After `curl -fsSL https://bun.sh/install | bash`, put ~/.bun/bin on PATH.
 bun add -g @hoox-sh/hoox-cli
 git clone --recursive https://github.com/hoox-sh/hoox.git && cd hoox
 hoox onboard
 hoox deploy all --auto
 hoox check health
 ```
+
+| Package                 | Version | Published    |
+| ----------------------- | ------- | ------------ |
+| `@hoox-sh/hoox-cli`     | 0.13.1  | yes          |
+| `@hoox-sh/hoox-tui`     | 0.3.2   | yes          |
+| `@hoox-sh/hoox-shared`  | 1.4.0   | yes          |
+| workspace root (`hoox`) | 0.13.1  | no (private) |
 
 ---
 

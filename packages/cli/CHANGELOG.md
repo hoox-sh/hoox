@@ -5,6 +5,22 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.13.1] — 2026-09-05
+
+### Fixed
+
+- **Never persist Cloudflare API tokens** in `wrangler.jsonc` or `.wizard-state.json`. Init writes a placeholder; use `CLOUDFLARE_API_TOKEN` or `wrangler login`.
+- **Materialize worker configs**: copy `wrangler.jsonc.example` → `wrangler.jsonc` on init/setup (dashboard OpenNext, analytics, pyne-worker).
+- **npm global abort**: `prepare-publish.ts` rewrites `optionalDependencies` `workspace:*` so the next tarball does not fail npm install.
+- **Docker**: default Bun 1.4.1; gateway volume is `workers/hoox-worker`; entrypoint builds `packages/shared` and copies wrangler examples.
+- **D1 name**: wizard provisions `trade-data-db` (matches worker configs).
+- **Vectorize**: gateway example no longer requires a placeholder index; init can create `hoox-rag-index`.
+- **`hoox init --self-hosted`**: prints the Docker / `server.js` path (does not invent a Cloudflare-free JSONC).
+
+### Docs
+
+- Cloudflare token permission matrix (D1:Edit, Queues, Vectorize). Bun-only install. `./hoox-tui` root shortcut.
+
 ## [0.13.0] — 2026-08-13
 
 ### Added

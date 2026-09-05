@@ -32,24 +32,33 @@ graph TB
 
 <CardGroup cols={3}>
   <Card title="End User" icon="user" href="/docs/enduser">
-    Getting started, concepts, guides, tutorials, CLI & FAQ for traders and
+    Getting started, concepts, guides, tutorials, CLI and FAQ for traders and
     operators of a live mesh.
   </Card>
-  <Card title="Architecture" icon="sitemap" href="/docs/devops/architecture">
+  <Card title="Ecosystem" icon="mesh" href="/docs/enduser/concepts/ecosystem">
+    HOOX vs PYNE vs AXIS vs PyneTS vs pyne-worker — what each surface does.
+  </Card>
+  <Card title="PYNE live trading" icon="signal" href="/docs/enduser/guides/pyne-live-trading">
+    Strategy events from pyne-worker to trade-worker. Alerts are a separate path.
+  </Card>
+  <Card title="AXIS and HOOX" icon="chart" href="/docs/enduser/guides/axis-and-hoox">
+    The PWA evaluates. The mesh executes. They do not share an order router.
+  </Card>
+  <Card title="Architecture" icon="layers" href="/docs/devops/architecture">
     Mesh topology, data flow, bindings, storage, and ADRs.
   </Card>
-  <Card title="Workers" icon="server" href="/docs/devops/workers">
+  <Card title="Workers" icon="worker" href="/docs/devops/workers">
     Per-isolate profiles — gateway, trade, D1, agent, telegram, dashboard, and
     more.
   </Card>
   <Card title="DevOps" icon="terminal" href="/docs/devops">
-    Install, local development, deployment, CI/CD, security, CLI & TUI.
+    Install, local development, deployment, CI/CD, security, CLI and TUI.
   </Card>
-  <Card title="API" icon="code" href="/docs/devops/api">
+  <Card title="API" icon="book" href="/docs/devops/api">
     HTTP endpoints, request payloads (including `test: true`), and response
     envelopes.
   </Card>
-  <Card title="Enterprise" icon="building" href="/docs/enterprise">
+  <Card title="Enterprise" icon="lock" href="/docs/enterprise">
     Multi-tenancy, compliance, and institutional architecture notes (commercial
     layer).
   </Card>
@@ -62,5 +71,7 @@ graph TB
 | Install CLI + first deploy | [Installation](/docs/enduser/getting-started/installation) · [Quick Start](/docs/enduser/getting-started/quick-start) |
 | Sandbox / testnet orders | [Test Trading](/docs/enduser/guides/test-trading) |
 | How a signal becomes a fill | [How Hoox Works](/docs/enduser/concepts/how-hoox-works) |
+| Pine strategy → live order | [PYNE live trading](/docs/enduser/guides/pyne-live-trading) |
+| Chart without trading | [AXIS and HOOX](/docs/enduser/guides/axis-and-hoox) |
 | Exchange execution isolate | [trade-worker](/docs/devops/workers/trade-worker) |
 | Production rollout | [Production Deployment](/docs/devops/deployment/production) |

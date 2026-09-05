@@ -7,9 +7,19 @@ import type { WizardState } from "./types";
 
 /**
  * Serialize wizard state to JSON string.
+ *
+ * The Cloudflare API token is stripped — `.wizard-state.json` must not
+ * hold live credentials. Resume re-reads `CLOUDFLARE_API_TOKEN` from the
+ * environment (or re-prompts).
  */
 export function serializeState(state: WizardState): string {
-  return JSON.stringify(state, null, 2);
+  const copy: WizardState = {
+    ...state,
+    cloudflareConfig: state.cloudflareConfig
+      ? { ...state.cloudflareConfig, apiToken: "" }
+      : undefined,
+  };
+  return JSON.stringify(copy, null, 2);
 }
 
 /**

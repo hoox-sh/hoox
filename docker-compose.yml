@@ -10,6 +10,13 @@
 # Profiles: workers | dashboard | full
 # Build image: docker buildx bake dev --load
 #              docker compose --profile workers build
+#
+# Requires Bun ≥ 1.4.1 (lockfile). Override with BUN_VERSION=1.4.1 if the
+# image was built with an older default.
+#
+# Bind-mounts hide image-built packages/shared/dist — the image entrypoint
+# runs `bun run build:shared` when dist is missing. You can also pre-build
+# on the host: bun run build:shared
 # ---------------------------------------------------------------------------
 
 # YAML anchors — applied to all worker services to avoid 9× duplication.
@@ -21,7 +28,7 @@ x-worker-base: &worker-base
     tags:
       - hoox:dev
     args:
-      BUN_VERSION: ${BUN_VERSION:-1.3.14}
+      BUN_VERSION: ${BUN_VERSION:-1.4.1}
   image: hoox:dev
   init: true # PID 1 reaper (M-07): clean signal handling
   mem_limit: 512m # (M-11) cap runaway workers
@@ -47,7 +54,7 @@ services:
     ports:
       - "8787:8787" # public gateway
     volumes:
-      - ./workers/hoox-worker:/app/workers/hoox
+      - ./workers/hoox-worker:/app/workers/hoox-worker
     healthcheck:
       test:
         [

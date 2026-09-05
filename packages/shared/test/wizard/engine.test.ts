@@ -79,9 +79,16 @@ describe("WizardEngine", () => {
       "abc123def456abc123def456abc123de"
     );
     expect(config.global.subdomain_prefix).toBe("myapp");
+    expect(config.global.cloudflare_api_token).toBe(
+      "<USE_CLOUDFLARE_API_TOKEN_ENV_OR_WRANGLER_AUTH>"
+    );
+    expect(config.global.cloudflare_api_token).not.toBe("test-token");
     expect(Object.keys(config.workers).length).toBeGreaterThan(0);
     expect(config.workers["d1-worker"]).toBeDefined();
     expect(config.workers.hoox).toBeDefined();
+    expect(config.workers["d1-worker"]?.vars.database_name).toBe(
+      "trade-data-db"
+    );
   });
 
   it("reset clears all state", () => {
@@ -118,8 +125,9 @@ describe("WizardEngine", () => {
     });
     engine.execute({ preset: "standard" });
     const plan = engine.getProvisioningPlan();
-    expect(plan.d1Databases).toContain("hoox-db");
+    expect(plan.d1Databases).toContain("trade-data-db");
     expect(plan.kvNamespaces).toContain("CONFIG_KV");
+    expect(plan.vectorizeIndexes).toContain("hoox-rag-index");
   });
 
   it("loads from existing state", () => {

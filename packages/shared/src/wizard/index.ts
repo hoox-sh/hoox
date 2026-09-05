@@ -14,6 +14,7 @@ export type {
   WizardState,
   StepDefinition,
 } from "./types";
+export { CLOUDFLARE_API_TOKEN_PLACEHOLDER } from "./types";
 export type { Provisioner } from "./provisioner";
 
 export { WizardEngine } from "./engine";

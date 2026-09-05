@@ -19,6 +19,7 @@ import type {
   WorkerPresetName,
   ProvisionResult,
 } from "./types";
+import { CLOUDFLARE_API_TOKEN_PLACEHOLDER } from "./types";
 import {
   PRESETS,
   INTEGRATIONS,
@@ -330,7 +331,9 @@ export class WizardEngine {
 
     return {
       global: {
-        cloudflare_api_token: cf?.apiToken ?? "",
+        // Never persist the live API token in wrangler.jsonc — operators
+        // authenticate via CLOUDFLARE_API_TOKEN or `wrangler login`.
+        cloudflare_api_token: CLOUDFLARE_API_TOKEN_PLACEHOLDER,
         cloudflare_account_id: cf?.accountId ?? "",
         cloudflare_secret_store_id: cf?.secretStoreId ?? "",
         subdomain_prefix: cf?.subdomain ?? "",
@@ -349,6 +352,7 @@ export class WizardEngine {
       kvNamespaces: [],
       r2Buckets: [],
       queues: [],
+      vectorizeIndexes: [],
     };
 
     const allWorkers = [
@@ -365,7 +369,7 @@ export class WizardEngine {
     const workerSet = new Set(allWorkers);
 
     if (workerSet.has("d1-worker")) {
-      plan.d1Databases.push("hoox-db");
+      plan.d1Databases.push("trade-data-db");
     }
     if (workerSet.has("hoox") || workerSet.has("analytics-worker")) {
       plan.kvNamespaces.push("CONFIG_KV");
@@ -373,10 +377,14 @@ export class WizardEngine {
     if (workerSet.has("web3-wallet-worker")) {
       plan.kvNamespaces.push("WEB3_CACHE_KV");
     }
+    if (workerSet.has("hoox") || workerSet.has("telegram-worker")) {
+      plan.vectorizeIndexes.push("hoox-rag-index");
+    }
 
     // Deduplicate
     plan.d1Databases = [...new Set(plan.d1Databases)];
     plan.kvNamespaces = [...new Set(plan.kvNamespaces)];
+    plan.vectorizeIndexes = [...new Set(plan.vectorizeIndexes)];
 
     return plan;
   }

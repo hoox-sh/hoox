@@ -89,6 +89,18 @@ describe("CLIProvisioner", () => {
       expect(result.errors).toEqual([]);
     });
 
+    it("includes Vectorize indexes in the dry-run list", async () => {
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.check({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["hoox-rag-index"],
+      });
+      expect(result.created).toEqual(["Vectorize:hoox-rag-index"]);
+    });
+
     it("lists multiple D1 and KV resources", async () => {
       const provisioner = new CLIProvisioner();
       const result = await provisioner.check({

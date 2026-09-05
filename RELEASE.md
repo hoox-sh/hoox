@@ -97,6 +97,11 @@ This runs on every PR and push to `main`. Fix any failures before tagging.
 If GitHub Actions is unavailable, you can publish manually:
 
 ```bash
+# Rewrite workspace:* (including optionalDependencies) to real versions
+bun scripts/prepare-publish.ts packages/cli
+bun scripts/prepare-publish.ts packages/tui
+bun scripts/prepare-publish.ts packages/shared
+
 # Build the CLI
 cd packages/cli && bun run build
 

@@ -14,7 +14,7 @@
 # Runtime limitations: see DESIGN.md → Self-Hosted Limitations.
 # =============================================================================
 
-ARG BUN_VERSION=1.3.14
+ARG BUN_VERSION=1.4.1
 
 # ---------------------------------------------------------------------------
 # Stage 1: builder

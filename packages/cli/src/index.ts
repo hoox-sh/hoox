@@ -15,9 +15,9 @@
 if (typeof Bun === "undefined") {
   process.stderr.write(
     "Error: the Hoox CLI requires Bun >= 1.2 to run.\n" +
-      "  Install Bun:  curl -fsSL https://bun.sh | bash\n" +
-      "  Then run:    bunx hoox <command>\n" +
-      "  (npm install -g will not produce a working binary.)\n"
+      "  Install Bun:  curl -fsSL https://bun.sh/install | bash\n" +
+      "  Put ~/.bun/bin on PATH, then: bun add -g @hoox-sh/hoox-cli\n" +
+      "  (npm install -g aborts on workspace:* in optionalDependencies.)\n"
   );
   process.exit(1);
 }

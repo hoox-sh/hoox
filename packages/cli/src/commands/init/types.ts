@@ -25,4 +25,9 @@ export interface InitOptions {
   resume?: boolean;
   /** --preset: Use a preset worker template (non-interactive) */
   preset?: string;
+  /**
+   * --self-hosted: print the VPS / Docker path and exit.
+   * Cloudflare init is skipped — the flag does not write wrangler.jsonc.
+   */
+  selfHosted?: boolean;
 }

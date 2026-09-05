@@ -29,7 +29,9 @@ describe("persistence", () => {
     const json = serializeState(state);
     const parsed = deserializeState(json);
     expect(parsed.step).toBe("CLOUDFLARE_CONFIG");
-    expect(parsed.cloudflareConfig?.apiToken).toBe("tok_xxx");
+    // Live API token must not land on disk.
+    expect(parsed.cloudflareConfig?.apiToken).toBe("");
+    expect(json).not.toContain("tok_xxx");
     expect(parsed.selectedWorkers).toContain("hoox");
     expect(parsed.selectedIntegrations).toContain("exchange");
     expect(parsed.secrets?.exchange?.EXCHANGE_KEY_BINDING).toBe("key123");

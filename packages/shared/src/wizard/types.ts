@@ -43,6 +43,10 @@ export interface WorkerConfig {
   secrets: string[];
 }
 
+/** Written to wrangler.jsonc instead of the live API token. */
+export const CLOUDFLARE_API_TOKEN_PLACEHOLDER =
+  "<USE_CLOUDFLARE_API_TOKEN_ENV_OR_WRANGLER_AUTH>";
+
 export interface WorkersJsonConfig {
   global: {
     cloudflare_api_token: string;
@@ -58,6 +62,8 @@ export interface ProvisioningPlan {
   kvNamespaces: string[];
   r2Buckets: string[];
   queues: string[];
+  /** Created for gateway/telegram RAG. Optional so older callers compile. */
+  vectorizeIndexes?: string[];
 }
 
 export interface ProvisionResult {

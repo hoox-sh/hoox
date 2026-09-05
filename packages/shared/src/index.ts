@@ -341,6 +341,7 @@ export {
   serializeState,
   deserializeState,
   WIZARD_STATE_PATH,
+  CLOUDFLARE_API_TOKEN_PLACEHOLDER,
 } from "./wizard";
 
 // ── Worker Manifest Schema ──────────────────────────────────────────────

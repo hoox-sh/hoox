@@ -56,6 +56,43 @@ export class CLIProvisioner implements Provisioner {
       }
     }
 
+    for (const index of plan.vectorizeIndexes ?? []) {
+      try {
+        const proc = Bun.spawn(
+          [
+            "wrangler",
+            "vectorize",
+            "create",
+            index,
+            "--dimensions",
+            "768",
+            "--metric",
+            "cosine",
+          ],
+          {
+            stdout: "pipe",
+            stderr: "pipe",
+          }
+        );
+        await new Response(proc.stdout).text();
+        const exitCode = await proc.exited;
+        if (exitCode === 0) {
+          created.push(`Vectorize:${index}`);
+        } else {
+          const err = await new Response(proc.stderr).text();
+          const text = err.trim() || `exit code ${exitCode}`;
+          // Already-exists is not fatal for a first-time onboard.
+          if (/already exists|duplicate/i.test(text)) {
+            created.push(`Vectorize:${index} (exists)`);
+          } else {
+            errors.push(`Vectorize:${index} — ${text}`);
+          }
+        }
+      } catch (e) {
+        errors.push(`Vectorize:${index} — ${(e as Error).message}`);
+      }
+    }
+
     return {
       success: errors.length === 0,
       created,
@@ -68,6 +105,7 @@ export class CLIProvisioner implements Provisioner {
     const created: string[] = [
       ...plan.d1Databases.map((d) => `D1:${d}`),
       ...plan.kvNamespaces.map((k) => `KV:${k}`),
+      ...(plan.vectorizeIndexes ?? []).map((v) => `Vectorize:${v}`),
     ];
     return { success: true, created, errors: [] };
   }

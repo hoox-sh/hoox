@@ -17,6 +17,7 @@
 
 import {
   chmodSync,
+  copyFileSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -172,6 +173,16 @@ const WORKER_FS_DIR: Record<string, string> = {
 function workerFsDir(worker: string): string {
   return WORKER_FS_DIR[worker] ?? worker;
 }
+
+/**
+ * Worker dirs that ship `wrangler.jsonc.example` (real `wrangler.jsonc` is
+ * gitignored). Fresh clones have no deployable config until this is copied.
+ */
+const WRANGLER_EXAMPLE_DIRS = [
+  ...ALL_WORKERS.map((w) => workerFsDir(w)),
+  ...TOOLING_WORKERS,
+  "dashboard",
+] as const;
 
 const KEYS_DIR = ".keys";
 
@@ -1021,6 +1032,57 @@ export class SetupService {
     return true;
   }
 
+  // ── Auto-Fix: Materialize wrangler.jsonc from .example ────────────────
+
+  /**
+   * Copy `wrangler.jsonc.example` → `wrangler.jsonc` when the real file is
+   * missing. Worker configs are gitignored; `hoox deploy` fails until they
+   * exist. Dashboard OpenNext also requires `workers/dashboard/wrangler.jsonc`.
+   *
+   * Returns the list of worker dirs that were created.
+   */
+  materializeWranglerConfigs(): string[] {
+    this.onProgress({
+      type: "step-start",
+      step: "configs",
+      message: "Materializing wrangler.jsonc from .example where missing...",
+    });
+
+    const created: string[] = [];
+    for (const dir of WRANGLER_EXAMPLE_DIRS) {
+      const dest = join("workers", dir, "wrangler.jsonc");
+      const example = join("workers", dir, "wrangler.jsonc.example");
+      if (existsSync(dest)) continue;
+      if (!existsSync(example)) {
+        this.onProgress({
+          type: "warn",
+          step: "configs",
+          message:
+            `No wrangler.jsonc or wrangler.jsonc.example for workers/${dir} — ` +
+            `copy/fill a config before deploy`,
+        });
+        continue;
+      }
+      copyFileSync(example, dest);
+      created.push(dir);
+      this.onProgress({
+        type: "info",
+        step: "configs",
+        message: `Created workers/${dir}/wrangler.jsonc from .example`,
+      });
+    }
+
+    this.onProgress({
+      type: "step-complete",
+      step: "configs",
+      message:
+        created.length > 0
+          ? `Materialized ${created.length} wrangler.jsonc file(s)`
+          : "All worker wrangler.jsonc files already present",
+    });
+    return created;
+  }
+
   // ── Auto-Fix: Null Vars in wrangler.jsonc ─────────────────────────────
 
   /**
@@ -1451,7 +1513,10 @@ export class SetupService {
       return results;
     }
 
-    // 0d. Fix wrangler configs (null vars → secrets)
+    // 0d. Copy wrangler.jsonc.example → wrangler.jsonc (gitignored)
+    this.materializeWranglerConfigs();
+
+    // 0e. Fix wrangler configs (null vars → secrets)
     this.fixWranglerConfigs();
 
     // ── 1. Keys (auto-generate if missing; --skip-keys loads .keys/setup.env)
