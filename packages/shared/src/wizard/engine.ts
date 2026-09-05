@@ -378,13 +378,14 @@ export class WizardEngine {
       plan.kvNamespaces.push("WEB3_CACHE_KV");
     }
     if (workerSet.has("hoox") || workerSet.has("telegram-worker")) {
+      plan.vectorizeIndexes = plan.vectorizeIndexes ?? [];
       plan.vectorizeIndexes.push("hoox-rag-index");
     }
 
     // Deduplicate
     plan.d1Databases = [...new Set(plan.d1Databases)];
     plan.kvNamespaces = [...new Set(plan.kvNamespaces)];
-    plan.vectorizeIndexes = [...new Set(plan.vectorizeIndexes)];
+    plan.vectorizeIndexes = [...new Set(plan.vectorizeIndexes ?? [])];
 
     return plan;
   }
