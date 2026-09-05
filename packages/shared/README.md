@@ -41,4 +41,10 @@ The named subdirectories with deep-import support are: `middleware`, `d1`, `sche
 
 ```bash
 bun test packages/shared
+bun run build:shared   # emits dist/ (gitignored)
+bun run typecheck      # builds shared first, then tsc every workspace
 ```
+
+Worker `tsc` resolves `@hoox-sh/hoox-shared/<subpath>` through this package's
+`exports` map to `dist/*.d.ts`. `bun run typecheck` (and the pre-push hook)
+builds `dist/` first so a clean tree does not fail with missing-module errors.

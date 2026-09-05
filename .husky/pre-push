@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
-echo "🔍 Running pre-push typecheck..."
+echo "🔍 Running pre-push typecheck (builds @hoox-sh/hoox-shared dist first)..."
 bun run typecheck

@@ -62,6 +62,51 @@ for (const pattern of packageJson.workspaces) {
   }
 }
 
+/**
+ * Worker (and dashboard) `package.json` exports resolve
+ * `@hoox-sh/hoox-shared/<subpath>` to `packages/shared/dist/*.d.ts`.
+ * That directory is gitignored, so a fresh clone / clean tree fails tsc
+ * with "Cannot find module '@hoox-sh/hoox-shared/middleware'" until we
+ * build shared. CLI/TUI inherit root `tsconfig.json` paths to `src/`
+ * and do not need dist; workers do.
+ */
+function ensureSharedDist(): boolean {
+  const distIndex = path.join(rootPath, "packages/shared/dist/index.d.ts");
+  const sharedPkg = path.join(rootPath, "packages/shared/package.json");
+  if (!fs.existsSync(sharedPkg)) {
+    console.error("packages/shared/package.json not found.");
+    return false;
+  }
+
+  console.log(
+    "📦 Building @hoox-sh/hoox-shared (worker typecheck needs dist/)..."
+  );
+  const result = Bun.spawnSync(["bun", "run", "build"], {
+    cwd: path.join(rootPath, "packages/shared"),
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (result.exitCode !== 0) {
+    const err =
+      result.stderr.toString().trim() || result.stdout.toString().trim();
+    console.error("❌ packages/shared build failed:");
+    console.error(err);
+    return false;
+  }
+  if (!fs.existsSync(distIndex)) {
+    console.error(
+      "❌ packages/shared build did not emit dist/index.d.ts — worker subpath exports will fail."
+    );
+    return false;
+  }
+  console.log("✓ shared dist ready\n");
+  return true;
+}
+
+if (!ensureSharedDist()) {
+  process.exit(1);
+}
+
 console.log(`🔍 Running typecheck for ${workspaces.length} workspaces...\n`);
 
 let hasErrors = false;
@@ -70,7 +115,7 @@ let completed = 0;
 const results: Array<{ workspace: string; status: "pass" | "fail" }> = [];
 
 // Run typecheck for each workspace
-const runTypecheck = (workspace: string, index: number) => {
+const runTypecheck = (workspace: string) => {
   // Verify workspace exists before spawning — fail fast on bad config
   const pkgPath = path.join(workspace, "package.json");
   if (!fs.existsSync(pkgPath)) {
@@ -117,9 +162,9 @@ const runTypecheck = (workspace: string, index: number) => {
 };
 
 // Run all typecheck commands sequentially
-(async () => {
+void (async () => {
   for (let i = 0; i < workspaces.length; i++) {
-    await runTypecheck(workspaces[i], i);
+    await runTypecheck(workspaces[i]!);
   }
 
   console.log("\n" + "=".repeat(50));
