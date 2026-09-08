@@ -108,16 +108,21 @@ jobs:
         # bun test --coverage has a bug in v1.3.13 where it exits code 1
         # despite all tests passing. The `|| true` ensures CI doesn't
         # falsely fail on the exit code — coverage data is still generated.
-        # Each suite gets its own coverage dir so uploads don't overwrite
-        # each other (bun writes to ./coverage relative to cwd by default).
-        run: bun test packages/cli --coverage --coverage-reporter=lcov --coverage-dir=coverage-cli || true
+        # bunfig.toml pins coverageDir=./coverage (overrides --coverage-dir),
+        # so each suite's lcov is moved aside to keep reports separate.
+        run: |
+          bun test packages/cli --coverage || true
+          mkdir -p coverage-cli && mv coverage/lcov.info coverage-cli/lcov.info
 
       - name: Run tests for shared package (coverage)
-        run: bun test packages/shared --coverage --coverage-reporter=lcov --coverage-dir=coverage-shared || true
+        run: |
+          bun test packages/shared --coverage || true
+          mkdir -p coverage-shared && mv coverage/lcov.info coverage-shared/lcov.info
 
       - name: Run worker unit tests
         run: |
-          bun test workers/trade-worker --coverage --coverage-reporter=lcov --coverage-dir=coverage-trade-worker || true
+          bun test workers/trade-worker --coverage || true
+          mkdir -p coverage-trade-worker && mv coverage/lcov.info coverage-trade-worker/lcov.info
           for dir in workers/hoox-worker workers/d1-worker workers/telegram-worker workers/agent-worker workers/web3-wallet-worker workers/email-worker workers/analytics-worker workers/report-worker; do
             if [ -f "$dir/package.json" ] && grep -q '"test"' "$dir/package.json"; then
               bun test --cwd "$dir" || true
