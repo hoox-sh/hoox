@@ -17,7 +17,7 @@ HOOX is a production-grade, open-source algorithmic trading stack. Signals are v
 [![Bun](https://shieldcn.dev/badge/Runtime-Bun-000000.png?size=sm&logo=bun)](https://bun.sh)
 [![Cloudflare Workers](https://shieldcn.dev/badge/Platform-Cloudflare_Workers-f38020.png?size=sm&logo=cloudflare)](https://workers.cloudflare.com/)
 [![CLI](https://shieldcn.dev/badge/CLI-@hoox--sh/hoox--cli-F97316.png?size=sm)](https://www.npmjs.com/package/@hoox-sh/hoox-cli)
-[![Coverage](https://shieldcn.dev/badge/Coverage-80%25%2B-22c55e.png?size=sm)](docs/devops/development/testing.mdx)
+[![codecov](https://codecov.io/gh/hoox-sh/hoox/graph/badge.svg)](https://codecov.io/gh/hoox-sh/hoox)
 [![License](https://shieldcn.dev/badge/License-Apache_2.0-6b7280.png?size=sm)](LICENSE-CODE)
 [![CI](https://shieldcn.dev/github/ci/hoox-sh/hoox.png?size=sm)](https://github.com/hoox-sh/hoox/actions/workflows/ci.yml)
 
