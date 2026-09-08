@@ -104,18 +104,20 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Run tests for CLI
+      - name: Run tests for CLI (coverage)
         # bun test --coverage has a bug in v1.3.13 where it exits code 1
         # despite all tests passing. The `|| true` ensures CI doesn't
         # falsely fail on the exit code — coverage data is still generated.
-        run: bun test packages/cli --coverage || true
+        # Each suite gets its own coverage dir so uploads don't overwrite
+        # each other (bun writes to ./coverage relative to cwd by default).
+        run: bun test packages/cli --coverage --coverage-reporter=lcov --coverage-dir=coverage-cli || true
 
-      - name: Run tests for shared package
-        run: bun test packages/shared --coverage || true
+      - name: Run tests for shared package (coverage)
+        run: bun test packages/shared --coverage --coverage-reporter=lcov --coverage-dir=coverage-shared || true
 
       - name: Run worker unit tests
         run: |
-          bun run test:trade-worker || true
+          bun test workers/trade-worker --coverage --coverage-reporter=lcov --coverage-dir=coverage-trade-worker || true
           for dir in workers/hoox-worker workers/d1-worker workers/telegram-worker workers/agent-worker workers/web3-wallet-worker workers/email-worker workers/analytics-worker workers/report-worker; do
             if [ -f "$dir/package.json" ] && grep -q '"test"' "$dir/package.json"; then
               bun test --cwd "$dir" || true
@@ -123,11 +125,12 @@ jobs:
           done
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/lcov.info
+          files: ./coverage-cli/lcov.info,./coverage-shared/lcov.info,./coverage-trade-worker/lcov.info
+          flags: cli,shared,trade-worker
           fail_ci_if_error: false
-          threshold: 80
+          token: ${{ secrets.CODECOV_TOKEN }}
         continue-on-error: true
 
       - name: Run dependency audit

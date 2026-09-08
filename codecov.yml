@@ -1,0 +1,38 @@
+# Codecov configuration — hoox-sh/hoox
+# Threshold: 80% line coverage on core paths (CLI / shared / trade-worker),
+# aspirational 90% line / 95% function per standards doc.
+
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+    patch:
+      default:
+        target: 70%
+
+flags:
+  cli:
+    carryforward: true
+  shared:
+    carryforward: true
+  trade-worker:
+    carryforward: true
+
+ignore:
+  - "workers/dashboard/"
+  - "pages/"
+  - "docs/"
+  - "examples/"
+  - "papers/"
+  - "hoox-tui/"
+  - "scripts/"
+  - "**/coverage/"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
