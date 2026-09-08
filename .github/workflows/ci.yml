@@ -129,11 +129,29 @@ jobs:
             fi
           done
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Upload CLI coverage to Codecov
+        uses: codecov/codecov-action@v7
         with:
-          files: ./coverage-cli/lcov.info,./coverage-shared/lcov.info,./coverage-trade-worker/lcov.info
-          flags: cli,shared,trade-worker
+          files: ./coverage-cli/lcov.info
+          flags: cli
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload shared coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage-shared/lcov.info
+          flags: shared
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload trade-worker coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage-trade-worker/lcov.info
+          flags: trade-worker
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
         continue-on-error: true
