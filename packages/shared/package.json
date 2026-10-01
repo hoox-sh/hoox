@@ -108,7 +108,7 @@
   "author": "jango-blockchained (hoox-sh)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260708.1",
+    "@cloudflare/workers-types": "^5.20261001.1",
     "typescript": "^6.0.3"
   },
   "engines": {
