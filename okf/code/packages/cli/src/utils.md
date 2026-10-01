@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "packages/cli/src/utils"
-description: "packages/cli/src/utils contains completion.test.ts, completion.ts, error-handler.test.ts, and 26 more files."
+description: "packages/cli/src/utils contains async.test.ts, async.ts, completion.test.ts, and 30 more files."
 resource: "packages/cli/src/utils"
 tags: [cli, code, packages, utils]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-01T17:59:04Z
 sources:
   - id: tree
     resource: "packages/cli/src/utils"
@@ -18,8 +18,12 @@ okf_lock: generated
 
 # Files
 
+* `async.test.ts`
+* `async.ts` — mapPool
 * `completion.test.ts`
 * `completion.ts` — Suggestion, getCmdPath, suggestNextCommand
+* `env-file.test.ts`
+* `env-file.ts` — formatEnvValue, parseEnvFile, serializeEnvLine
 * `error-handler.test.ts`
 * `error-handler.ts` — CommandResult, suggestForCommand, withErrorHandling
 * `errors.test.ts`

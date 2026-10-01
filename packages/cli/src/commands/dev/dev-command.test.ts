@@ -379,17 +379,19 @@ describe("registerDevCommand", () => {
 
   describe("dev dashboard", () => {
     it("handles missing dashboard directory", async () => {
-      // Override Bun.file for this test to say dashboard doesn't exist
-      (Bun as unknown as unknown as Record<string, unknown>).file = mock(
-        (_p: string) => ({
-          exists: mock(async () => false),
-        })
-      );
+      // Stub the fs shim used by the dashboard action (node:fs based —
+      // Bun.file is not consulted by the implementation)
+      const mod = await import("./dev-command.js");
+      const origExists = mod.fsUtils.existsSync;
+      mod.fsUtils.existsSync = mock(() => false);
+      try {
+        const program = await createProgram();
+        await program.parseAsync(["dev", "dashboard"], { from: "user" });
 
-      const program = await createProgram();
-      await program.parseAsync(["dev", "dashboard"], { from: "user" });
-
-      expect(process.exitCode).toBe(2); // INVALID_USAGE
+        expect(process.exitCode).toBe(2); // INVALID_USAGE
+      } finally {
+        mod.fsUtils.existsSync = origExists;
+      }
     });
   });
 

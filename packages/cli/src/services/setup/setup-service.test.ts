@@ -4,6 +4,9 @@
  */
 
 import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { SetupService } from "./setup-service.js";
 import type { ProgressEvent } from "./setup-service.js";
 
@@ -61,6 +64,29 @@ describe("SetupService", () => {
       // Either null (no disk keys) or a full GeneratedKeys object — never partial.
       if (result !== null) {
         expect(typeof result.INTERNAL_KEY_BINDING).toBe("string");
+      }
+    });
+  });
+
+  describe("generateKeys .keys collision", () => {
+    it("throws an actionable error when .keys exists as a file", async () => {
+      const dir = mkdtempSync(join(tmpdir(), "hoox-keys-"));
+      const origCwd = process.cwd();
+      writeFileSync(join(dir, ".keys"), "not a directory\n");
+      process.chdir(dir);
+      try {
+        const svc = new SetupService();
+        let thrown: unknown = null;
+        try {
+          await svc.generateKeys(false);
+        } catch (err) {
+          thrown = err;
+        }
+        expect(thrown).toBeInstanceOf(Error);
+        expect(String((thrown as Error).message)).toMatch(/not a directory/);
+      } finally {
+        process.chdir(origCwd);
+        rmSync(dir, { recursive: true, force: true });
       }
     });
   });

@@ -563,10 +563,41 @@ export class CloudflareService {
    * the monorepo root meta-wrangler as config.
    */
   private resolveWorkerDirForSecrets(workerName: string): string {
-    const dirName = WORKER_FS_DIR[workerName] ?? workerName;
+    const normalized = workerName.trim();
+    if (!normalized || normalized.includes("\0")) {
+      throw new Error(`Invalid worker name: ${JSON.stringify(workerName)}`);
+    }
+    // Reject absolute paths and parent traversal — secret ops must stay
+    // inside the monorepo workers tree (or the configured home workers dir).
+    // Bare logical names (no slash) can never escape via path.join.
+    if (path.isAbsolute(normalized) || normalized.split("/").includes("..")) {
+      throw new Error(
+        `Invalid worker name (path traversal rejected): ${JSON.stringify(workerName)}`
+      );
+    }
+    let dirName: string;
+    if (normalized.includes("/")) {
+      // Only the explicit `workers/<dir>` shape is accepted for paths.
+      const parts = normalized.split("/");
+      if (
+        parts.length !== 2 ||
+        parts[0] !== "workers" ||
+        !/^[A-Za-z0-9_.-]+$/.test(parts[1] ?? "")
+      ) {
+        throw new Error(
+          `Invalid worker path (expected "workers/<name>"): ${JSON.stringify(workerName)}`
+        );
+      }
+      dirName = parts[1] as string;
+    } else {
+      if (!/^[A-Za-z0-9_-]+$/.test(normalized)) {
+        throw new Error(`Invalid worker name: ${JSON.stringify(workerName)}`);
+      }
+      dirName = WORKER_FS_DIR[normalized] ?? normalized;
+    }
     // Accept either logical name or path like workers/trade-worker
-    const relative = workerName.includes("/")
-      ? workerName
+    const relative = normalized.includes("/")
+      ? `workers/${dirName}`
       : path.join("workers", dirName);
     return this.resolveWorkerPath(relative);
   }

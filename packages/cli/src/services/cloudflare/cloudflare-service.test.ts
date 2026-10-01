@@ -803,6 +803,23 @@ describe("CloudflareService", () => {
         "my-worker",
       ]);
     });
+
+    it("secretPut rejects path traversal in worker names", async () => {
+      const service = new CloudflareService();
+      for (const evil of [
+        "workers/../../etc",
+        "../outside",
+        "/absolute/path",
+        "workers/a/b",
+        "",
+        "bad name!",
+        "workers/",
+      ]) {
+        const put = await service.secretPut(evil, "K", "v");
+        expect(put.ok).toBe(false);
+        if (!put.ok) expect(put.error).toMatch(/Invalid worker/);
+      }
+    });
   });
 
   // -- zonesList ------------------------------------------------------------

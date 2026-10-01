@@ -11,6 +11,8 @@
  * for version checking.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { PrerequisitesService } from "../prerequisites/index.js";
 import { theme } from "../../utils/theme.js";
 import { confirm } from "@clack/prompts";
@@ -20,6 +22,58 @@ export interface UpdateResult {
   previousVersion?: string;
   newVersion?: string;
   error?: string;
+}
+
+/**
+ * Where `bun update wrangler` must run to take effect.
+ * - Inside the HOOX monorepo → run project-local `bun update wrangler`
+ *   at the monorepo root (walks up from cwd).
+ * - Anywhere else (global install) → `bun add -g wrangler@latest`.
+ *   Running `bun update` in an arbitrary user directory would either fail
+ *   or mutate an unrelated project, so the global path is explicit.
+ */
+export interface UpdatePlan {
+  mode: "project" | "global";
+  /** Directory to run the update command in. */
+  cwd: string;
+}
+
+/** Max ancestor levels to scan when looking for the monorepo root. */
+const MONOREPO_SCAN_DEPTH = 5;
+
+/**
+ * Resolve how wrangler should be updated from `startDir`.
+ * Exported for unit tests (real filesystem, tmp dirs).
+ */
+export function resolveUpdatePlan(startDir: string): UpdatePlan {
+  let dir = startDir;
+  for (let i = 0; i <= MONOREPO_SCAN_DEPTH; i++) {
+    try {
+      // package.json files are tiny; sync read keeps this usable anywhere.
+      const text = readFileSync(`${dir}/package.json`, "utf-8");
+      const pkg = JSON.parse(text) as { name?: string };
+      if (pkg.name === "hoox") {
+        return { mode: "project", cwd: dir };
+      }
+    } catch {
+      // Missing/unreadable/invalid package.json — keep walking up.
+    }
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return { mode: "global", cwd: startDir };
+}
+
+/** Command + cwd for an {@link UpdatePlan}. Exported for unit tests. */
+export function buildUpdateCommand(plan: UpdatePlan): {
+  cmd: string[];
+  cwd: string;
+} {
+  if (plan.mode === "project") {
+    return { cmd: ["bun", "update", "wrangler"], cwd: plan.cwd };
+  }
+  return { cmd: ["bun", "add", "-g", "wrangler@latest"], cwd: plan.cwd };
 }
 
 export class UpdateService {
@@ -45,8 +99,10 @@ export class UpdateService {
     this.updateRunner =
       updateRunner ??
       (async () => {
-        const proc = Bun.spawn(["bun", "update", "wrangler"], {
-          cwd: this.cwd,
+        const plan = resolveUpdatePlan(this.cwd);
+        const { cmd, cwd } = buildUpdateCommand(plan);
+        const proc = Bun.spawn(cmd, {
+          cwd,
           stdout: "ignore",
           stderr: "pipe",
         });
@@ -193,7 +249,8 @@ export class UpdateService {
   }
 
   /**
-   * Run `bun update wrangler` in the project root and verify the result.
+   * Run the wrangler update for the resolved plan (project-local inside the
+   * monorepo, global `bun add -g` otherwise) and verify the result.
    */
   private async runUpdate(previousVersion?: string): Promise<UpdateResult> {
     process.stdout.write(`  ${theme.info("i")} Updating wrangler...\n`);

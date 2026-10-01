@@ -28,6 +28,13 @@ import {
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 
+/**
+ * Injectable filesystem shim for the dashboard presence check.
+ * Uses node:fs (Bun.file().exists() is unreliable for directories).
+ * Exported so tests can stub it without touching process-wide node:fs.
+ */
+export const fsUtils = { existsSync, statSync };
+
 // ---------------------------------------------------------------------------
 // Command registration
 // ---------------------------------------------------------------------------
@@ -388,8 +395,8 @@ EXAMPLES:
           );
           // Bun.file().exists() is unreliable for directories — use fs.stat
           if (
-            !existsSync(dashboardPath) ||
-            !statSync(dashboardPath).isDirectory()
+            !fsUtils.existsSync(dashboardPath) ||
+            !fsUtils.statSync(dashboardPath).isDirectory()
           ) {
             formatError(
               new CLIError(

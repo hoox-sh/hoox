@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-01T17:59:04Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/update"
@@ -20,8 +20,8 @@ okf_lock: generated
 
 * `index.ts` — UpdateResult, UpdateService
 * `update-service.test.ts`
-* `update-service.ts` — UpdateResult, UpdateService
+* `update-service.ts` — UpdatePlan, UpdateResult, UpdateService, buildUpdateCommand, resolveUpdatePlan
 
 # Packages
 
-`@clack/prompts`, `bun:test`
+`@clack/prompts`, `bun:test`, `node:fs`, `node:os`, `node:path`

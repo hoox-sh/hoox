@@ -33,6 +33,7 @@ import { runRichTasks, type RichTaskResult } from "../../utils/rich.js";
 import { ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 import { isGitTracked, gitUntrackFile } from "../../utils/git.js";
+import { mapPool } from "../../utils/async.js";
 import type { FormatOptions } from "../../utils/formatters.js";
 import type {
   CheckResult,
@@ -206,8 +207,16 @@ async function runConfigChecks(
 async function runInfraChecks(cf: CloudflareService): Promise<CheckCategory> {
   const checks: CheckResult[] = [];
 
+  // D1 / KV / R2 / Queues listings are independent — run them together
+  // instead of four sequential `wrangler` subprocess startups.
+  const [d1Result, kvResult, r2Result, queueResult] = await Promise.all([
+    cf.d1List(),
+    cf.kvList(),
+    cf.r2List(),
+    cf.queueList(),
+  ]);
+
   // D1 databases
-  const d1Result = await cf.d1List();
   checks.push({
     name: "D1 Databases",
     success: d1Result.ok,
@@ -218,7 +227,6 @@ async function runInfraChecks(cf: CloudflareService): Promise<CheckCategory> {
   });
 
   // KV namespaces
-  const kvResult = await cf.kvList();
   checks.push({
     name: "KV Namespaces",
     success: kvResult.ok,
@@ -229,7 +237,6 @@ async function runInfraChecks(cf: CloudflareService): Promise<CheckCategory> {
   });
 
   // R2 buckets
-  const r2Result = await cf.r2List();
   checks.push({
     name: "R2 Buckets",
     success: r2Result.ok,
@@ -238,7 +245,6 @@ async function runInfraChecks(cf: CloudflareService): Promise<CheckCategory> {
   });
 
   // Queues
-  const queueResult = await cf.queueList();
   checks.push({
     name: "Queues",
     success: queueResult.ok,
@@ -289,8 +295,11 @@ async function runSecretsChecks(
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  for (const workerName of enabledWorkers) {
-    const result = await secretsService.checkLocalSecrets(workerName);
+  const localResults = await mapPool(enabledWorkers, 8, async (workerName) => ({
+    workerName,
+    result: await secretsService.checkLocalSecrets(workerName),
+  }));
+  for (const { workerName, result } of localResults) {
     if (result.missing.length > 0) {
       errors.push(
         `Worker "${workerName}" missing secrets: ${result.missing.join(", ")}. ` +
@@ -318,13 +327,19 @@ async function runSecretsChecks(
   });
 
   // Check remote secrets via CloudflareService — compare declared names.
+  // Per-worker `wrangler secret list` spawns run with bounded concurrency:
+  // sequential execution costs ~1 subprocess startup per worker (10+ workers).
   const remoteErrors: string[] = [];
   const remoteWarnings: string[] = [];
-  for (const workerName of enabledWorkers) {
+  const remoteTargets = enabledWorkers.filter(
+    (w) => secretsService.listSecrets(w).length > 0
+  );
+  const remoteResults = await mapPool(remoteTargets, 4, async (workerName) => {
     const expected = secretsService.listSecrets(workerName);
-    if (expected.length === 0) continue;
-
     const result = await cf.secretList(workerName);
+    return { workerName, expected, result };
+  });
+  for (const { workerName, expected, result } of remoteResults) {
     if (!result.ok) {
       remoteErrors.push(`Worker "${workerName}": ${result.error}`);
       continue;

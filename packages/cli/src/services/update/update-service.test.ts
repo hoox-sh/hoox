@@ -4,8 +4,15 @@
  */
 
 import { afterEach, describe, expect, it, mock, spyOn } from "bun:test";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import * as clack from "@clack/prompts";
-import { UpdateService } from "./update-service.js";
+import {
+  UpdateService,
+  resolveUpdatePlan,
+  buildUpdateCommand,
+} from "./update-service.js";
 
 function createMockPrereqs(
   overrides?: Partial<{
@@ -321,6 +328,67 @@ describe("UpdateService", () => {
       } finally {
         (Bun as unknown as Record<string, unknown>).spawn = realSpawn;
       }
+    });
+  });
+
+  describe("resolveUpdatePlan", () => {
+    const temps: string[] = [];
+    afterEach(() => {
+      for (const t of temps.splice(0)) {
+        try {
+          rmSync(t, { recursive: true, force: true });
+        } catch {
+          /* ignore */
+        }
+      }
+    });
+
+    it("resolves project mode at the monorepo root", () => {
+      const root = mkdtempSync(join(tmpdir(), "hoox-upd-"));
+      temps.push(root);
+      writeFileSync(
+        join(root, "package.json"),
+        JSON.stringify({ name: "hoox" })
+      );
+      expect(resolveUpdatePlan(root)).toEqual({ mode: "project", cwd: root });
+      expect(buildUpdateCommand(resolveUpdatePlan(root))).toEqual({
+        cmd: ["bun", "update", "wrangler"],
+        cwd: root,
+      });
+    });
+
+    it("walks up from a nested worker dir to the monorepo root", () => {
+      const root = mkdtempSync(join(tmpdir(), "hoox-upd-"));
+      temps.push(root);
+      const nested = join(root, "workers", "trade-worker");
+      mkdirSync(nested, { recursive: true });
+      writeFileSync(
+        join(root, "package.json"),
+        JSON.stringify({ name: "hoox" })
+      );
+      writeFileSync(
+        join(nested, "package.json"),
+        JSON.stringify({ name: "trade-worker" })
+      );
+      expect(resolveUpdatePlan(nested)).toEqual({
+        mode: "project",
+        cwd: root,
+      });
+    });
+
+    it("resolves global mode outside the monorepo", () => {
+      const outside = mkdtempSync(join(tmpdir(), "hoox-upd-"));
+      temps.push(outside);
+      writeFileSync(
+        join(outside, "package.json"),
+        JSON.stringify({ name: "some-user-project" })
+      );
+      const plan = resolveUpdatePlan(outside);
+      expect(plan.mode).toBe("global");
+      expect(buildUpdateCommand(plan)).toEqual({
+        cmd: ["bun", "add", "-g", "wrangler@latest"],
+        cwd: outside,
+      });
     });
   });
 });
