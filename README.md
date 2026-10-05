@@ -16,7 +16,7 @@ HOOX is a production-grade, open-source algorithmic trading stack. Signals are v
 [![CI](https://img.shields.io/github/actions/workflow/status/hoox-sh/hoox/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/hoox-sh/hoox/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/hoox-sh/hoox/graph/badge.svg)](https://codecov.io/gh/hoox-sh/hoox)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9%2B-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-1.4-000000?style=flat-square&logo=bun&logoColor=white)](https://bun.sh)
+[![Bun](https://img.shields.io/badge/Bun-1.2+-000000?style=flat-square&logo=bun&logoColor=white)](https://bun.sh)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-edge-f38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![npm](https://img.shields.io/npm/v/@hoox-sh/hoox-cli?style=flat-square&logo=npm&logoColor=white&label=npm%20CLI)](https://www.npmjs.com/package/@hoox-sh/hoox-cli)
 [![License](https://img.shields.io/badge/license-Apache--2.0_%2B_CC--BY--4.0-6b7280?style=flat-square)](LICENSE-CODE)
@@ -186,16 +186,28 @@ The primary operator interface. Running `hoox` with no arguments launches the in
 | Command                         | Purpose                                        |
 | ------------------------------- | ---------------------------------------------- |
 | `hoox onboard`                  | Recommended bootstrap (init + setup)           |
+| `hoox init`                     | Interactive setup wizard for the workspace     |
+| `hoox clone --all`              | Clone worker repos as git submodules           |
 | `hoox deploy all --auto`        | Workers + dashboard + wiring                   |
 | `hoox dev start`                | Local native or Docker                         |
 | `hoox check health`             | Post-deploy verification                       |
-| `hoox monitor trades`           | Live trade stream                              |
+| `hoox config` / `hoox secrets`  | Configuration and Worker secrets management    |
+| `hoox keys`                     | Manage internal auth keys (mesh)               |
+| `hoox db`                       | Database management (D1)                       |
+| `hoox test`                     | Run tests and CI pipeline                      |
+| `hoox monitor trades`           | Live trade stream (`logs` for worker logs)     |
 | `hoox perf fastpath run --n 50` | Latency probes                                 |
 | `hoox trace events`             | Workers observability                          |
+| `hoox pyne`                     | PYNE edge evaluate worker commands             |
+| `hoox workers`                  | Worker management facade                       |
+| `hoox waf`                      | Cloudflare WAF management                      |
+| `hoox agent`                    | Agent health checks                            |
 | `hoox repair check`             | Diagnose and fix                               |
 | `hoox doctor`                   | Paths, TUI entry, operator security hygiene    |
 | `hoox tunnel check`             | Private ingress helpers (cloudflared + Access) |
 | `hoox update`                   | Pull repo/submodule updates or update wrangler |
+| `hoox tui`                      | OpenTUI terminal operations center             |
+| `hoox disclaimer`               | Legal disclaimers and trademark information    |
 | `hoox completion`               | bash / zsh / fish                              |
 
 Full reference: [CLI docs](https://docs.hoox.sh/docs/enduser/reference/cli-commands) · [packages/cli/README.md](packages/cli/README.md) · [hoox.sh/cli](https://hoox.sh/cli)
