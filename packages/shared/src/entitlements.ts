@@ -24,7 +24,8 @@ export type EntitlementScope =
   | "signal"
   | "pyne:run"
   | "agent:chat"
-  | "axis:stream";
+  | "axis:stream"
+  | "axis:run";
 
 /**
  * Tenant context enriched with commercial entitlement data.
