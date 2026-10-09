@@ -241,6 +241,13 @@ export type {
   CliErrorDetails,
 } from "./types";
 
+// ── Entitlements (verify-prep, no enforcement) ──────────────────────────
+// Open thin types for the commercial verifyTenant hook (hx_live_…).
+// Pure helpers only — no fetch, no KV, no Stripe. Self-host unaffected.
+
+export type { EntitledContext, EntitlementScope } from "./entitlements";
+export { hasScope, verifyCacheKey } from "./entitlements";
+
 // ── Path Resolution Service ────────────────────────────────────────────
 
 export {
