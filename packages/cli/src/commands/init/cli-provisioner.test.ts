@@ -235,5 +235,126 @@ describe("CLIProvisioner", () => {
       expect(result.errors).toEqual([]);
       expect(spawnCalls.length).toBe(0);
     });
+
+    it("creates Vectorize indexes on successful wrangler exits", async () => {
+      spawnQueue.push(spawnResult(0, "Created index\n"));
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["hoox-rag-index"],
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.created).toEqual(["Vectorize:hoox-rag-index"]);
+      expect(result.errors).toEqual([]);
+      expect(spawnCalls[0]).toEqual([
+        "wrangler",
+        "vectorize",
+        "create",
+        "hoox-rag-index",
+        "--dimensions",
+        "768",
+        "--metric",
+        "cosine",
+      ]);
+    });
+
+    it("records Vectorize failure when wrangler exits non-zero", async () => {
+      spawnQueue.push(spawnResult(1, "", "index quota exceeded"));
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["bad-index"],
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.created).toEqual([]);
+      expect(result.errors).toContain(
+        "Vectorize:bad-index — index quota exceeded"
+      );
+    });
+
+    it("treats already-exists Vectorize output as created", async () => {
+      spawnQueue.push(spawnResult(1, "", "Index already exists"));
+      spawnQueue.push(spawnResult(1, "", "duplicate index name"));
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["idx-a", "idx-b"],
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.created).toEqual([
+        "Vectorize:idx-a (exists)",
+        "Vectorize:idx-b (exists)",
+      ]);
+      expect(result.errors).toEqual([]);
+    });
+
+    it("falls back to exit code when Vectorize stderr is empty", async () => {
+      spawnQueue.push(spawnResult(2, "", "  "));
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["idx-x"],
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.errors).toContain("Vectorize:idx-x — exit code 2");
+    });
+
+    it("captures thrown errors from Bun.spawn for Vectorize", async () => {
+      (Bun as Record<string, unknown>).spawn = mock(() => {
+        throw new Error("spawn ENOENT");
+      });
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: [],
+        kvNamespaces: [],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["idx-throw"],
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.created).toEqual([]);
+      expect(result.errors).toEqual(["Vectorize:idx-throw — spawn ENOENT"]);
+    });
+
+    it("provisions D1, KV, and Vectorize together in order", async () => {
+      spawnQueue.push(spawnResult(0));
+      spawnQueue.push(spawnResult(0));
+      spawnQueue.push(spawnResult(0));
+
+      const provisioner = new CLIProvisioner();
+      const result = await provisioner.provision({
+        d1Databases: ["db-a"],
+        kvNamespaces: ["kv-a"],
+        r2Buckets: [],
+        queues: [],
+        vectorizeIndexes: ["idx-a"],
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.created).toEqual(["D1:db-a", "KV:kv-a", "Vectorize:idx-a"]);
+      expect(spawnCalls.length).toBe(3);
+    });
   });
 });

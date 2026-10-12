@@ -151,6 +151,18 @@ describe("SecretsService", () => {
     });
   });
 
+  describe("getWorkerPath", () => {
+    it("returns the filesystem path for a known worker", async () => {
+      const svc = await createService();
+      expect(svc.getWorkerPath("trade-worker")).toBe("workers/trade-worker");
+    });
+
+    it("returns null for an unknown worker", async () => {
+      const svc = await createService();
+      expect(svc.getWorkerPath("nonexistent")).toBeNull();
+    });
+  });
+
   // -- listAllSecrets -------------------------------------------------------
 
   describe("listAllSecrets", () => {
@@ -591,6 +603,166 @@ describe("SecretsService", () => {
       const svc = await createService();
       const result = await svc.syncToCloudflare("unknown-worker");
       expect(expectErr(result)).toContain("not found in config");
+    });
+
+    describe("execWranglerSecretPut / execWranglerSecretDelete (spawn)", () => {
+      const writeWorkerConfig = (dir: string, name?: string) => {
+        writeFileSync(
+          join(dir, "wrangler.jsonc"),
+          JSON.stringify(name ? { name } : {})
+        );
+      };
+
+      /** Stubs Bun.spawn with a fake proc; caller must restore(). */
+      const mockSpawn = (exitCode: number, stderrText = "") => {
+        const writes: string[] = [];
+        const calls: Array<{ args: string[]; opts: any }> = [];
+        const stdin = {
+          write: mock(async (chunk: string) => {
+            writes.push(chunk);
+          }),
+          end: mock(async () => {}),
+        };
+        const stderr = new ReadableStream({
+          start(controller) {
+            if (stderrText) {
+              controller.enqueue(new TextEncoder().encode(stderrText));
+            }
+            controller.close();
+          },
+        });
+        const originalSpawn = Bun.spawn;
+        (Bun as any).spawn = mock((args: string[], opts: any) => {
+          calls.push({ args, opts });
+          return { stdin, exited: Promise.resolve(exitCode), stderr };
+        });
+        return {
+          writes,
+          calls,
+          restore: () => {
+            (Bun as any).spawn = originalSpawn;
+          },
+        };
+      };
+
+      it("put writes the secret value to stdin with -c/--name", async () => {
+        const dir = tmpDir();
+        const spawn = mockSpawn(0);
+        try {
+          writeWorkerConfig(dir, "deploy-name");
+          const svc = await createService();
+          await (svc as any).execWranglerSecretPut(
+            dir,
+            "MY_SECRET",
+            "s3cr3t",
+            "logical-name"
+          );
+          expect(spawn.calls).toHaveLength(1);
+          const { args, opts } = spawn.calls[0]!;
+          expect(args.slice(0, 4)).toEqual([
+            "wrangler",
+            "secret",
+            "put",
+            "MY_SECRET",
+          ]);
+          expect(args).toContain("-c");
+          expect(args).toContain(join(dir, "wrangler.jsonc"));
+          // Deploy name from wrangler.jsonc wins over the logical name
+          expect(args.slice(-2)).toEqual(["--name", "deploy-name"]);
+          expect(opts.cwd).toBe(dir);
+          expect(spawn.writes).toEqual(["s3cr3t\n"]);
+        } finally {
+          spawn.restore();
+          rmSync(dir, { recursive: true, force: true });
+        }
+      });
+
+      it("put falls back to the logical worker name without a deploy name", async () => {
+        const dir = tmpDir();
+        const spawn = mockSpawn(0);
+        try {
+          writeWorkerConfig(dir);
+          const svc = await createService();
+          await (svc as any).execWranglerSecretPut(
+            dir,
+            "MY_SECRET",
+            "s3cr3t",
+            "logical-name"
+          );
+          expect(spawn.calls[0]!.args.slice(-2)).toEqual([
+            "--name",
+            "logical-name",
+          ]);
+        } finally {
+          spawn.restore();
+          rmSync(dir, { recursive: true, force: true });
+        }
+      });
+
+      it("put throws a sanitized error on non-zero exit", async () => {
+        const dir = tmpDir();
+        const spawn = mockSpawn(1, "something went wrong");
+        try {
+          writeWorkerConfig(dir, "deploy-name");
+          const svc = await createService();
+          const err = await (svc as any)
+            .execWranglerSecretPut(dir, "MY_SECRET", "s3cr3t")
+            .catch((e: unknown) => e);
+          expect(err).toBeInstanceOf(Error);
+          expect((err as Error).message).toContain(
+            "wrangler secret put failed (exit 1)"
+          );
+        } finally {
+          spawn.restore();
+          rmSync(dir, { recursive: true, force: true });
+        }
+      });
+
+      it("delete answers the confirmation prompt and passes delete args", async () => {
+        const dir = tmpDir();
+        const spawn = mockSpawn(0);
+        try {
+          writeWorkerConfig(dir, "deploy-name");
+          const svc = await createService();
+          await (svc as any).execWranglerSecretDelete(
+            dir,
+            "MY_SECRET",
+            "logical-name"
+          );
+          expect(spawn.calls).toHaveLength(1);
+          const { args } = spawn.calls[0]!;
+          expect(args.slice(0, 4)).toEqual([
+            "wrangler",
+            "secret",
+            "delete",
+            "MY_SECRET",
+          ]);
+          expect(args.slice(-2)).toEqual(["--name", "deploy-name"]);
+          expect(spawn.writes).toEqual(["y\n"]);
+        } finally {
+          spawn.restore();
+          rmSync(dir, { recursive: true, force: true });
+        }
+      });
+
+      it("delete throws a sanitized error on non-zero exit", async () => {
+        const dir = tmpDir();
+        const spawn = mockSpawn(1, "no such secret");
+        try {
+          writeWorkerConfig(dir, "deploy-name");
+          const svc = await createService();
+          const err = await (svc as any)
+            .execWranglerSecretDelete(dir, "MY_SECRET")
+            .catch((e: unknown) => e);
+          expect(err).toBeInstanceOf(Error);
+          expect((err as Error).message).toContain(
+            "wrangler secret delete failed (exit 1)"
+          );
+        } finally {
+          spawn.restore();
+          rmSync(dir, { recursive: true, force: true });
+        }
+      });
     });
 
     it("handles wrangler failures gracefully", async () => {

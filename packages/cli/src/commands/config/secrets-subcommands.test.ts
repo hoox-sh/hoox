@@ -543,6 +543,364 @@ describe("registerSecretsSubcommands", () => {
         exitCode === ExitCode.INVALID_USAGE || stdout.includes("not declared")
       ).toBe(true);
     });
+
+    function mockStdinChunks(chunks: string[]): void {
+      const encoded = chunks.map((c) => new TextEncoder().encode(c));
+      spyOn(Bun.stdin, "stream").mockReturnValue(
+        encoded as unknown as ReturnType<typeof Bun.stdin.stream>
+      );
+    }
+
+    function makeWorkerDir(prefix: string): {
+      dir: string;
+      workerPath: string;
+    } {
+      const dir = mkdtempSync(join(tmpdir(), prefix));
+      const workerPath = join(dir, "workers", "trade-worker");
+      mkdirSync(workerPath, { recursive: true });
+      return { dir, workerPath };
+    }
+
+    function setStdinTTY(value: boolean): () => void {
+      const hadOwn = Object.prototype.hasOwnProperty.call(
+        process.stdin,
+        "isTTY"
+      );
+      const prev = (process.stdin as unknown as { isTTY?: boolean }).isTTY;
+      Object.defineProperty(process.stdin, "isTTY", {
+        value,
+        configurable: true,
+      });
+      return () => {
+        if (hadOwn) {
+          Object.defineProperty(process.stdin, "isTTY", {
+            value: prev,
+            configurable: true,
+          });
+        } else {
+          delete (process.stdin as unknown as { isTTY?: boolean }).isTTY;
+        }
+      };
+    }
+
+    it("writes .dev.vars and reports successful Cloudflare sync", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-ok-");
+      try {
+        mockStdinChunks(["supersecret\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["API_KEY"],
+              items: [{ name: "API_KEY", status: "synced" }],
+            }),
+          }),
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(stdout).toContain('Secret "API_KEY" updated in');
+        expect(stdout).toMatch(/synced to Cloudflare/i);
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "API_KEY=supersecret"
+        );
+        expect(exitCode).toBe(0);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects an empty secret value", async () => {
+      mockStdinChunks(["\n"]);
+      mockService({
+        listSecrets: () => ["API_KEY"],
+        getWorkerPath: () => "workers/trade-worker",
+      });
+      const { stdout, exitCode } = await run([
+        "secrets",
+        "set",
+        "trade-worker",
+        "API_KEY",
+      ]);
+      expect(exitCode).toBe(ExitCode.INVALID_USAGE);
+      expect(stdout).toContain("cannot be empty");
+    });
+
+    it("reports Cloudflare sync failure (Result.ok false)", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-syncfail-");
+      try {
+        mockStdinChunks(["s3cr3t\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async () => ({ ok: false, error: "auth failed" }),
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(ExitCode.ERROR);
+        expect(stdout).toContain("Sync failed");
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("reports a failed put for the secret", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-putfail-");
+      try {
+        mockStdinChunks(["s3cr3t\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              ok: false,
+              synced: [],
+              failed: [
+                { name: "API_KEY", status: "failed", reason: "put denied" },
+              ],
+              items: [
+                { name: "API_KEY", status: "failed", reason: "put denied" },
+              ],
+            }),
+          }),
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(ExitCode.ERROR);
+        expect(stdout).toContain('Failed to put secret "API_KEY"');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("notes locally-written value when Cloudflare put is skipped", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-skipped-");
+      try {
+        mockStdinChunks(["s3cr3t\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              ok: true,
+              synced: ["OTHER"],
+              items: [{ name: "OTHER", status: "synced" }],
+            }),
+          }),
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(stdout).toContain("written locally");
+        expect(exitCode).toBe(0);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("allows any secret when the worker declares none", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-any-");
+      try {
+        mockStdinChunks(["anything\n"]);
+        mockService({
+          listSecrets: () => [],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["CUSTOM"],
+              items: [{ name: "CUSTOM", status: "synced" }],
+            }),
+          }),
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "CUSTOM",
+        ]);
+        expect(stdout).toContain('Secret "CUSTOM" updated in');
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "CUSTOM=anything"
+        );
+        expect(exitCode).toBe(0);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("reads multi-chunk non-TTY stdin (readLine accumulation)", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-chunks-");
+      try {
+        mockStdinChunks(["par", "tial\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["API_KEY"],
+              items: [{ name: "API_KEY", status: "synced" }],
+            }),
+          }),
+        });
+        const { exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(0);
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "API_KEY=partial"
+        );
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("reads TTY masked input across chunks", async () => {
+      const restoreTTY = setStdinTTY(true);
+      const { dir, workerPath } = makeWorkerDir("hoox-set-tty-");
+      try {
+        mockStdinChunks(["sec", "ret\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["API_KEY"],
+              items: [{ name: "API_KEY", status: "synced" }],
+            }),
+          }),
+        });
+        const { exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(0);
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "API_KEY=secret"
+        );
+      } finally {
+        restoreTTY();
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("handles TTY backspace editing", async () => {
+      const restoreTTY = setStdinTTY(true);
+      const { dir, workerPath } = makeWorkerDir("hoox-set-bs-");
+      try {
+        mockStdinChunks(["ab\x7fc\n"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["API_KEY"],
+              items: [{ name: "API_KEY", status: "synced" }],
+            }),
+          }),
+        });
+        const { exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(0);
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "API_KEY=ac"
+        );
+      } finally {
+        restoreTTY();
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("cancels on TTY Ctrl-C", async () => {
+      const restoreTTY = setStdinTTY(true);
+      try {
+        mockStdinChunks(["ab\x03"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => "workers/trade-worker",
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(ExitCode.INVALID_USAGE);
+        expect(stdout).toMatch(/cancelled/i);
+      } finally {
+        restoreTTY();
+      }
+    });
+
+    it("returns TTY input at end of stream without newline", async () => {
+      const restoreTTY = setStdinTTY(true);
+      const { dir, workerPath } = makeWorkerDir("hoox-set-tty-eof-");
+      try {
+        mockStdinChunks(["ab"]);
+        mockService({
+          listSecrets: () => ["API_KEY"],
+          getWorkerPath: () => workerPath,
+          syncToCloudflare: async (w) => ({
+            ok: true,
+            value: okSync({
+              worker: w,
+              synced: ["API_KEY"],
+              items: [{ name: "API_KEY", status: "synced" }],
+            }),
+          }),
+        });
+        const { exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "API_KEY",
+        ]);
+        expect(exitCode).toBe(0);
+        expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
+          "API_KEY=ab"
+        );
+      } finally {
+        restoreTTY();
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
   });
 
   describe("delete", () => {
