@@ -68,8 +68,15 @@ export async function trackAnalytics(
     } catch {
       tenantId = null;
     }
+    // Drop caller-supplied tenant keys so only the env-derived tenant is
+    // ever attributed. Otherwise an untrusted body could spoof analytics
+    // rows when the flag is off (or shadow the env tenant under the
+    // camelCase alias when on).
+    const rest: Record<string, unknown> = { ...body };
+    delete rest.tenant_id;
+    delete rest.tenantId;
     const payload = {
-      ...body,
+      ...rest,
       ...(tenantId ? { tenant_id: tenantId } : {}),
       ...(options?.indexes ? { indexes: [...options.indexes] } : {}),
     };

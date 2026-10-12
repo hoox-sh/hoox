@@ -45,4 +45,43 @@ describe("trackAnalytics indexes option", () => {
     >;
     expect(body.indexes).toBeUndefined();
   });
+
+  it("drops caller-supplied tenant keys when flag is off", async () => {
+    const env = {
+      ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+    };
+    await trackAnalytics(env, "/track/api-call", {
+      foo: "bar",
+      tenant_id: "spoofed",
+      tenantId: "spoofed",
+    });
+    const req = fetchMock.mock.calls[0]?.[0] as Request;
+    const body = (await new Response(req.body).json()) as Record<
+      string,
+      unknown
+    >;
+    expect(body.foo).toBe("bar");
+    expect("tenant_id" in body).toBe(false);
+    expect("tenantId" in body).toBe(false);
+  });
+
+  it("env tenant wins over caller-supplied tenant keys", async () => {
+    const env = {
+      ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+      TENANT_MODE: "true",
+      TENANT_ID: "acme",
+    };
+    await trackAnalytics(env, "/track/api-call", {
+      foo: "bar",
+      tenant_id: "spoofed",
+      tenantId: "spoofed",
+    });
+    const req = fetchMock.mock.calls[0]?.[0] as Request;
+    const body = (await new Response(req.body).json()) as Record<
+      string,
+      unknown
+    >;
+    expect(body.tenant_id).toBe("acme");
+    expect("tenantId" in body).toBe(false);
+  });
 });

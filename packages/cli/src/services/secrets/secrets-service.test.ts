@@ -385,6 +385,43 @@ describe("SecretsService", () => {
       }
     });
 
+    it("retries via delete when wrangler reports already in use", async () => {
+      const dir = tmpDir();
+      try {
+        writeFileSync(
+          join(dir, ".dev.vars"),
+          "TG_BOT_TOKEN_BINDING=my-real-token\n"
+        );
+
+        const svc = await createService();
+
+        (svc as any).config.workers["telegram-worker"].path = dir;
+
+        let puts = 0;
+        (svc as any).execWranglerSecretPut = mock(async () => {
+          puts++;
+          if (puts === 1) {
+            throw new Error("secret already in use by another worker");
+          }
+        });
+        const deleted: string[] = [];
+        (svc as any).execWranglerSecretDelete = mock(
+          async (_path: string, name: string) => {
+            deleted.push(name);
+          }
+        );
+
+        const result = await svc.syncToCloudflare("telegram-worker");
+        const sync = expectOk(result);
+        expect(sync.ok).toBe(true);
+        expect(sync.synced).toEqual(["TG_BOT_TOKEN_BINDING"]);
+        expect(deleted).toEqual(["TG_BOT_TOKEN_BINDING"]);
+        expect(puts).toBe(2);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
     it("skips secrets that are placeholder values", async () => {
       const dir = tmpDir();
       try {

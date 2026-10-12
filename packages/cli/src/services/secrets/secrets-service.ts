@@ -477,7 +477,13 @@ export class SecretsService {
     }
   }
 
-  /** Runs `wrangler secret delete <name>` for a worker. */
+  /**
+   * Runs `wrangler secret delete <name>` for a worker.
+   *
+   * Wrangler prompts for confirmation (`Are you sure? (y/n)`); piping `y`
+   * answers it in non-interactive runs. A bare EOF (just ending stdin)
+   * aborts the delete, which would break the already-in-use retry path.
+   */
   private async execWranglerSecretDelete(
     workerPath: string,
     name: string,
@@ -499,6 +505,7 @@ export class SecretsService {
       stderr: "pipe",
     });
 
+    await proc.stdin.write("y\n");
     await proc.stdin.end();
 
     const exitCode = await proc.exited;
