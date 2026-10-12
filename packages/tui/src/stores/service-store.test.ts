@@ -769,13 +769,16 @@ describe("useServiceStore", () => {
   // ── Ring Buffer Limits ────────────────────────────────────────────────────
 
   describe("ring buffer limits", () => {
+    // NOTE: each push through the immer-backed store costs a few ms, so
+    // these bulk-fill loops get explicit timeouts instead of bun's 5s
+    // default (they time out on loaded machines otherwise).
     it("caps trade stream at 500 entries", () => {
       const store = useServiceStore.getState();
       for (let i = 0; i < 600; i++) {
         store.pushTrade(makeTrade({ id: `t${i}` }));
       }
       expect(useServiceStore.getState().tradeStream).toHaveLength(500);
-    });
+    }, 30000);
 
     it("trade stream keeps newest entries when exceeding cap", () => {
       const store = useServiceStore.getState();
@@ -788,7 +791,7 @@ describe("useServiceStore", () => {
       expect(stream).toHaveLength(500);
       // "first" should be dropped
       expect(stream.find((t) => t.id === "first")).toBeUndefined();
-    });
+    }, 30000);
 
     it("caps alerts at 100 entries", () => {
       for (let i = 0; i < 150; i++) {
@@ -818,7 +821,7 @@ describe("useServiceStore", () => {
         useServiceStore.getState().pushLog(makeLog({ id: `l${i}` }));
       }
       expect(useServiceStore.getState().logs).toHaveLength(1000);
-    });
+    }, 30000);
 
     it("logs buffer keeps newest entries when exceeding cap", () => {
       useServiceStore.getState().pushLog(makeLog({ id: "first-log" }));
@@ -828,7 +831,7 @@ describe("useServiceStore", () => {
       expect(
         useServiceStore.getState().logs.find((l) => l.id === "first-log")
       ).toBeUndefined();
-    });
+    }, 30000);
 
     it("trade stream preserves order (FIFO)", () => {
       const store = useServiceStore.getState();

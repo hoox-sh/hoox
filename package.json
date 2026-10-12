@@ -9,7 +9,7 @@
     "packages/test-utils"
   ],
   "scripts": {
-    "test": "bun run scripts/test-with-table.ts --isolate --path-ignore-patterns 'tests/live/**'",
+    "test": "bun run scripts/test-with-table.ts --isolate --path-ignore-patterns 'tests/live/**' --path-ignore-patterns 'packages/tui/**' && bun run test:tui",
     "test:live": "bun run scripts/test-with-table.ts tests/live/ --jobs 1",
     "test:cli": "bun run scripts/test-with-table.ts --isolate packages/cli/",
     "test:tui": "bun run scripts/test-with-table.ts --preload ./packages/tui/src/test-setup.ts packages/tui/",

@@ -26,6 +26,21 @@ import {
   HOOX_DIR_MODE,
 } from "../src/config";
 
+/**
+ * Snapshot of the real node:fs, taken before any mock.module("node:fs")
+ * registration below. Bun's mock.restore() cannot undo mock.module, so the
+ * mocked-fs describe re-registers this snapshot in afterAll to avoid
+ * poisoning later test files in the same process (they would otherwise see
+ * no-op writeFileSync / mkdirSync and empty reads).
+ *
+ * NOTE: this must be a spread snapshot evaluated NOW, not a bare namespace
+ * reference. Module namespaces resolve live: once node:fs is mocked, even a
+ * previously captured namespace reads back mock values, so re-registering
+ * the namespace (or spreading it lazily in the afterAll factory) would just
+ * perpetuate the mock.
+ */
+const realFsSnapshot = { ...(await import("node:fs")) };
+
 describe("validateConfig", () => {
   test("returns empty array for valid config", () => {
     const errors = validateConfig({
@@ -119,10 +134,16 @@ describe("readConfigSync", () => {
   });
 
   afterEach(() => {
-    if (ORIGINAL_API_URL !== undefined)
+    if (ORIGINAL_API_URL !== undefined) {
       process.env.HOOX_API_URL = ORIGINAL_API_URL;
-    if (ORIGINAL_API_TOKEN !== undefined)
+    } else {
+      delete process.env.HOOX_API_URL;
+    }
+    if (ORIGINAL_API_TOKEN !== undefined) {
       process.env.HOOX_API_TOKEN = ORIGINAL_API_TOKEN;
+    } else {
+      delete process.env.HOOX_API_TOKEN;
+    }
   });
 
   test("returns default config when config file does not exist", () => {
@@ -161,8 +182,18 @@ describe("readConfigSync / write with mocked fs (file paths)", () => {
   });
 
   afterEach(() => {
-    process.env.HOOX_API_URL = ORIGINAL_ENV.HOOX_API_URL;
-    process.env.HOOX_API_TOKEN = ORIGINAL_ENV.HOOX_API_TOKEN;
+    // Restore or delete: assigning undefined would leave the literal string
+    // "undefined" in process.env for later test files.
+    if (ORIGINAL_ENV.HOOX_API_URL !== undefined) {
+      process.env.HOOX_API_URL = ORIGINAL_ENV.HOOX_API_URL;
+    } else {
+      delete process.env.HOOX_API_URL;
+    }
+    if (ORIGINAL_ENV.HOOX_API_TOKEN !== undefined) {
+      process.env.HOOX_API_TOKEN = ORIGINAL_ENV.HOOX_API_TOKEN;
+    } else {
+      delete process.env.HOOX_API_TOKEN;
+    }
   });
 
   test("reads and merges config from existing file (via mock.module)", async () => {
@@ -273,8 +304,11 @@ describe("readConfigSync / write with mocked fs (file paths)", () => {
   });
 
   afterAll(() => {
-    // Avoid leaking mock.module("node:fs") into other test files in the same process.
-    mock.restore();
+    // mock.restore() cannot undo mock.module("node:fs"): re-register the
+    // snapshot so later test files in the same process get real fs.
+    // Without this, suites doing real file IO (tmp .dev.vars, wrangler
+    // configs, mkdir) silently see no-op writes and fail.
+    mock.module("node:fs", () => realFsSnapshot);
   });
 });
 
