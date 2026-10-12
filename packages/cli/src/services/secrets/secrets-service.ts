@@ -365,12 +365,7 @@ export class SecretsService {
       try {
         const value = existingValues.get(secret) ?? keysFallback.get(secret);
         if (value !== undefined && !this.isPlaceholder(value)) {
-          await this.execWranglerSecretPut(
-            worker.path,
-            secret,
-            value,
-            workerName
-          );
+          await this.handleAlreadyInUse(worker.path, secret, value, workerName);
           synced.push(secret);
           items.push({ name: secret, status: "synced" });
         } else {
@@ -449,6 +444,71 @@ export class SecretsService {
       map.set(key, value);
     }
     return map;
+  }
+
+  /** Handles "already in use" error by deleting then recreating the secret. */
+  private async handleAlreadyInUse(
+    workerPath: string,
+    name: string,
+    value: string,
+    logicalWorkerName?: string
+  ): Promise<void> {
+    try {
+      await this.execWranglerSecretPut(
+        workerPath,
+        name,
+        value,
+        logicalWorkerName
+      );
+      return;
+    } catch (err: unknown) {
+      const raw = err instanceof Error ? err.message : String(err);
+      if (!/already in use/i.test(raw)) {
+        throw err;
+      }
+      // Secret already exists — delete it first, then recreate
+      await this.execWranglerSecretDelete(workerPath, name, logicalWorkerName);
+      await this.execWranglerSecretPut(
+        workerPath,
+        name,
+        value,
+        logicalWorkerName
+      );
+    }
+  }
+
+  /** Runs `wrangler secret delete <name>` for a worker. */
+  private async execWranglerSecretDelete(
+    workerPath: string,
+    name: string,
+    logicalWorkerName?: string
+  ): Promise<void> {
+    const { configPath, deployName } =
+      await resolveWorkerWranglerConfig(workerPath);
+    const workerName = deployName ?? logicalWorkerName ?? null;
+
+    const args = ["wrangler", "secret", "delete", name, "-c", configPath];
+    if (workerName) {
+      args.push("--name", workerName);
+    }
+
+    const proc = Bun.spawn(args, {
+      cwd: resolvePath(workerPath),
+      stdin: "pipe",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    await proc.stdin.end();
+
+    const exitCode = await proc.exited;
+    if (exitCode !== 0) {
+      const stderrText = await new Response(proc.stderr).text();
+      const cleaned = sanitizeWranglerOutput(stderrText);
+      throw new Error(
+        `wrangler secret delete failed (exit ${exitCode}): ${cleaned}`
+      );
+    }
   }
 
   /** Returns `true` when a value looks like an unfilled template. */

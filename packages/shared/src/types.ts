@@ -32,6 +32,12 @@ export const WebhookPayloadSchema = z
      * (if the exchange supports it). Live trading is the default.
      */
     test: z.boolean().optional(),
+    /**
+     * Opt-in tenant attribution for platform deployments (direct service
+     * path). Absent on self-host. Scoped by the receiver into KV/DO keys —
+     * never trusted for auth.
+     */
+    tenantId: z.string().min(1).max(64).optional(),
   })
   .strict();
 
@@ -52,6 +58,12 @@ export const TradeQueueMessageSchema = z
      * When present, trade-worker queue dedupe prefers this over requestId.
      */
     idempotencyKey: z.string().min(1).max(512).optional(),
+    /**
+     * Opt-in tenant attribution for platform deployments (Workers for
+     * Platforms shared queue/consumer path). Absent on self-host.
+     * Scoped by the consumer into KV/DO keys — never trusted for auth.
+     */
+    tenantId: z.string().min(1).max(64).optional(),
     queuedAt: z.string().min(1).max(64),
   })
   .strict();
@@ -472,10 +484,7 @@ export interface SystemMetrics {
 
 /** Connection status for the TUI data-fetching state machine. */
 export type ConnectionStatus =
-  | "connected"
-  | "polling"
-  | "offline"
-  | "reconnecting";
+  "connected" | "polling" | "offline" | "reconnecting";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 

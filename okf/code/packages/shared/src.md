@@ -7,7 +7,7 @@ tags: [code, packages, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-12T12:29:26Z
 sources:
   - id: tree
     resource: "packages/shared/src"
@@ -28,6 +28,7 @@ okf_lock: generated
 * `cron-handler.ts` — CronHandlerOptions, createCronHandler
 * `dashboard-manifest.test.ts`
 * `dashboard-manifest.ts` — DASHBOARD_FIELD_KV_OVERRIDES, DASHBOARD_SECTIONS_NOT_FLAT_KV, DASHBOARD_SECTIONS_UI_SKIP, DASHBOARD_SECTION_PREFIX, DASHBOARD_WORKER_IDS, DASHBOARD_WORKER_PREFIX, DashboardFieldKind, DashboardFieldOption, DashboardFieldType, DashboardKvManifest, DashboardKvManifestKey, DashboardSection
+* `entitlements.ts` — EntitledContext, EntitlementScope, hasScope, verifyCacheKey
 * `errors.ts` — AppError, Errors, createErrorResponse, createJsonResponse, createSuccessResponse, toError
 * `exchange-client.ts` — BaseExchangeClient, ClientCreateOptions, ExchangeConfig, ExchangeName, ExchangeRouter, IExchangeProvider, OrderResponse, Position, TradeParams
 * `format-time.ts` — formatDuration, formatRelativeTime
@@ -47,6 +48,8 @@ okf_lock: generated
 * `service-bindings.ts` — AuthenticatedServiceEnv, D1_READ_AUTH_KEY_FIELDS, D1_WRITE_AUTH_KEY_FIELDS, DASHBOARD_D1_READ_AUTH_KEY_FIELDS, DASHBOARD_TELEGRAM_ALERT_AUTH_KEY_FIELDS, DASHBOARD_TRADE_EXECUTE_AUTH_KEY_FIELDS, InternalAuthKeyFields, ServiceAuthError, ServiceBinding, TELEGRAM_ALERT_AUTH_KEY_FIELDS, TRADE_EXECUTE_AUTH_KEY_FIELDS, TRADE_READ_AUTH_KEY_FIELDS
 * `session.ts` — SessionState, restoreSession, saveSession
 * `sse.ts` — SSECallback, SSEStatusCallback, SubscribeSSEOptions, subscribeSSE
+* `tenant.test.ts`
+* `tenant.ts` — TenantEnv, TenantScope, effectiveTenantId, isTenantFlagOn, isTenantMode, scopeKey, scopeR2Key, tenantContextOf, tenantScope, withTenantId
 * `test-utils.ts` — MockAi, MockAnalyticsEngine, MockAnalyticsEngineDataset, MockD1Database, MockD1PreparedStatement, MockExecutionContext, MockFetcher, MockKVNamespace, MockQueue, MockR2Bucket, MockSecretsStore, MockVectorizeIndex
 * `types.ts` — Alert, AlertSeverity, ApiErrorResponse, ApiResponse, ApiSuccessResponse, AuditEvent, BalanceSchema, BaseEnv, BatchPayload, CliErrorDetails, CliErrorType, ConnectionStatus
 

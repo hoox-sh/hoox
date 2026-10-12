@@ -62,6 +62,17 @@ export type {
 } from "./types";
 export { KVKeys } from "./kvKeys";
 export {
+  effectiveTenantId,
+  isTenantFlagOn,
+  isTenantMode,
+  scopeKey,
+  scopeR2Key,
+  tenantContextOf,
+  tenantScope,
+  withTenantId,
+} from "./tenant";
+export type { TenantEnv, TenantScope } from "./tenant";
+export {
   KILL_SWITCH_KEYS,
   KILL_SWITCH_ACTIVE_PREFIX,
   isTruthyKillSwitchFlag,

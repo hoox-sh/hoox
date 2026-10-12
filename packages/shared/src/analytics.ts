@@ -8,6 +8,8 @@
  * Centralizes the trackAnalytics helper used across all workers
  */
 
+import { effectiveTenantId } from "./tenant";
+
 /**
  * Environment with optional analytics service binding.
  * Workers that support analytics tracking should extend this type.
@@ -24,6 +26,9 @@
  */
 export interface AnalyticsEnv {
   ANALYTICS_SERVICE?: Fetcher;
+  /** Opt-in tenant isolation (see tenant.ts). Absent = self-host default. */
+  TENANT_ID?: string;
+  TENANT_MODE?: string;
 }
 
 /**
@@ -55,8 +60,17 @@ export async function trackAnalytics(
 ): Promise<void> {
   if (!env.ANALYTICS_SERVICE) return;
   try {
+    // Opt-in tenant tag for platform deployments. Lenient by design:
+    // analytics stays lossy-safe and this function never throws.
+    let tenantId: string | null = null;
+    try {
+      tenantId = effectiveTenantId(env);
+    } catch {
+      tenantId = null;
+    }
     const payload = {
       ...body,
+      ...(tenantId ? { tenant_id: tenantId } : {}),
       ...(options?.indexes ? { indexes: [...options.indexes] } : {}),
     };
     const headers: Record<string, string> = {
