@@ -50,7 +50,7 @@ flowchart TB
 | Local Alerts panel webhook | Your URL. Not certified as a trade path |
 | PYNE Agent plugin | Writes scripts; optional validate via `/run` |
 
-AXIS Worker (`pynescript-axis`, `pynescript-axis.cryptolinx.workers.dev`) is **not** the HOOX `pyne-worker` isolate.
+The AXIS Worker (`worker-axis`, `https://worker.axis.hoox.sh`) is **not** the HOOX `pyne-worker` isolate.
 
 Full engine table: [AXIS evaluation map](https://hoox.sh/axis/docs/architecture/evaluation).
 
@@ -91,7 +91,7 @@ Install the PYNE Agent component plugin, generate a script, evaluate on Flask, t
 | --- | --- | --- |
 | Great backtest, flat account | No trade hop | Deploy pyne-worker forwarding |
 | 503 `NO_BACKEND` in AXIS | AXIS Worker has no `EXTERNAL_BACKEND` | Set it, or use Pyodide / Flask |
-| Confused two Worker URLs | `pynescript-axis` vs `pyne-worker` | Check the hostname |
+| Confused two Worker URLs | `worker.axis.hoox.sh` vs `pyne-worker` | Check the hostname |
 | Discord alert, no fill | Alert webhook ≠ `TRADE_SERVICE` | Expected |
 
 ## See also
