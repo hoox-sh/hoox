@@ -11,6 +11,13 @@ published dependency of the CLI and the TUI.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **npm no longer refuses to run in this repo (`EOVERRIDE`).** The root `package.json` declared `@cloudflare/workers-types` as a devDependency at `^5.20261001.1` while `overrides` pinned it to `^5.20260708.1`. npm rejects an override that contradicts a direct dependency, which left `npm pack` and `npm install` both dead. Removed the override; the single-version guarantee it existed to provide is already enforced by all 14 `package.json` files specifying the identical range. The `@radix-ui/react-slot` override is untouched — it is a transitive pin with no direct dependency to conflict with.
+- **Removed `brand/email-signatures`.** Unreferenced HTML email signature blocks. Nothing in source, docs, tests, or build referenced the path, so they were dead weight in the published npm tarball. The rest of `brand/` (fonts, png, svg, generators) is untouched.
+
 ## [0.14.0] - 2026-10-13
 
 Minor: DEX spot execution, opt-in tenant isolation across the mesh, and a first
