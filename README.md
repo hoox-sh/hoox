@@ -353,13 +353,11 @@ Everything under [github.com/hoox-sh](https://github.com/hoox-sh) — one open t
 | **analytics-worker**   | Analytics Engine fan-in — trades, signals, latency       | [hoox-sh/analytics-worker](https://github.com/hoox-sh/analytics-worker)     |
 | **report-worker**      | Browser Rendering PDFs → R2, cron delivery               | [hoox-sh/report-worker](https://github.com/hoox-sh/report-worker)           |
 | **dashboard**          | Next.js ops console (in the HOOX tree)                   | [hoox-sh/hoox](https://github.com/hoox-sh/hoox)                             |
-| **pine-worker**        | Pine evaluator → trade events (private)                  | [hoox-sh/pine-worker](https://github.com/hoox-sh/pine-worker)               |
+| **pine-worker**        | Pine evaluator → trade events (private)                  | private                                                                     |
 
 **Web**
 
-| Project               | Role                                                 | Repository                                                                |
-| --------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- |
-| **hoox-landing-page** | Marketing site source for [hoox.sh](https://hoox.sh) | [hoox-sh/hoox-landing-page](https://github.com/hoox-sh/hoox-landing-page) |
+[hoox.sh](https://hoox.sh) is a Next.js site. Its source is not published — there is no public repository to link to here.
 
 ## Ethos
 
