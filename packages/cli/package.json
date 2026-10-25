@@ -20,7 +20,7 @@
     "ansis": "^4.2.0",
     "commander": "^15.0.0",
     "jsonc-parser": "^3.3.1",
-    "wrangler": "^4.145.0"
+    "wrangler": "^4.152.0"
   },
   "optionalDependencies": {
     "@hoox-sh/hoox-tui": "workspace:*"
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@hoox-sh/hoox-shared": "workspace:*",
     "@types/node": "^26.6.3",
-    "bun-types": "^1.4.2",
+    "bun-types": "^1.4.4",
     "typescript": "^6.0.3"
   },
   "publishConfig": {

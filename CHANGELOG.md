@@ -13,9 +13,14 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+### Changed
+
+- **Wrangler 4.152.0** across the monorepo and worker submodules (`workerd` 1.20261019.1). Source maps upload on deploy by default from 4.150.0.
+- Dependency refresh: eslint 10.13, prettier 3.9.10, bun-types 1.4.4, Next.js 16.4, `@opennextjs/cloudflare` 1.20, plus lockfile updates within existing ranges. CI Bun pin is 1.4.3.
+
 ### Fixed
 
-- Pin `@cloudflare/workers-types` to `5.20261001.1`. A fresh install was resolving `5.20261025.1`, and that copy of `ExecutionContext` no longer matched the one `packages/shared` typechecks against.
+- Keep `@cloudflare/workers-types` on `5.20261001.1`. `5.20261025.1` still disagrees with bun-types on `ExecutionContext` (`Request.credentials` / `mapVirtualHost`). Wrangler 4.152 lists `^5.20261019.1` as an optional peer; the older types package remains the one that typechecks.
 
 ## [0.15.0] - 2026-10-25
 
