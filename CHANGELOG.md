@@ -16,6 +16,7 @@ published dependency of the CLI and the TUI.
 ### Changed
 
 - **Wrangler 4.152.0** across the monorepo and worker submodules (`workerd` 1.20261019.1). Source maps upload on deploy by default from 4.150.0.
+- Regenerated `worker-configuration.d.ts` in every TypeScript isolate (`bun run types:workers`). Env now matches wrangler.jsonc bindings (including `EXCHANGE_CONNECTION_MANAGER`, `BROWSER`, `EMAIL`, `PYNE_SERVICE`) plus catalog secrets. `.dev.vars` is ignored during typegen so a full-preset dump does not leak onto every worker.
 - Dependency refresh: eslint 10.13, prettier 3.9.10, bun-types 1.4.4, Next.js 16.4, `@opennextjs/cloudflare` 1.20, plus lockfile updates within existing ranges. CI Bun pin is 1.4.3.
 
 ### Fixed

@@ -7,7 +7,7 @@ tags: [code, packages, schemas, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T16:53:44Z
 sources:
   - id: tree
     resource: "packages/shared/src/schemas"
@@ -26,3 +26,7 @@ okf_lock: generated
 # Packages
 
 `jsonc-parser`
+
+# Used by
+
+* [scripts](/code/scripts.md)

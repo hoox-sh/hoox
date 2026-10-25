@@ -17,7 +17,7 @@ describe("dashboard config", () => {
   });
 
   test("uses fallback when SESSION_SECRET is missing", async () => {
-    delete process.env.SESSION_SECRET;
+    delete (process.env as { SESSION_SECRET?: string }).SESSION_SECRET;
 
     const mod = await import("../src/lib/config");
     expect(mod).toBeDefined();
@@ -89,7 +89,7 @@ describe("dashboard config", () => {
   });
 
   test("resolveTradingViewWebhookUrl derives from sibling worker URL", async () => {
-    delete process.env.HOOX_URL;
+    delete (process.env as { HOOX_URL?: string }).HOOX_URL;
     delete process.env.HOOX_GATEWAY_URL;
     process.env.D1_WORKER_URL = "https://d1-worker.myprefix.workers.dev";
 

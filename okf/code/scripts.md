@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "scripts"
-description: "scripts contains check-coverage.ts, check-script-paths.ts, check-worker-submodules.ts, and 7 more files."
+description: "scripts contains check-coverage.ts, check-script-paths.ts, check-worker-submodules.ts, and 8 more files."
 resource: "scripts"
 tags: [code, scripts]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T16:53:44Z
 sources:
   - id: tree
     resource: "scripts"
@@ -23,6 +23,7 @@ okf_lock: generated
 * `check-worker-submodules.ts`
 * `cloudflare-workers-shim.js`
 * `extract-graph.ts`
+* `generate-worker-types.ts`
 * `prepare-publish.ts`
 * `render-test-table.ts`
 * `sync-dashboard-configs.ts`
@@ -38,10 +39,11 @@ okf_lock: generated
 
 # Packages
 
-`child_process`, `cloudflare:workers`, `fs`, `node:fs`, `node:path`, `path`, `ts-morph`, `zod`
+`child_process`, `cloudflare:workers`, `fs`, `node:child_process`, `node:fs`, `node:path`, `path`, `ts-morph`, `zod`
 
 # Depends on
 
+* [packages/shared/src/schemas](/code/packages/shared/src/schemas.md)
 * [packages/test-utils/src](/code/packages/test-utils/src.md)
 
 # Nested

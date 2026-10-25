@@ -183,7 +183,7 @@ describe("Login API Route", () => {
 
   test("POST returns 200 immediately when AUTH_TYPE=none", async () => {
     process.env.AUTH_TYPE = "none";
-    delete process.env.SESSION_SECRET;
+    delete (process.env as { SESSION_SECRET?: string }).SESSION_SECRET;
 
     const request = new Request("http://localhost/api/auth/login", {
       method: "POST",
