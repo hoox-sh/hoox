@@ -61,7 +61,7 @@ hoox secrets set dashboard PYNE_API_KEY            # optional, match API_KEY
 | Method | Path | Auth | Description |
 | ------ | ---- | ---- | ----------- |
 | GET | `/health` | No | Health + feature flags |
-| POST | `/run` | Yes | Evaluate Pine (`mode` interpret \| compile \| auto) |
+| POST | `/run` | Yes | Evaluate Pine (`mode` interpret \| compile \| auto; `realtime_*` last-bar / `varip` ticks, engine ≥ 0.6.22) |
 | POST | `/ingest` | Yes | Upload OHLCV to R2 |
 | POST/GET/DELETE | `/scripts`… | Yes | Deployed script registry |
 | GET/PUT | `/cron/jobs` | Yes | Bar-close job config |
