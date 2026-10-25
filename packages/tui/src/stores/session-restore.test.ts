@@ -63,6 +63,7 @@ describe("session restore / save", () => {
     expect(session.activeView).toBe("dashboard");
     expect(session.sidebarExpanded).toBe(true);
     expect(session.lastData).toBe(0);
+    expect(session.fromDisk).toBe(false);
   });
 
   it("round-trips every ViewId (all 16)", async () => {
@@ -74,6 +75,7 @@ describe("session restore / save", () => {
       expect(restored.sidebarExpanded).toBe(true);
       expect(restored.windowSize).toEqual({ cols: 100, rows: 40 });
       expect(restored.lastData).toBe(12345);
+      expect(restored.fromDisk).toBe(true);
     }
   });
 

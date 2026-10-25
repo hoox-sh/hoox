@@ -284,24 +284,31 @@ export interface ProcessRequestBody<T = unknown> {
 // TUI / Dashboard display types (canonical definitions — see types.ts for re-exports)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Canonical TUI view identifiers in registry / sidebar order.
+ * Session restore, Settings, and the TUI registry all consume this list.
+ */
+export const VIEW_IDS = [
+  "dashboard",
+  "workers",
+  "worker-detail",
+  "trade-monitor",
+  "logs-viewer",
+  "service-manager",
+  "config-editor",
+  "setup-wizard",
+  "settings",
+  "queue-depth",
+  "kv-viewer",
+  "secrets-viewer",
+  "db-query",
+  "ai-chat",
+  "edge-topology",
+  "worker-settings",
+] as const;
+
 /** View identifier for TUI navigation. */
-export type ViewId =
-  | "dashboard"
-  | "workers"
-  | "worker-detail"
-  | "trade-monitor"
-  | "logs-viewer"
-  | "service-manager"
-  | "config-editor"
-  | "setup-wizard"
-  | "settings"
-  | "queue-depth"
-  | "kv-viewer"
-  | "secrets-viewer"
-  | "db-query"
-  | "ai-chat"
-  | "edge-topology"
-  | "worker-settings";
+export type ViewId = (typeof VIEW_IDS)[number];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Extension points for Open Core + Enterprise

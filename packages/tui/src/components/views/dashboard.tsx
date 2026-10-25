@@ -37,6 +37,7 @@ import { PyneHealthSection } from "./dashboard/pyne-health-section";
 import { AlertsPanel } from "./dashboard/alerts-panel";
 import { useUIStore } from "@hoox-sh/hoox-shared";
 import { useViewKeyboard } from "../../hooks/shell-overlay";
+import { usePolling } from "../../hooks/use-polling";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -71,41 +72,37 @@ function formatStatNumber(value: number, isPnl = false): string {
 
 /**
  * KillSwitchStatusBadge — Compact trade kill-switch indicator for the dashboard
- * header. Auto-refreshes on mount and shows the engaged/released state with a
- * color-coded status dot. Errors degrade gracefully (badge just shows UNKNOWN).
+ * header. Auto-refreshes on the Settings interval and shows the engaged/released
+ * state with a color-coded status dot. Errors degrade to UNKNOWN.
  */
-/** How often the dashboard kill-switch badge re-probes (ms). */
-const KILL_SWITCH_POLL_MS = 15_000;
-
 function KillSwitchStatusBadge() {
   const [state, setState] = useState<"engaged" | "released" | "unknown">(
     "unknown"
   );
-  useEffect(() => {
-    let cancelled = false;
-    const refresh = async () => {
-      try {
-        const result = await cliBridge.monitorKillSwitch("show");
-        if (cancelled) return;
-        if (result.success && result.data) {
-          setState(result.data.engaged ? "engaged" : "released");
-        } else {
-          setState("unknown");
-        }
-      } catch {
-        if (!cancelled) setState("unknown");
+  const genRef = useRef(0);
+
+  const refresh = useCallback(async () => {
+    const gen = ++genRef.current;
+    try {
+      const result = await cliBridge.monitorKillSwitch("show");
+      if (gen !== genRef.current) return;
+      if (result.success && result.data) {
+        setState(result.data.engaged ? "engaged" : "released");
+      } else {
+        setState("unknown");
       }
-    };
-    void refresh();
-    // Re-probe periodically so engage/release in Service Manager is visible here
-    const timer = setInterval(() => {
-      void refresh();
-    }, KILL_SWITCH_POLL_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
+    } catch {
+      if (gen === genRef.current) setState("unknown");
+    }
   }, []);
+
+  useEffect(
+    () => () => {
+      genRef.current += 1;
+    },
+    []
+  );
+  usePolling({ callback: refresh, immediate: true });
 
   const label =
     state === "engaged"

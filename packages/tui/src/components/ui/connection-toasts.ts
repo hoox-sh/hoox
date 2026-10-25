@@ -17,16 +17,19 @@ import { remoteAuthMissingHint } from "../../services/tui-connection";
 
 // ─── Pure message builders (testable without toast side effects) ─────────────
 
+/** Status-bar toast copy for a successful LOCAL/REMOTE connect. */
 export function messageConnected(mode: TuiMode, host: string): string {
   const label = mode === "remote" ? "REMOTE" : "LOCAL";
   return `Connected · ${label} · ${host}`;
 }
 
+/** Status-bar toast copy when the LOCAL/REMOTE session drops. */
 export function messageConnectionLost(mode: TuiMode, host: string): string {
   const label = mode === "remote" ? "REMOTE" : "LOCAL";
   return `Connection lost · ${label} · ${host}`;
 }
 
+/** Status-bar toast copy after a reconnect, including downtime. */
 export function messageReconnected(
   mode: TuiMode,
   host: string,
@@ -38,15 +41,18 @@ export function messageReconnected(
   return `Reconnected · ${label} · ${host} · ${duration} downtime`;
 }
 
+/** Status-bar toast copy when auth is rejected. */
 export function messageAuthRequired(mode: TuiMode, host: string): string {
   const label = mode === "remote" ? "REMOTE" : "LOCAL";
   return `Auth failed · ${label} · ${host}`;
 }
 
+/** Status-bar toast copy when remote mode has no API credentials. */
 export function messageAuthMissing(host: string): string {
   return `No API credentials · REMOTE · ${host}`;
 }
 
+/** Status-bar toast copy when the TUI starts without a live connection. */
 export function messageOfflineStartup(
   mode: TuiMode,
   host: string,

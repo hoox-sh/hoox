@@ -1055,12 +1055,11 @@ describe("CloudflareService", () => {
       expect(result.ok).toBe(true);
       expect(lastSpawnCmd).toEqual([
         "wrangler",
-        "versions",
         "rollback",
+        "ver-1",
         "--name",
         "trade-worker",
-        "--version-id",
-        "ver-1",
+        "--yes",
       ]);
     });
   });

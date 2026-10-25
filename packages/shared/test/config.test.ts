@@ -245,11 +245,7 @@ describe("readConfigSync / write with mocked fs (file paths)", () => {
     expect(cfg.apiUrl).toBe("http://localhost:8787"); // defaulted
   });
 
-  test("writeConfigSync ensures dir + writes file; catches errors", async () => {
-    const consoleSpy = mock(() => {});
-    const origConsole = console.error;
-    console.error = consoleSpy;
-
+  test("writeConfigSync ensures dir + writes file; rethrows I/O errors", async () => {
     const existsMock = mock(() => false);
     const mkdirMock = mock(() => {});
     const writeMock = mock(() => {
@@ -279,12 +275,9 @@ describe("readConfigSync / write with mocked fs (file paths)", () => {
       defaultView: "dashboard",
     } as any;
 
-    writeFresh(sample);
+    expect(() => writeFresh(sample)).toThrow("no space");
     expect(mkdirMock).toHaveBeenCalled();
     expect(writeMock).toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalled(); // error path covered
-
-    console.error = origConsole;
   });
 
   test("async readConfig and writeConfig work (delegation)", async () => {

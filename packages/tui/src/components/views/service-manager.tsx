@@ -939,6 +939,7 @@ export function ServiceManager({ dialog }: ServiceManagerProps) {
       }
       return;
     }
+    if (key.ctrl || key.alt || key.meta) return;
     // d → deploy selected · r → restart selected (lowercase)
     if (name === "d" && !key.shift) {
       if (selected) void handleDeploy(selected);

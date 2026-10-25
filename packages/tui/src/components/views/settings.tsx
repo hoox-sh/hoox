@@ -37,24 +37,22 @@ import { cliBridge as realCliBridge } from "../../services/cli-bridge";
 import { getSettingsConnectionSnapshot } from "../../services/tui-connection";
 import * as path from "path";
 import * as os from "os";
-import type { ViewId, NotificationPreferences } from "@hoox-sh/hoox-shared";
+import {
+  VIEW_IDS,
+  type ViewId,
+  type NotificationPreferences,
+} from "@hoox-sh/hoox-shared";
 import { useViewKeyboard } from "../../hooks/shell-overlay";
 
-/**
- * Prefer the process-wide CLI bridge test double when test-setup installed it
- * (`globalThis.__hooxCliBridgeDouble`). Resolved at call time so the double is
- * picked up even if this module evaluated before the preload finished.
- */
 function cliBridge(): typeof realCliBridge {
-  const g = globalThis as unknown as {
-    __hooxCliBridgeDouble?: typeof realCliBridge;
-  };
-  return g.__hooxCliBridgeDouble ?? realCliBridge;
+  return realCliBridge;
 }
 
 export interface SettingsViewProps {
   /** Dialog handle for destructive action confirmation. */
   dialog?: DialogHandle;
+  /** Test-only: run Check Setup once on mount. */
+  autoCheckSetup?: boolean;
 }
 
 // ─── Check Setup Types ────────────────────────────────────────────────────────
@@ -171,26 +169,6 @@ function formatRefreshRate(ms: number): string {
   if (ms >= 1000) return `${ms / 1000}s`;
   return `${ms}ms`;
 }
-
-/** ViewId options for the default view selector */
-const VIEW_OPTIONS: ViewId[] = [
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-];
 
 /** Human-readable labels for ViewId values */
 const VIEW_LABELS: Record<ViewId, string> = {
@@ -846,7 +824,10 @@ function CheckSetupResultsPanel({
  *
  * Wrapped in ErrorBoundary for crash recovery.
  */
-export function SettingsView({ dialog }: SettingsViewProps = {}) {
+export function SettingsView({
+  dialog,
+  autoCheckSetup = false,
+}: SettingsViewProps = {}) {
   const activeView = useUIStore((s) => s.activeView);
   const isActive = activeView === "settings";
 
@@ -909,7 +890,18 @@ export function SettingsView({ dialog }: SettingsViewProps = {}) {
     try {
       const cachePath = path.join(os.homedir(), ".hoox", "cache");
       const proc = Bun.spawn(["rm", "-rf", cachePath]);
-      await proc.exited;
+      const code = await proc.exited;
+      if (code !== 0) {
+        useServiceStore.getState().addAlert({
+          id: `cache-err-${Date.now()}`,
+          type: "config",
+          severity: "error",
+          message: `Cache clear failed (exit ${code})`,
+          timestamp: Date.now(),
+          acknowledged: false,
+        });
+        return;
+      }
       useServiceStore.getState().addAlert({
         id: `cache-${Date.now()}`,
         type: "config",
@@ -1259,22 +1251,12 @@ export function SettingsView({ dialog }: SettingsViewProps = {}) {
     });
   }, [confirmAction, resetDefaults]);
 
-  /**
-   * Test hook: when `globalThis.__hooxTestAutoCheckSetup` is set, the
-   * Check Setup check runs automatically once on mount. This lets the
-   * test suite populate the results panel without simulating mouse/keyboard
-   * events. Production code never sets this flag.
-   */
   useEffect(() => {
-    const g = globalThis as unknown as {
-      __hooxTestAutoCheckSetup?: boolean;
-    };
-    if (g.__hooxTestAutoCheckSetup) {
+    if (autoCheckSetup) {
       void handleCheckSetup();
     }
-    // Intentionally mount-only — tests set the flag then render, so
-    // re-running on state changes would cause duplicate checks.
-  }, []);
+    // Mount-only: tests pass autoCheckSetup then render once.
+  }, [autoCheckSetup]);
 
   /** Max items per panel */
   const maxItemsPerPanel = useMemo((): Record<number, number> => {
@@ -1310,9 +1292,11 @@ export function SettingsView({ dialog }: SettingsViewProps = {}) {
       return;
     }
 
-    // Tab: cycle panels
+    // Tab / Shift+Tab: cycle panels
     if (key.name === "tab") {
-      setActivePanel((p) => (p + 1) % PANEL_COUNT);
+      setActivePanel((p) =>
+        key.shift ? (p - 1 + PANEL_COUNT) % PANEL_COUNT : (p + 1) % PANEL_COUNT
+      );
       setActiveItem(0);
       return;
     }
@@ -1351,14 +1335,13 @@ export function SettingsView({ dialog }: SettingsViewProps = {}) {
           }
           case 1: {
             // Default view
-            const currentIdx = VIEW_OPTIONS.indexOf(defaultView);
+            const currentIdx = VIEW_IDS.indexOf(defaultView);
             if (key.name === "left") {
-              const prev =
-                (currentIdx - 1 + VIEW_OPTIONS.length) % VIEW_OPTIONS.length;
-              updateConfig({ defaultView: VIEW_OPTIONS[prev] });
+              const prev = (currentIdx - 1 + VIEW_IDS.length) % VIEW_IDS.length;
+              updateConfig({ defaultView: VIEW_IDS[prev] });
             } else if (key.name === "right") {
-              const next = (currentIdx + 1) % VIEW_OPTIONS.length;
-              updateConfig({ defaultView: VIEW_OPTIONS[next] });
+              const next = (currentIdx + 1) % VIEW_IDS.length;
+              updateConfig({ defaultView: VIEW_IDS[next] });
             }
             break;
           }

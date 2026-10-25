@@ -9,7 +9,7 @@
  *   - `hoox secrets …` (top-level alias, in-process — no PATH re-spawn)
  */
 import type { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 
 import {
   SecretsService,
@@ -27,7 +27,11 @@ import {
 } from "../../utils/formatters.js";
 import { theme, icons } from "../../utils/theme.js";
 import type { FormatOptions } from "../../utils/formatters.js";
-import { sanitizeWranglerOutput } from "../../utils/wrangler-output.js";
+import {
+  sanitizeWranglerOutput,
+  formatSecretFailureDetails,
+} from "../../utils/wrangler-output.js";
+import { serializeEnvLine } from "../../utils/env-file.js";
 
 /** Render a structured secret-sync result; set exitCode on failure. */
 export function reportSecretSync(
@@ -73,9 +77,13 @@ export function reportSecretSync(
   }
 
   const detailParts: string[] = [];
-  for (const f of result.failed) {
-    detailParts.push(`✗ ${f.name}: ${f.reason ?? "failed"}`);
-  }
+  const failedBlock = formatSecretFailureDetails(
+    result.failed.map((f) => ({
+      name: f.name,
+      reason: f.reason ?? "failed",
+    }))
+  );
+  if (failedBlock) detailParts.push(failedBlock);
   for (const s of result.skipped) {
     detailParts.push(`· ${s.name}: ${s.reason ?? "skipped"}`);
   }
@@ -183,7 +191,7 @@ export async function updateDevVars(
 
     for (const line of lines) {
       if (line.startsWith(`${key}=`)) {
-        updated.push(`${key}=${value}`);
+        updated.push(serializeEnvLine(key, value));
         found = true;
       } else {
         updated.push(line);
@@ -191,7 +199,7 @@ export async function updateDevVars(
     }
 
     if (!found) {
-      updated.push(`${key}=${value}`);
+      updated.push(serializeEnvLine(key, value));
     }
 
     while (updated.length > 0 && updated[updated.length - 1] === "") {
@@ -200,7 +208,7 @@ export async function updateDevVars(
 
     await Bun.write(filePath, updated.join("\n") + "\n");
   } else {
-    await Bun.write(filePath, `${key}=${value}\n`);
+    await Bun.write(filePath, `${serializeEnvLine(key, value)}\n`);
   }
   const { secureSecretFile } = await import("../../utils/fs-secure.js");
   secureSecretFile(filePath);
@@ -333,7 +341,7 @@ EXAMPLES:
             opts
           );
 
-          const syncSpin = spinner();
+          const syncSpin = createCliSpinner(opts);
           syncSpin.start("Syncing to Cloudflare...");
           const result = await svc.syncToCloudflare(workerName);
           if (!result.ok) {
@@ -515,7 +523,7 @@ EXAMPLES:
           const svc = await SecretsService.create();
 
           if (workerName) {
-            const syncSpin = spinner();
+            const syncSpin = createCliSpinner(opts);
             syncSpin.start(`Syncing ${scopeLabel} for "${workerName}"...`);
             const result = await svc.syncToCloudflare(workerName, syncOpts);
             if (!result.ok) {
@@ -557,7 +565,7 @@ EXAMPLES:
             let workersOk = 0;
             let workersFailed = 0;
             let totalSecrets = 0;
-            const syncSpin = spinner();
+            const syncSpin = createCliSpinner(opts);
             const failures: string[] = [];
 
             for (const name of workers) {

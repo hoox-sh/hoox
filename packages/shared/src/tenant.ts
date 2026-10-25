@@ -34,6 +34,7 @@ export interface TenantScope {
 
 const TENANT_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
+/** True when `TENANT_MODE` is the token `true` or `1`. */
 export function isTenantFlagOn(env: TenantEnv | undefined | null): boolean {
   const v = env?.TENANT_MODE;
   return v === "true" || v === "1";

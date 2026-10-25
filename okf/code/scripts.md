@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "scripts"
-description: "scripts contains check-coverage.ts, check-script-paths.ts, check-worker-submodules.ts, and 8 more files."
+description: "scripts contains changelog-notes.ts, check-coverage.ts, check-script-paths.ts, and 9 more files."
 resource: "scripts"
 tags: [code, scripts]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T16:53:44Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "scripts"
@@ -18,6 +18,7 @@ okf_lock: generated
 
 # Files
 
+* `changelog-notes.ts`
 * `check-coverage.ts`
 * `check-script-paths.ts`
 * `check-worker-submodules.ts`

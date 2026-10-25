@@ -155,6 +155,10 @@ export function authenticatedServiceFetch<E extends AuthenticatedServiceEnv>(
   });
 }
 
+/**
+ * Unauthenticated service-binding fetch. Callers that need mesh auth must
+ * use {@link authenticatedServiceFetch}, which injects `X-Internal-Auth-Key`.
+ */
 export function serviceFetch(
   binding: ServiceBinding,
   path: string,

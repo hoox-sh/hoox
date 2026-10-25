@@ -288,19 +288,18 @@ export class CloudflareService {
 
   /**
    * Rolls back a worker to a specific version
-   * (`wrangler versions rollback --name <worker> --version-id <id>`).
+   * (`wrangler rollback <version-id> --name <worker> --yes`).
    */
   async versionsRollback(
     workerName: string,
     versionId: string
   ): Promise<WranglerResult<string>> {
     return this.runWrangler([
-      "versions",
       "rollback",
+      versionId,
       "--name",
       workerName,
-      "--version-id",
-      versionId,
+      "--yes",
     ]);
   }
 
@@ -664,18 +663,35 @@ export class CloudflareService {
     }
   }
 
-  /** Deletes a secret from a worker (`wrangler secret delete <secretName> --name <workerName>`). */
+  /**
+   * Deletes a secret from a worker (`wrangler secret delete`).
+   * Always passes `-c <worker-config>` so wrangler does not pick up the
+   * monorepo root meta-config.
+   */
   async secretDelete(
     workerName: string,
     secretName: string
   ): Promise<WranglerResult<string>> {
-    return this.runWrangler([
-      "secret",
-      "delete",
-      secretName,
-      "--name",
-      workerName,
-    ]);
+    const fallback = ["secret", "delete", secretName, "--name", workerName];
+    try {
+      const workerPath = this.resolveWorkerDirForSecrets(workerName);
+      const { configPath, deployName } =
+        await resolveWorkerWranglerConfig(workerPath);
+      return this.runWrangler(
+        [
+          "secret",
+          "delete",
+          secretName,
+          "-c",
+          configPath,
+          "--name",
+          deployName ?? workerName,
+        ],
+        workerPath
+      );
+    } catch {
+      return this.runWrangler(fallback);
+    }
   }
 
   // ---------------------------------------------------------------------------

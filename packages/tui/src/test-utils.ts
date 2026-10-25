@@ -20,7 +20,7 @@
  */
 
 import type { ReactNode } from "react";
-import type { ViewId } from "@hoox-sh/hoox-shared";
+import { VIEW_IDS, type ViewId } from "@hoox-sh/hoox-shared";
 
 export {
   cliBridgeDouble,
@@ -43,35 +43,15 @@ export {
   sseSubscriptions,
 } from "./network-test-double";
 
-/** Canonical 16 ViewIds — keep aligned with types.ts + view-registry. */
-export const ALL_VIEW_IDS: ViewId[] = [
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-];
+/** Canonical ViewIds — same tuple as shared `VIEW_IDS`. */
+export const ALL_VIEW_IDS: readonly ViewId[] = VIEW_IDS;
 
 // ── Type Aliases ─────────────────────────────────────────────────────────────
 
 export type WorkerStatus = "operational" | "degraded" | "down";
 export type LogLevel = "debug" | "info" | "warn" | "error";
 export type ConnectionStatus =
-  | "connected"
-  | "polling"
-  | "offline"
-  | "reconnecting";
+  "connected" | "polling" | "offline" | "reconnecting";
 export type TradeSide = "buy" | "sell";
 
 export interface TestWorkerInfo {

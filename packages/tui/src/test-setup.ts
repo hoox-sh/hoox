@@ -157,10 +157,7 @@ installSpawnShim();
 //
 // Per-test overrides: import { cliBridgeDouble, resetCliBridgeDouble } from
 // "./cli-bridge-test-double" and use mockResolvedValue / mockImplementation.
-import {
-  cliBridgeDouble,
-  createCliBridgeModuleMock,
-} from "./cli-bridge-test-double";
+import { createCliBridgeModuleMock } from "./cli-bridge-test-double";
 
 const cliBridgeModule = await createCliBridgeModuleMock();
 
@@ -188,11 +185,6 @@ function installCliBridgeDouble(): void {
 }
 
 installCliBridgeDouble();
-
-// Expose for tests that need the double without importing the helper path
-(
-  globalThis as unknown as { __hooxCliBridgeDouble?: typeof cliBridgeDouble }
-).__hooxCliBridgeDouble = cliBridgeDouble;
 
 // ── Shared network doubles (api-client + SSE) ────────────────────────────────
 //

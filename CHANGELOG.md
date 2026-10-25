@@ -13,15 +13,47 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-25
+
+Minor: package audit of `shared`, `cli`, and `tui` — correctness, fail-closed setup, JSON-safe CLI output, and TUI Settings that actually drive the shell.
+
+### Added
+
+- Shared **`VIEW_IDS`** tuple is the single source for TUI view identifiers. Session restore, Settings, and the TUI registry consume it.
+- Session restore returns **`fromDisk`**. A missing file opens Settings `defaultView` instead of always dashboard.
+- CLI **`createCliSpinner`**: `--json` / `--quiet` never mix clack ANSI with machine stdout. Human non-TTY still prints `stop()` lines.
+
 ### Changed
 
 - **Wrangler 4.152.0** across the monorepo and worker submodules (`workerd` 1.20261019.1). Source maps upload on deploy by default from 4.150.0.
-- Regenerated `worker-configuration.d.ts` in every TypeScript isolate (`bun run types:workers`). Env now matches wrangler.jsonc bindings (including `EXCHANGE_CONNECTION_MANAGER`, `BROWSER`, `EMAIL`, `PYNE_SERVICE`) plus catalog secrets. `.dev.vars` is ignored during typegen so a full-preset dump does not leak onto every worker.
-- Dependency refresh: eslint 10.13, prettier 3.9.10, bun-types 1.4.4, Next.js 16.4, `@opennextjs/cloudflare` 1.20, plus lockfile updates within existing ranges. CI Bun pin is 1.4.3.
+- Regenerated `worker-configuration.d.ts` in every TypeScript isolate (`bun run types:workers`).
+- Dependency refresh: eslint 10.13, prettier 3.9.10, bun-types 1.4.4, Next.js 16.4, `@opennextjs/cloudflare` 1.20. CI Bun pin is 1.4.3.
+- Wizard LLM secrets are **`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY`**. `buildConfig` enables only selected base workers. Vectorize index is `my-rag-index`.
+- `hoox monitor kill-switch` reads and writes both `trade:kill_switch` and `global:kill_switch`. `--json` emits `{ engaged, keys }`.
+- TUI queue, KV, secrets, dashboard kill-switch, PYNE health, and model health poll on Settings **`refreshIntervalMs`**.
+- GitHub Releases use the matching **`CHANGELOG.md`** section (`scripts/changelog-notes.ts`). Auto-generated commit lists are off.
 
 ### Fixed
 
-- Keep `@cloudflare/workers-types` on `5.20261001.1`. `5.20261025.1` still disagrees with bun-types on `ExecutionContext` (`Request.credentials` / `mapVirtualHost`). Wrangler 4.152 lists `^5.20261019.1` as an optional peer; the older types package remains the one that typechecks.
+- Keep `@cloudflare/workers-types` on `5.20261001.1` (bun-types `ExecutionContext` clash on newer 5.20261025.1).
+- **Queue handler**: Cloudflare `attempts` is 1-based; retry index is `delivery-1`. Successful handlers and DLQ paths `ack()` so messages are not redelivered. Hook throws are isolated.
+- **SSE**: AbortController cancel, clean EOF reconnects, `data:` lines with an optional space.
+- JSONC parse reports errors; wrangler `queues` is one object; producer binding is `TRADE_QUEUE`.
+- `writeConfigSync` rethrows I/O errors. `hooxDir()` / `configPath()` honor `HOOX_HOME`. `isInsideDir` treats a trailing separator as inside.
+- Analytics skip without `INTERNAL_KEY_BINDING`. Rate-limit `checkKey` is windowed. Exchange GET sends the query string.
+- `wrangler rollback [version-id] --name --yes` (Wrangler 4.120+). WAF uses Rulesets (`http_request_firewall_custom`, `http_ratelimit`) plus `security_level`.
+- `ensureD1Database` fails closed. Check tables, repair rebuild, init deploy, and `hoox tui` child exit report failure when the process fails.
+- `createDevVars` writes only matching integration secrets. `config env --json` redacts secret values. Placeholder detection is one helper.
+- `secretDelete` falls back to `--name` when the worker wrangler path is missing.
+- TUI `configKvGet` unwraps `{key,value}`. Kill-switch display uses `isTruthyKillSwitchFlag`. Worker-settings hard-fails a bad `agent:config` get. Service Manager ignores ctrl/alt/meta. Settings Check Setup is a prop, not `globalThis`.
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.16.0  |
+| `@hoox-sh/hoox-tui`    | 0.4.0   |
+| `@hoox-sh/hoox-shared` | 1.6.0   |
 
 ## [0.15.0] - 2026-10-25
 
@@ -123,4 +155,6 @@ pass at entitlement scopes.
 Previous release. See the [GitHub release history](https://github.com/hoox-sh/hoox/releases)
 for the 0.13.x line.
 
+[0.16.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.16.0
+[0.15.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.15.0
 [0.14.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.14.0

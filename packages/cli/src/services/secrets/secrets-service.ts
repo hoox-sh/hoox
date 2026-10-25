@@ -6,6 +6,8 @@
 import { join, resolve as resolvePath } from "node:path";
 import { parse as parseJsonc } from "jsonc-parser";
 import { sanitizeWranglerOutput } from "../../utils/wrangler-output.js";
+import { parseEnvFile } from "../../utils/env-file.js";
+import { isPlaceholderValue } from "../../utils/placeholder.js";
 import type {
   Result,
   SecretCheckResult,
@@ -424,26 +426,7 @@ export class SecretsService {
    * Skips empty lines and comments (lines starting with `#`).
    */
   private parseDotEnv(content: string): Map<string, string> {
-    const map = new Map<string, string>();
-    for (const line of content.split("\n")) {
-      const trimmed = line.trim();
-      if (trimmed === "" || trimmed.startsWith("#")) continue;
-
-      const eqIdx = trimmed.indexOf("=");
-      if (eqIdx < 1) continue;
-
-      const key = trimmed.substring(0, eqIdx).trim();
-      let value = trimmed.substring(eqIdx + 1).trim();
-      // Match EnvService: strip surrounding quotes so secrets are not uploaded with quotes
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-      map.set(key, value);
-    }
-    return map;
+    return parseEnvFile(content);
   }
 
   /** Handles "already in use" error by deleting then recreating the secret. */
@@ -520,15 +503,7 @@ export class SecretsService {
 
   /** Returns `true` when a value looks like an unfilled template. */
   private isPlaceholder(value: string): boolean {
-    const v = value.trim();
-    return (
-      v === "" ||
-      v.startsWith("placeholder_") ||
-      v.startsWith("your_") ||
-      v.startsWith("generate_") ||
-      v.startsWith("<") ||
-      v.includes("generate-with")
-    );
+    return isPlaceholderValue(value);
   }
 
   /**

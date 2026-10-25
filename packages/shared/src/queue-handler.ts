@@ -112,36 +112,58 @@ export function createQueueHandler<T>(options: QueueHandlerOptions<T>) {
       : 1;
 
   async function processMessage(msg: Message<T>): Promise<void> {
-    const attemptNumber = msg.attempts || 0;
+    // Cloudflare Queues: first delivery is attempts = 1. Treat 0 as 1 so
+    // older mocks still index backoffDelays[0] on the first failure.
+    const delivery = Math.max(
+      1,
+      typeof msg.attempts === "number" && Number.isFinite(msg.attempts)
+        ? msg.attempts
+        : 1
+    );
+    const retryIndex = delivery - 1;
     const logId = `[${msg.id}]`;
 
     try {
-      logger?.info(
-        `${logId} Processing message (attempt ${attemptNumber + 1})`
-      );
-      await onMessage(msg.body, attemptNumber);
+      logger?.info(`${logId} Processing message (attempt ${delivery})`);
+      await onMessage(msg.body, retryIndex);
       logger?.info(`${logId} Message processed successfully`);
+      msg.ack();
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : String(error);
 
-      if (attemptNumber < maxRetries) {
+      if (retryIndex < maxRetries) {
         const delaySeconds =
-          backoffDelays[attemptNumber] ??
+          backoffDelays[retryIndex] ??
           backoffDelays[backoffDelays.length - 1] ??
           0;
 
         logger?.info(
-          `${logId} Retrying in ${delaySeconds}s (attempt ${attemptNumber + 2}/${maxRetries + 1})`
+          `${logId} Retrying in ${delaySeconds}s (attempt ${delivery + 1}/${maxRetries + 1})`
         );
 
-        await onRetry?.(msg.body, attemptNumber, errorMsg, delaySeconds);
+        try {
+          await onRetry?.(msg.body, retryIndex, errorMsg, delaySeconds);
+        } catch (hookError: unknown) {
+          logger?.error(
+            `${logId} onRetry failed: ${hookError instanceof Error ? hookError.message : String(hookError)}`
+          );
+        }
         msg.retry({ delaySeconds });
       } else {
         logger?.error(
           `${logId} Max retries exceeded (${maxRetries + 1} attempts), moving to DLQ`
         );
 
-        await onDLQ?.(msg.body, attemptNumber, errorMsg);
+        try {
+          await onDLQ?.(msg.body, retryIndex, errorMsg);
+        } catch (hookError: unknown) {
+          logger?.error(
+            `${logId} onDLQ failed: ${hookError instanceof Error ? hookError.message : String(hookError)}`
+          );
+        }
+        // Consume after the local DLQ hook so the platform does not
+        // redeliver, and so a hook throw cannot retry the whole batch.
+        msg.ack();
       }
     }
   }

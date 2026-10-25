@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/views"
@@ -29,13 +29,13 @@ okf_lock: generated
 * `edge-topology.test.tsx`
 * `edge-topology.tsx` — EdgeTopology, MAX_FLOWS_PREVIEW, resolveGraphMetadataPath
 * `kv-viewer.test.tsx`
-* `kv-viewer.tsx` — KvViewer, MAX_VISIBLE_KEYS, REFRESH_INTERVAL_MS, filterKvKeys, sanitizeKvValue
+* `kv-viewer.tsx` — KvViewer, MAX_VISIBLE_KEYS, filterKvKeys, sanitizeKvValue
 * `logs-viewer.test.tsx`
 * `logs-viewer.tsx` — LogsViewer, MAX_VISIBLE_LOGS, applyLogFilters, sanitizeLogText
 * `queue-depth.test.tsx`
-* `queue-depth.tsx` — QueueDepthView, REFRESH_INTERVAL_MS, sortQueuesByPressure
+* `queue-depth.tsx` — QueueDepthView, sortQueuesByPressure
 * `secrets-viewer.test.tsx`
-* `secrets-viewer.tsx` — MAX_VISIBLE_SECRETS, REFRESH_INTERVAL_MS, SecretsViewer, filterSecrets
+* `secrets-viewer.tsx` — MAX_VISIBLE_SECRETS, SecretsViewer, filterSecrets
 * `service-manager.test.tsx`
 * `service-manager.tsx` — ServiceManager, ServiceManagerProps
 * `settings.test.tsx`

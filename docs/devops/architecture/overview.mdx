@@ -8,7 +8,7 @@ title: "System Topology & Overview"
 description: "High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models."
 ---
 
-Hoox is a serverless algorithmic trading platform on **Cloudflare® Workers**. Version **0.15.0** splits the system into **11 compute surfaces**: 10 workers under `workers/*` plus the **dashboard** (Next.js 16 / OpenNext). **pyne-worker** is Python; the rest are TypeScript V8 isolates.
+Hoox is a serverless algorithmic trading platform on **Cloudflare® Workers**. Version **0.16.0** splits the system into **11 compute surfaces**: 10 workers under `workers/*` plus the **dashboard** (Next.js 16 / OpenNext). **pyne-worker** is Python; the rest are TypeScript V8 isolates.
 
 Most workers talk over **Service Bindings** (no public HTTP). Public ingress is the **hoox gateway** (`POST /webhook`, `GET /health`, operator `/v1/*` and `/wallet/*`) and the **dashboard**. **pyne-worker** is a tooling isolate: public evaluate/management routes use `API_KEY` (`X-API-Key`); live strategy forwards to **trade-worker** use mesh internal auth.
 

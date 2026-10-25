@@ -14,7 +14,7 @@
  *   live        — Run live Cloudflare service tests (no mocks)
  */
 import { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { ConfigService } from "../../services/config/index.js";
 import { theme, icons } from "../../utils/theme.js";
 import {
@@ -222,7 +222,7 @@ export function registerTestCommand(program: Command): void {
           const opts = { json: useJson, quiet: fmt.quiet };
 
           const results: TestStepResult[] = [];
-          const s = spinner();
+          const s = createCliSpinner(opts);
           const pipelineTimer = startTimer();
           s.start("Running CI pipeline...");
 
@@ -381,8 +381,9 @@ export function registerTestCommand(program: Command): void {
     )
     .action(
       withErrorHandling(
-        async (options: { service?: string }) => {
-          const s = spinner();
+        async (options: { service?: string }, cmd: Command) => {
+          const fmt = getFormatOptions(cmd);
+          const s = createCliSpinner(fmt);
           const liveTimer = startTimer();
 
           let filePattern = options.service

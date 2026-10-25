@@ -127,7 +127,7 @@ describe("WizardEngine", () => {
     const plan = engine.getProvisioningPlan();
     expect(plan.d1Databases).toContain("trade-data-db");
     expect(plan.kvNamespaces).toContain("CONFIG_KV");
-    expect(plan.vectorizeIndexes).toContain("hoox-rag-index");
+    expect(plan.vectorizeIndexes).toContain("my-rag-index");
   });
 
   it("loads from existing state", () => {
@@ -244,5 +244,40 @@ describe("WizardEngine", () => {
     expect(engine.getState().secrets.exchange?.EXCHANGE_KEY_BINDING).toBe(
       "key-value"
     );
+  });
+
+  it("minimal preset enables only selected base workers", () => {
+    const engine = new WizardEngine();
+    engine.execute({ checksPassed: true });
+    engine.execute({
+      apiToken: "tok",
+      accountId: "acct",
+      secretStoreId: "",
+      subdomain: "app",
+    });
+    engine.execute({ preset: "minimal" });
+    const config = engine.buildConfig();
+    expect(config.workers.hoox?.enabled).toBe(true);
+    expect(config.workers["d1-worker"]?.enabled).toBe(true);
+    expect(config.workers["analytics-worker"]?.enabled).toBe(true);
+    expect(config.workers["agent-worker"]?.enabled).toBe(false);
+    expect(config.workers["pyne-worker"]?.enabled).toBe(false);
+  });
+
+  it("goBack drops the left step from completedSteps", () => {
+    const engine = new WizardEngine();
+    engine.execute({ checksPassed: true });
+    engine.execute({
+      apiToken: "tok",
+      accountId: "acct",
+      secretStoreId: "",
+      subdomain: "app",
+    });
+    expect(engine.getCompletedSteps()).toContain("PREREQUISITES");
+    expect(engine.getCompletedSteps()).toContain("CLOUDFLARE_CONFIG");
+    engine.goBack();
+    expect(engine.getCurrentStep().id).toBe("CLOUDFLARE_CONFIG");
+    expect(engine.getCompletedSteps()).not.toContain("CLOUDFLARE_CONFIG");
+    expect(engine.getCompletedSteps()).toContain("PREREQUISITES");
   });
 });

@@ -5,6 +5,21 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.16.0] — 2026-10-25
+
+### Fixed
+
+- **Queue / SSE / wizard / config** correctness in `@hoox-sh/hoox-shared@1.6.0` (1-based queue attempts, explicit ack, AbortController SSE, wizard `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY`, JSONC parse errors, `writeConfigSync` rethrows).
+- **`wrangler rollback [version-id] --name --yes`**. WAF Rulesets + `security_level`.
+- **`ensureD1Database`**, check tables, repair rebuild, init deploy, and `hoox tui` child exit fail closed.
+- **`createDevVars`** writes only matching integration secrets. `config env --json` redacts secrets.
+- **`hoox monitor kill-switch`** reads and writes `trade:kill_switch` and `global:kill_switch`.
+- **`--json` / `--quiet`** no longer mix clack spinners with machine stdout (`createCliSpinner`).
+
+### Changed
+
+- Ships with `@hoox-sh/hoox-tui@0.4.0` (Settings `defaultView` / `refreshIntervalMs`, kill-switch truthy flags, `VIEW_IDS`).
+
 ## [0.15.0] — 2026-10-25
 
 ### Fixed

@@ -7,7 +7,7 @@ tags: [code, packages, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-12T12:29:26Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/shared/src"
@@ -30,7 +30,7 @@ okf_lock: generated
 * `dashboard-manifest.ts` — DASHBOARD_FIELD_KV_OVERRIDES, DASHBOARD_SECTIONS_NOT_FLAT_KV, DASHBOARD_SECTIONS_UI_SKIP, DASHBOARD_SECTION_PREFIX, DASHBOARD_WORKER_IDS, DASHBOARD_WORKER_PREFIX, DashboardFieldKind, DashboardFieldOption, DashboardFieldType, DashboardKvManifest, DashboardKvManifestKey, DashboardSection
 * `entitlements.ts` — EntitledContext, EntitlementScope, hasScope, verifyCacheKey
 * `errors.ts` — AppError, Errors, createErrorResponse, createJsonResponse, createSuccessResponse, toError
-* `exchange-client.ts` — BaseExchangeClient, ClientCreateOptions, ExchangeConfig, ExchangeName, ExchangeRouter, IExchangeProvider, OrderResponse, Position, TradeParams
+* `exchange-client.ts` — ClientCreateOptions, ExchangeConfig, ExchangeName, ExchangeRouter, IExchangeProvider, OrderResponse, Position, TradeParams
 * `format-time.ts` — formatDuration, formatRelativeTime
 * `formatters.ts` — formatCompactCurrency, formatCpu, formatCurrency, formatDuration, formatDurationCompact, formatLatency, formatMemory, formatNumber, formatPercent, formatRelativeTime, formatRequests, formatTimestamp
 * `health.ts` — HealthCheckOptions, healthCheck
@@ -46,7 +46,7 @@ okf_lock: generated
 * `queue-handler.ts` — QueueHandlerOptions, createQueueHandler
 * `router.ts` — Handler, MiddlewareHandler, RouteParams, createRouter
 * `service-bindings.ts` — AuthenticatedServiceEnv, D1_READ_AUTH_KEY_FIELDS, D1_WRITE_AUTH_KEY_FIELDS, DASHBOARD_D1_READ_AUTH_KEY_FIELDS, DASHBOARD_TELEGRAM_ALERT_AUTH_KEY_FIELDS, DASHBOARD_TRADE_EXECUTE_AUTH_KEY_FIELDS, InternalAuthKeyFields, ServiceAuthError, ServiceBinding, TELEGRAM_ALERT_AUTH_KEY_FIELDS, TRADE_EXECUTE_AUTH_KEY_FIELDS, TRADE_READ_AUTH_KEY_FIELDS
-* `session.ts` — SessionState, restoreSession, saveSession
+* `session.ts` — RestoredSession, SessionState, restoreSession, saveSession
 * `sse.ts` — SSECallback, SSEStatusCallback, SubscribeSSEOptions, subscribeSSE
 * `tenant.test.ts`
 * `tenant.ts` — TenantEnv, TenantScope, effectiveTenantId, isTenantFlagOn, isTenantMode, scopeKey, scopeR2Key, tenantContextOf, tenantScope, withTenantId
@@ -55,7 +55,7 @@ okf_lock: generated
 
 # Packages
 
-`@cloudflare/workers-types`, `@hoox-sh/hoox-shared`, `@hoox-sh/hoox-shared/kvKeys`, `bun:test`, `fs`, `node:fs`, `node:os`, `node:path`, `node:url`, `os`, `path`, `router.ts`, `zod`
+`@cloudflare/workers-types`, `@hoox-sh/hoox-shared`, `@hoox-sh/hoox-shared/kvKeys`, `bun:test`, `fs`, `node:fs`, `node:path`, `node:url`, `os`, `path`, `router.ts`, `zod`
 
 # Depends on
 

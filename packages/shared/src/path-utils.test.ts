@@ -89,6 +89,19 @@ describe("path-utils - Path Resolution Service", () => {
       }
     });
 
+    it("does not treat a sibling .hoox-* directory as inside home", () => {
+      const orig = process.env.HOOX_HOME;
+      const home = join(tmpdir(), "hoox-home-contain");
+      try {
+        process.env.HOOX_HOME = home;
+        expect(isWithinHooxHome(join(home, "repo"))).toBe(true);
+        expect(isWithinHooxHome(`${home}-evil/secret`)).toBe(false);
+      } finally {
+        if (orig !== undefined) process.env.HOOX_HOME = orig;
+        else delete process.env.HOOX_HOME;
+      }
+    });
+
     it("should prefer HOOX_HOME when set", () => {
       const orig = process.env.HOOX_HOME;
       const custom = join(tmpdir(), "custom-hoox-home");

@@ -8,7 +8,7 @@ title: "CLI Architecture & Features"
 description: "Detailed specification of the Hoox Command-Line Interface, monorepo workspaces compilation, and task-management engines."
 ---
 
-The **`hoox` CLI** (`packages/cli`, **0.15.0**) is the unified lifecycle engine of the trading platform monorepo. It governs local sandboxes, compiles TypeScript structures, coordinates Cloudflare infrastructure resources, deploys edge isolates, manages encrypted secrets, and executes self-healing diagnostics.
+The **`hoox` CLI** (`packages/cli`, **0.16.0**) is the unified lifecycle engine of the trading platform monorepo. It governs local sandboxes, compiles TypeScript structures, coordinates Cloudflare infrastructure resources, deploys edge isolates, manages encrypted secrets, and executes self-healing diagnostics.
 
 Agents drive that same command tree through the [Hoox MCP server](/docs/devops/mcp) (`bun run mcp` from a checkout). `@hoox-sh/hoox-mcp` is a **private** workspace package and is **not** published to npm.
 

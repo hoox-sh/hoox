@@ -4,13 +4,12 @@
  */
 
 /** @jsxImportSource @opentui/react */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Colors, WorkerStatusColor } from "@hoox-sh/hoox-shared";
 import { StatusDot } from "../../shared/status-dot";
 import { cliBridge } from "../../../services/cli-bridge";
 import type { PyneHealthResult } from "../../../services/cli-bridge";
-
-const POLL_MS = 30_000;
+import { usePolling } from "../../../hooks/use-polling";
 
 function statusToDot(
   status: PyneHealthResult["status"]
@@ -27,53 +26,49 @@ function statusToDot(
 export function PyneHealthSection() {
   const [result, setResult] = useState<PyneHealthResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const genRef = useRef(0);
+  const inFlightRef = useRef(false);
 
-  // Poll with cancel-on-unmount and skip overlapping probes
-  useEffect(() => {
-    let cancelled = false;
-    let generation = 0;
-    let inFlight = false;
-
-    const refresh = async () => {
-      if (cancelled || inFlight) return;
-      inFlight = true;
-      const gen = ++generation;
-      try {
-        const res = await cliBridge.pyneHealthCheck();
-        if (cancelled || gen !== generation) return;
-        if (res.data) {
-          setResult(res.data);
-        } else {
-          setResult({
-            worker: "pyne-worker",
-            url: "",
-            status: "down",
-            error: res.stderr || "probe failed",
-            timestamp: new Date().toISOString(),
-          });
-        }
-      } catch (err) {
-        if (cancelled || gen !== generation) return;
+  const refresh = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    const gen = ++genRef.current;
+    try {
+      const res = await cliBridge.pyneHealthCheck();
+      if (gen !== genRef.current) return;
+      if (res.data) {
+        setResult(res.data);
+      } else {
         setResult({
           worker: "pyne-worker",
           url: "",
           status: "down",
-          error: err instanceof Error ? err.message : "probe failed",
+          error: res.stderr || "probe failed",
           timestamp: new Date().toISOString(),
         });
-      } finally {
-        inFlight = false;
-        if (!cancelled && gen === generation) setLoading(false);
       }
-    };
-
-    void refresh();
-    const id = setInterval(() => void refresh(), POLL_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(id);
-    };
+    } catch (err) {
+      if (gen !== genRef.current) return;
+      setResult({
+        worker: "pyne-worker",
+        url: "",
+        status: "down",
+        error: err instanceof Error ? err.message : "probe failed",
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      inFlightRef.current = false;
+      if (gen === genRef.current) setLoading(false);
+    }
   }, []);
+
+  useEffect(
+    () => () => {
+      genRef.current += 1;
+    },
+    []
+  );
+  usePolling({ callback: refresh, immediate: true });
 
   const status = result?.status ?? "down";
   const dot = statusToDot(status);

@@ -30,6 +30,7 @@ import { join } from "node:path";
 import { CloudflareService } from "../cloudflare/index.js";
 import { applyWalletRpcDefaults, ensureSolanaPrivateKey } from "./dex-setup.js";
 import { parseEnvFile, serializeEnvLine } from "../../utils/env-file.js";
+import { isPlaceholderValue } from "../../utils/placeholder.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -434,7 +435,9 @@ export class SetupService {
     const jupiterKey = map.get("JUPITER_API_KEY")?.trim();
     const results: SecretResult[] = [];
     const puts: Array<[string, string]> = [];
-    if (solanaKey) puts.push(["SOLANA_PRIVATE_KEY", solanaKey]);
+    if (solanaKey && !isPlaceholderValue(solanaKey)) {
+      puts.push(["SOLANA_PRIVATE_KEY", solanaKey]);
+    }
     if (jupiterKey) puts.push(["JUPITER_API_KEY", jupiterKey]);
     for (const [name, value] of puts) {
       this.onProgress({
@@ -1273,38 +1276,56 @@ export class SetupService {
 
     // Check if database exists
     const listResult = await this.cf.d1List();
-    if (listResult.ok) {
-      try {
-        const databases: Array<{ name: string }> = JSON.parse(listResult.value);
-        const exists = databases.some((d) => d.name === dbName);
+    if (!listResult.ok) {
+      const msg = `Failed to list D1 databases: ${listResult.error}`;
+      this.onProgress({
+        type: "step-error",
+        step: "d1-database",
+        message: msg,
+      });
+      return { step: "d1-database", success: false, message: msg };
+    }
 
-        if (!exists) {
-          this.onProgress({
-            type: "info",
-            step: "d1-database",
-            message: `Database "${dbName}" not found — creating...`,
-          });
+    let databases: Array<{ name: string }>;
+    try {
+      const parsed: unknown = JSON.parse(listResult.value);
+      databases = Array.isArray(parsed)
+        ? (parsed as Array<{ name: string }>)
+        : [];
+    } catch {
+      const msg = `Could not parse D1 list output for "${dbName}"`;
+      this.onProgress({
+        type: "step-error",
+        step: "d1-database",
+        message: msg,
+      });
+      return { step: "d1-database", success: false, message: msg };
+    }
 
-          const createResult = await this.cf.d1Create(dbName);
-          if (!createResult.ok) {
-            const msg = `Failed to create D1 database: ${createResult.error}`;
-            this.onProgress({
-              type: "step-error",
-              step: "d1-database",
-              message: msg,
-            });
-            return { step: "d1-database", success: false, message: msg };
-          }
+    const exists = databases.some((d) => d.name === dbName);
+    if (!exists) {
+      this.onProgress({
+        type: "info",
+        step: "d1-database",
+        message: `Database "${dbName}" not found — creating...`,
+      });
 
-          this.onProgress({
-            type: "info",
-            step: "d1-database",
-            message: `Created D1 database "${dbName}"`,
-          });
-        }
-      } catch {
-        // Can't parse JSON — assume it exists
+      const createResult = await this.cf.d1Create(dbName);
+      if (!createResult.ok) {
+        const msg = `Failed to create D1 database: ${createResult.error}`;
+        this.onProgress({
+          type: "step-error",
+          step: "d1-database",
+          message: msg,
+        });
+        return { step: "d1-database", success: false, message: msg };
       }
+
+      this.onProgress({
+        type: "info",
+        step: "d1-database",
+        message: `Created D1 database "${dbName}"`,
+      });
     }
 
     this.onProgress({
@@ -1374,7 +1395,13 @@ export class SetupService {
               step: "reconcile",
               message: `Cleaning up legacy secret "${oldName}" on ${worker}...`,
             });
-            await this.cf.secretDelete(worker, oldName);
+            const del = await this.cf.secretDelete(worker, oldName);
+            if (!del.ok) {
+              warnings.push(
+                `Could not delete legacy secret "${oldName}" on ${worker}: ${del.error}`
+              );
+              continue;
+            }
             fixed.push(`${worker}:${oldName}→deleted`);
             warnings.push(
               `Deleted legacy secret "${oldName}" from ${worker} — was replaced by "${newName}"`
@@ -1392,8 +1419,14 @@ export class SetupService {
               newValue
             );
             if (putResult.ok) {
-              await this.cf.secretDelete(worker, oldName);
-              fixed.push(`${worker}:${oldName}→${newName}`);
+              const del = await this.cf.secretDelete(worker, oldName);
+              if (!del.ok) {
+                warnings.push(
+                  `Set "${newName}" on ${worker} but could not delete "${oldName}": ${del.error}`
+                );
+              } else {
+                fixed.push(`${worker}:${oldName}→${newName}`);
+              }
             } else {
               warnings.push(
                 `Could not migrate "${oldName}" to "${newName}" on ${worker}: ${putResult.error}`

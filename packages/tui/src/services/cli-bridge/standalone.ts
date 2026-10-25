@@ -270,7 +270,10 @@ export function agentChatStream(
 
         while (!abortController.signal.aborted) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done) {
+            completed = true;
+            break;
+          }
 
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split("\n");

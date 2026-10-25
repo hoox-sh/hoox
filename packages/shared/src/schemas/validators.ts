@@ -3,8 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { parse } from "jsonc-parser";
+import { parse, type ParseError } from "jsonc-parser";
 import type { WorkerManifest, ValidationError } from "./types.js";
+
+function parseJsoncDocument(content: string): {
+  value: unknown;
+  errors: ParseError[];
+} {
+  const errors: ParseError[] = [];
+  const value = parse(content, errors, { allowTrailingComma: true });
+  return { value, errors };
+}
 
 /** Shape of a parsed wrangler.jsonc object — fields we read for validation. */
 interface ParsedWrangler {
@@ -27,10 +36,9 @@ export function validateWranglerJsonc(
   jsoncContent: string
 ): ValidationError[] {
   const errors: ValidationError[] = [];
-  let parsed: unknown;
-  try {
-    parsed = parse(jsoncContent);
-  } catch {
+  const { value: parsed, errors: parseErrors } =
+    parseJsoncDocument(jsoncContent);
+  if (parseErrors.length > 0) {
     errors.push({
       worker: workerName,
       severity: "error",
@@ -80,7 +88,10 @@ export function validateWranglerJsonc(
       name !== "DASHBOARD_USER" &&
       name !== "DASHBOARD_PASS" &&
       name !== "SESSION_SECRET" &&
-      name !== "AGENT_INTERNAL_KEY"
+      name !== "AGENT_INTERNAL_KEY" &&
+      name !== "OPENAI_API_KEY" &&
+      name !== "ANTHROPIC_API_KEY" &&
+      name !== "GOOGLE_API_KEY"
     ) {
       errors.push({
         worker: workerName,
@@ -146,10 +157,9 @@ export function validateRootSecrets(
   rootJsoncContent: string
 ): ValidationError[] {
   const errors: ValidationError[] = [];
-  let parsed: unknown;
-  try {
-    parsed = parse(rootJsoncContent);
-  } catch {
+  const { value: parsed, errors: parseErrors } =
+    parseJsoncDocument(rootJsoncContent);
+  if (parseErrors.length > 0) {
     errors.push({
       worker: workerName,
       severity: "error",
@@ -228,6 +238,12 @@ export function validateDevVars(
 }
 
 // ── Generate functions ───────────────────────────────────────────────
+
+/** Wrangler producer binding name for a queue (matches deployed hoox-worker). */
+function queueProducerBinding(queue: string): string {
+  if (queue === "trade-execution") return "TRADE_QUEUE";
+  return queue.replace(/[^A-Za-z0-9]+/g, "_").toUpperCase();
+}
 
 /**
  * Generate a complete per-worker wrangler.jsonc from a manifest.
@@ -330,23 +346,33 @@ export function generateWranglerJsonc(manifest: WorkerManifest): string {
     parts.push(`  ],`);
   }
 
-  // queues
+  // queues — one object so JSON.parse keeps both producers and consumers
   if (infra.queues) {
-    if (infra.queues.producer && infra.queues.producer.length > 0) {
-      parts.push(`  "queues": { "producers": [`);
-      for (const [i, q] of infra.queues.producer.entries()) {
-        const comma = i < infra.queues.producer.length - 1 ? "," : "";
-        parts.push(`    { "queue": "${q}", "binding": "" }${comma}`);
+    const producers = infra.queues.producer ?? [];
+    const consumers = infra.queues.consumer ?? [];
+    if (producers.length > 0 || consumers.length > 0) {
+      const queueParts: string[] = [];
+      if (producers.length > 0) {
+        queueParts.push(`    "producers": [`);
+        for (const [i, q] of producers.entries()) {
+          const comma = i < producers.length - 1 ? "," : "";
+          queueParts.push(
+            `      { "queue": "${q}", "binding": "${queueProducerBinding(q)}" }${comma}`
+          );
+        }
+        queueParts.push(consumers.length > 0 ? `    ],` : `    ]`);
       }
-      parts.push(`  ] },`);
-    }
-    if (infra.queues.consumer && infra.queues.consumer.length > 0) {
-      parts.push(`  "queues": { "consumers": [`);
-      for (const [i, q] of infra.queues.consumer.entries()) {
-        const comma = i < infra.queues.consumer.length - 1 ? "," : "";
-        parts.push(`    { "queue": "${q}" }${comma}`);
+      if (consumers.length > 0) {
+        queueParts.push(`    "consumers": [`);
+        for (const [i, q] of consumers.entries()) {
+          const comma = i < consumers.length - 1 ? "," : "";
+          queueParts.push(`      { "queue": "${q}" }${comma}`);
+        }
+        queueParts.push(`    ]`);
       }
-      parts.push(`  ] },`);
+      parts.push(`  "queues": {`);
+      parts.push(...queueParts);
+      parts.push(`  },`);
     }
   }
 

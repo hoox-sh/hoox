@@ -104,6 +104,7 @@ function formatOptsFromArgs(
   return {};
 }
 
+/** Wrap a Commander action so thrown errors become formatted CLI exits. */
 export function withErrorHandling<T extends unknown[]>(
   handler: (...args: T) => Promise<void>,
   options?: { service?: string; opts?: FormatOptions }

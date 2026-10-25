@@ -62,7 +62,7 @@ function getCredentials(): { token: string; accountId: string } {
  * Returns a WranglerResult-style discriminated union for consistent error handling.
  */
 async function cfApi<T>(
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   path: string,
   body?: unknown
 ): Promise<WranglerResult<T>> {
@@ -103,18 +103,23 @@ async function cfApi<T>(
 // WAF API operations
 // ---------------------------------------------------------------------------
 
-interface CfWafSetting {
+interface CfSecurityLevel {
   id: string;
   value: string;
 }
 
-interface CfFirewallRule {
+interface CfCustomRule {
   id: string;
-  description: string;
+  description?: string;
   action: string;
-  filter: { id: string; expression: string };
-  created_on: string;
-  modified_on: string;
+  expression: string;
+  enabled?: boolean;
+  last_updated?: string;
+}
+
+interface CfRulesetEntrypoint {
+  id: string;
+  rules?: CfCustomRule[];
 }
 
 interface CfAnalyticsOverview {
@@ -130,35 +135,43 @@ interface CfAnalyticsOverview {
  *   rate-limit  → handled as custom with rate-limit expression
  *   custom      → uses value as raw expression
  */
+function quoteIp(value: string): string {
+  const v = value.trim();
+  if (/^[0-9a-fA-F:.]+$/.test(v) || v.includes("/")) return v;
+  return `"${v.replace(/"/g, '\\"')}"`;
+}
+
 function buildExpression(type: WafRuleInput["type"], value: string): string {
   switch (type) {
     case "ip-allowlist":
-      return `(ip.src eq ${value})`;
     case "ip-blocklist":
-      return `(ip.src eq ${value})`;
+      return `(ip.src eq ${quoteIp(value)})`;
     case "rate-limit":
-      // Rate limiting is configured via a separate API; here we build a
-      // basic rate-limit expression that can be extended.
-      return `(http.request.uri.path contains "/")`;
+      return value.trim() ? value : '(http.request.uri.path ne "")';
     case "custom":
       return value;
   }
 }
 
-/**
- * Maps rule type and value to a Cloudflare firewall rule action.
- */
 function mapAction(type: WafRuleInput["type"]): string {
   switch (type) {
     case "ip-allowlist":
-      return "allow";
+      return "skip";
     case "ip-blocklist":
       return "block";
     case "rate-limit":
-      return "managed_challenge";
+      return "block";
     case "custom":
       return "block";
   }
+}
+
+function customRulesetPath(zoneId: string): string {
+  return `/zones/${zoneId}/rulesets/phases/http_request_firewall_custom/entrypoint`;
+}
+
+function rateLimitRulesetPath(zoneId: string): string {
+  return `/zones/${zoneId}/rulesets/phases/http_ratelimit/entrypoint`;
 }
 
 /**
@@ -187,6 +200,12 @@ async function resolveZone(
     throw new CLIError(
       "No zones found. Set CLOUDFLARE_ZONE_ID environment variable.",
       ExitCode.ERROR
+    );
+  }
+  if (lines.length > 1) {
+    throw new CLIError(
+      `Multiple zones found (${lines.length}). Set CLOUDFLARE_ZONE_ID to choose one.`,
+      ExitCode.INVALID_USAGE
     );
   }
 
@@ -220,24 +239,24 @@ async function handleStatus(opts: FormatOptions): Promise<void> {
 
   const zone = await resolveZone(cf);
 
-  // Fetch WAF setting
-  const wafResult = await cfApi<CfWafSetting>(
+  const securityResult = await cfApi<CfSecurityLevel>(
     "GET",
-    `/zones/${zone.id}/settings/waf`
+    `/zones/${zone.id}/settings/security_level`
   );
-  if (!wafResult.ok) {
+  if (!securityResult.ok) {
     throw new CLIError(
-      `Failed to get WAF status: ${wafResult.error}`,
+      `Failed to get WAF status: ${securityResult.error}`,
       ExitCode.ERROR
     );
   }
 
-  // Fetch firewall rules count
-  const rulesResult = await cfApi<CfFirewallRule[]>(
+  const rulesResult = await cfApi<CfRulesetEntrypoint>(
     "GET",
-    `/zones/${zone.id}/firewall/rules?per_page=50`
+    customRulesetPath(zone.id)
   );
-  const activeRulesCount = rulesResult.ok ? rulesResult.value.length : 0;
+  const activeRulesCount = rulesResult.ok
+    ? (rulesResult.value.rules ?? []).filter((r) => r.enabled !== false).length
+    : 0;
 
   // Fetch recent blocks (last 24h analytics overview)
   let recentBlocks = 0;
@@ -250,9 +269,10 @@ async function handleStatus(opts: FormatOptions): Promise<void> {
     recentBlocks = analyticsResult.value.totals?.threats ?? 0;
   }
 
+  const mode = securityResult.value.value;
   const status: WafStatus = {
-    enabled: wafResult.value.value === "on",
-    mode: wafResult.value.value,
+    enabled: mode !== "essentially_off" && mode !== "off",
+    mode,
     activeRulesCount,
     recentBlocks,
     zoneId: zone.id,
@@ -284,9 +304,9 @@ async function handleRulesList(opts: FormatOptions): Promise<void> {
   const cf = new CloudflareService();
   const zone = await resolveZone(cf);
 
-  const result = await cfApi<CfFirewallRule[]>(
+  const result = await cfApi<CfRulesetEntrypoint>(
     "GET",
-    `/zones/${zone.id}/firewall/rules?per_page=50`
+    customRulesetPath(zone.id)
   );
   if (!result.ok) {
     throw new CLIError(
@@ -295,13 +315,13 @@ async function handleRulesList(opts: FormatOptions): Promise<void> {
     );
   }
 
-  const rules: WafRule[] = result.value.map((r) => ({
+  const rules: WafRule[] = (result.value.rules ?? []).map((r) => ({
     id: r.id,
-    description: r.description,
+    description: r.description ?? "",
     mode: r.action,
-    expression: r.filter?.expression ?? "(unknown)",
-    created_at: r.created_on,
-    updated_at: r.modified_on,
+    expression: r.expression ?? "(unknown)",
+    created_at: r.last_updated ?? "",
+    updated_at: r.last_updated ?? "",
   }));
 
   if (opts.json) {
@@ -358,36 +378,45 @@ async function handleRulesAdd(
 
   const expression = buildExpression(ruleInput.type, value);
   const action = mapAction(ruleInput.type);
+  const description =
+    ruleInput.description ?? `${ruleInput.type} rule for ${value}`;
+  const phasePath =
+    ruleInput.type === "rate-limit"
+      ? rateLimitRulesetPath(zone.id)
+      : customRulesetPath(zone.id);
 
-  const body = {
-    description: ruleInput.description ?? `${ruleInput.type} rule for ${value}`,
-    action,
-    filter: { expression },
-  };
-
-  // Create filter first, then rule referencing the filter
-  const filterResult = await cfApi<{ id: string }>(
-    "POST",
-    `/zones/${zone.id}/filters`,
-    { expression }
-  );
-  if (!filterResult.ok) {
+  const entry = await cfApi<CfRulesetEntrypoint>("GET", phasePath);
+  if (!entry.ok) {
     throw new CLIError(
-      `Failed to create filter: ${filterResult.error}`,
+      `Failed to load WAF ruleset: ${entry.error}`,
       ExitCode.ERROR
     );
   }
 
-  const ruleBody = {
-    description: body.description,
+  const ruleBody: Record<string, unknown> = {
+    description,
     action,
-    filter: { id: filterResult.value.id },
+    expression,
+    enabled: true,
   };
+  if (ruleInput.type === "ip-allowlist") {
+    ruleBody.action_parameters = { products: ["waf"] };
+  }
+  if (ruleInput.type === "rate-limit") {
+    const perPeriod = Number.parseInt(value, 10);
+    ruleBody.ratelimit = {
+      characteristics: ["cf.colo.id", "ip.src"],
+      period: 10,
+      requests_per_period:
+        Number.isFinite(perPeriod) && perPeriod > 0 ? perPeriod : 100,
+      mitigation_timeout: 60,
+    };
+  }
 
-  const ruleResult = await cfApi<CfFirewallRule>(
+  const ruleResult = await cfApi<CfCustomRule>(
     "POST",
-    `/zones/${zone.id}/firewall/rules`,
-    [ruleBody] // Cloudflare expects an array of rules
+    `/zones/${zone.id}/rulesets/${entry.value.id}/rules`,
+    ruleBody
   );
   if (!ruleResult.ok) {
     throw new CLIError(
@@ -396,13 +425,8 @@ async function handleRulesAdd(
     );
   }
 
-  // Cloudflare returns an array of created rules
-  const created = Array.isArray(ruleResult.value)
-    ? (ruleResult.value[0] as unknown as CfFirewallRule)
-    : (ruleResult.value as unknown as CfFirewallRule);
-
   formatSuccess(
-    `WAF rule added (${created.id}) — ${created.action} for "${value}"`,
+    `WAF rule added (${ruleResult.value.id}) — ${ruleResult.value.action} for "${value}"`,
     opts
   );
 }
@@ -418,9 +442,19 @@ async function handleRulesRemove(
   const cf = new CloudflareService();
   const zone = await resolveZone(cf);
 
+  const entry = await cfApi<CfRulesetEntrypoint>(
+    "GET",
+    customRulesetPath(zone.id)
+  );
+  if (!entry.ok) {
+    throw new CLIError(
+      `Failed to load WAF ruleset: ${entry.error}`,
+      ExitCode.ERROR
+    );
+  }
   const result = await cfApi<{ id: string }>(
     "DELETE",
-    `/zones/${zone.id}/firewall/rules/${ruleId}`
+    `/zones/${zone.id}/rulesets/${entry.value.id}/rules/${ruleId}`
   );
   if (!result.ok) {
     throw new CLIError(
@@ -443,10 +477,10 @@ async function handleMode(
   const cf = new CloudflareService();
   const zone = await resolveZone(cf);
 
-  const result = await cfApi<CfWafSetting>(
+  const result = await cfApi<CfSecurityLevel>(
     "PATCH",
-    `/zones/${zone.id}/settings/waf`,
-    { value: mode }
+    `/zones/${zone.id}/settings/security_level`,
+    { value: mode === "on" ? "medium" : "essentially_off" }
   );
   if (!result.ok) {
     throw new CLIError(

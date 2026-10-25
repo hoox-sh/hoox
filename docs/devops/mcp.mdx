@@ -10,7 +10,7 @@ description: "Drive every hoox CLI command from an MCP client, with a confirm ga
 
 ---
 
-`@hoox-sh/hoox-mcp` is a **private** stdio MCP server in `packages/mcp` (**0.15.0**). It is **not published to npm** — run it from a Hoox checkout. It turns the live Commander tree into one tool per runnable command, then adds five operator tools around that surface.
+`@hoox-sh/hoox-mcp` is a **private** stdio MCP server in `packages/mcp` (**0.16.0**). It is **not published to npm** — run it from a Hoox checkout. It turns the live Commander tree into one tool per runnable command, then adds five operator tools around that surface.
 
 ```bash
 bun run mcp
@@ -53,7 +53,7 @@ Use `hoox_catalog` to list paths, risk, and tool names. Use `hoox_describe` for 
 
 ## Confirm gate
 
-Read-only commands run immediately. Mutating commands return `confirm_token` and stop. Send the same arguments again with `confirm` set to that token. The token is bound to the argv, the checkout path, and a hash of any stdin payload (Pine script or secret). The secret and the script are not stored in the token. It expires after 10 minutes.
+Read-only commands run immediately. Mutating commands return `confirm_token` and stop. Send the same arguments again with `confirm` set to that token. The token is bound to the argv, the checkout path, and a hash of any stdin payload (Pine Script™ or a secret). The secret and the script are not stored in the token. It expires after 10 minutes.
 
 `--dry-run` is treated as a read. `--fix`, `--fix-runtime`, `--install-deps`, `--provision`, and `--allow-destructive` turn a read into a mutation.
 

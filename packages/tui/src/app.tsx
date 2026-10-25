@@ -20,7 +20,12 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import { useKeyboard } from "@opentui/react";
-import { useServiceStore, useUIStore, Colors } from "@hoox-sh/hoox-shared";
+import {
+  useServiceStore,
+  useUIStore,
+  useConfigStore,
+  Colors,
+} from "@hoox-sh/hoox-shared";
 import { restoreSession, saveSession } from "@hoox-sh/hoox-shared";
 import type { ViewId } from "@hoox-sh/hoox-shared";
 
@@ -132,7 +137,11 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
       const session = await restoreSession();
       if (cancelled) return;
 
-      const view: ViewId = session.activeView;
+      const preferred = useConfigStore.getState().defaultView;
+      const view: ViewId =
+        !session.fromDisk && isRegisteredViewId(preferred)
+          ? preferred
+          : session.activeView;
       const expanded = session.sidebarExpanded;
 
       if (isRegisteredViewId(view)) {
@@ -224,8 +233,7 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
           if (result.success && result.data) {
             const raw = result.data as Record<string, unknown>;
             const rawWorkers = (raw.workers ?? raw.status ?? raw) as
-              | unknown[]
-              | Record<string, unknown>;
+              unknown[] | Record<string, unknown>;
             const parsed = Array.isArray(rawWorkers)
               ? rawWorkers
               : typeof rawWorkers === "object" && rawWorkers !== null

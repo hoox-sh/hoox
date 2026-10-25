@@ -4,14 +4,12 @@
  */
 
 /** @jsxImportSource @opentui/react */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Colors, WorkerStatusColor } from "@hoox-sh/hoox-shared";
 import { StatusDot } from "../../shared/status-dot";
 import { cliBridge } from "../../../services/cli-bridge";
 import type { ModelHealth } from "../../../services/cli-bridge";
-
-/** Polling interval for AI model health checks (30 seconds). */
-const MODEL_HEALTH_POLL_MS = 30_000;
+import { usePolling } from "../../../hooks/use-polling";
 
 /**
  * Map model status to a StatusDot-compatible status string.
@@ -116,7 +114,7 @@ function ModelHealthRow({
 /**
  * ModelHealthSection — displays health status of all configured AI providers.
  *
- * Auto-refreshes every 30 seconds when the dashboard is active.
+ * Auto-refreshes on the Settings interval when the dashboard is active.
  * Supports multiple providers: Workers AI, OpenAI, Anthropic, Google, Azure.
  * Click on a provider to expand detailed stats (latency, daily usage, error).
  * Cancels in-flight probes on unmount; race-safe via generation counter.
@@ -127,50 +125,44 @@ function ModelHealthSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number | null>(null);
+  const genRef = useRef(0);
+  const inFlightRef = useRef(false);
 
-  // Initial fetch + 30s polling with cancel + race safety
-  useEffect(() => {
-    let cancelled = false;
-    let generation = 0;
-    let inFlight = false;
-
-    const fetchHealth = async () => {
-      if (cancelled || inFlight) return;
-      inFlight = true;
-      const gen = ++generation;
-      try {
-        const result = await cliBridge.agentHealthCheck();
-        if (cancelled || gen !== generation) return;
-        if (result.success && result.data) {
-          setProviders(result.data.providers ?? []);
-          setError(null);
-          setLastRefresh(Date.now());
-        } else {
-          // Keep prior providers if any; surface probe failure distinctly
-          setError(
-            result.stderr ||
-              result.stdout ||
-              "AI health probe failed (CLI offline?)"
-          );
-        }
-      } catch (err) {
-        if (cancelled || gen !== generation) return;
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        inFlight = false;
-        if (!cancelled && gen === generation) setLoading(false);
+  const fetchHealth = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    const gen = ++genRef.current;
+    try {
+      const result = await cliBridge.agentHealthCheck();
+      if (gen !== genRef.current) return;
+      if (result.success && result.data) {
+        setProviders(result.data.providers ?? []);
+        setError(null);
+        setLastRefresh(Date.now());
+      } else {
+        // Keep prior providers if any; surface probe failure distinctly
+        setError(
+          result.stderr ||
+            result.stdout ||
+            "AI health probe failed (CLI offline?)"
+        );
       }
-    };
-
-    void fetchHealth();
-    const interval = setInterval(() => {
-      void fetchHealth();
-    }, MODEL_HEALTH_POLL_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
+    } catch (err) {
+      if (gen !== genRef.current) return;
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      inFlightRef.current = false;
+      if (gen === genRef.current) setLoading(false);
+    }
   }, []);
+
+  useEffect(
+    () => () => {
+      genRef.current += 1;
+    },
+    []
+  );
+  usePolling({ callback: fetchHealth, immediate: true });
 
   const toggleExpand = useCallback((index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));

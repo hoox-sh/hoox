@@ -20,7 +20,7 @@
  */
 
 import { getHooxHome } from "./path-utils";
-import type { ViewId } from "./types";
+import { VIEW_IDS, type ViewId } from "./types";
 import { z } from "zod";
 
 // ─── Session shape ───────────────────────────────────────────────────────────
@@ -37,6 +37,12 @@ export interface SessionState {
   /** ISO timestamp of when the session was saved */
   savedAt: string;
 }
+
+/** Restore result: on-disk session plus whether a file was actually read. */
+export type RestoredSession = SessionState & {
+  /** True when session.json existed and was parsed (even if fields fell back). */
+  fromDisk: boolean;
+};
 
 /**
  * Zod schema for the on-disk session.json shape.
@@ -126,13 +132,15 @@ export async function saveSession(
  * Restore the previous session state from $HOME/.hoox/.tui-state/session.json.
  * Returns defaults if the file doesn't exist or can't be parsed.
  *
- * @returns The saved session state, or defaults
+ * @returns The saved session state, or defaults. `fromDisk` is false when
+ * no file existed or JSON was unreadable — callers may then apply
+ * `defaultView` from TUI preferences.
  */
-export async function restoreSession(): Promise<SessionState> {
+export async function restoreSession(): Promise<RestoredSession> {
   try {
     const file = Bun.file(getSessionFilePath());
     const exists = await file.exists();
-    if (!exists) return { ...DEFAULT_SESSION };
+    if (!exists) return { ...DEFAULT_SESSION, fromDisk: false };
 
     const raw = await file.text();
     const result = SessionStateFileSchema.safeParse(JSON.parse(raw));
@@ -153,34 +161,17 @@ export async function restoreSession(): Promise<SessionState> {
           ? parsed.lastData
           : DEFAULT_SESSION.lastData,
       savedAt: parsed.savedAt ?? DEFAULT_SESSION.savedAt,
+      fromDisk: true,
     };
   } catch {
     // Corrupt or unreadable session file — use defaults
-    return { ...DEFAULT_SESSION };
+    return { ...DEFAULT_SESSION, fromDisk: false };
   }
 }
 
 // ─── Validation ──────────────────────────────────────────────────────────────
 
-/** Must stay aligned with `ViewId` in types.ts (16 views). */
-const VALID_VIEW_IDS = new Set<string>([
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-]);
+const VALID_VIEW_IDS = new Set<string>(VIEW_IDS);
 
 function validateViewId(id: unknown): id is ViewId {
   return typeof id === "string" && VALID_VIEW_IDS.has(id);

@@ -171,13 +171,9 @@ async function renderSettingsWithCheck(
   width = 140,
   height = 60
 ): Promise<string> {
-  // Tell the view to auto-run the check on mount via a useEffect.
-  (
-    globalThis as unknown as { __hooxTestAutoCheckSetup?: boolean }
-  ).__hooxTestAutoCheckSetup = true;
   try {
     const { captureCharFrame, renderOnce } = await testRender(
-      <SettingsView />,
+      <SettingsView autoCheckSetup />,
       {
         width,
         height,
@@ -209,8 +205,7 @@ async function renderSettingsWithCheck(
     // Fallback - return whatever we have
     return captureCharFrame();
   } finally {
-    delete (globalThis as unknown as { __hooxTestAutoCheckSetup?: boolean })
-      .__hooxTestAutoCheckSetup;
+    /* autoCheckSetup is a render prop; nothing to clean up */
   }
 }
 

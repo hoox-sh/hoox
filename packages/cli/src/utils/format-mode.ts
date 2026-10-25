@@ -18,8 +18,13 @@
  * ask "is rich mode right now?" and get the same answer.
  */
 
+import * as clack from "@clack/prompts";
 import type { FormatOptions } from "./formatters.js";
 
+/**
+ * True when spinners, color, and progress chrome may write to the terminal.
+ * False for `--json`, `--quiet`, `--no-color`, `NO_COLOR`, `TERM=dumb`, or a non-TTY.
+ */
 export function isRichMode(opts?: FormatOptions): boolean {
   if (opts?.json || opts?.quiet || opts?.noColor) return false;
   if (process.env.NO_COLOR) return false;
@@ -28,4 +33,40 @@ export function isRichMode(opts?: FormatOptions): boolean {
   // Treat undefined as "not a TTY" so we never accidentally emit ansi
   // codes into captured test output.
   return Boolean(process.stdout.isTTY);
+}
+
+/** Minimal spinner surface used by CLI commands. */
+export interface CliSpinner {
+  start: (msg?: string) => void;
+  stop: (msg?: string) => void;
+  message: (msg?: string) => void;
+}
+
+const NOOP_SPINNER: CliSpinner = {
+  start() {},
+  stop() {},
+  message() {},
+};
+
+/**
+ * Clack spinner that stays off `--json` / `--quiet` stdout.
+ * Human non-TTY (tests, CI) still prints `stop()` lines so progress is visible.
+ */
+export function createCliSpinner(opts?: FormatOptions): CliSpinner {
+  if (opts?.json || opts?.quiet) return NOOP_SPINNER;
+  if (isRichMode(opts)) {
+    const s = clack.spinner();
+    return {
+      start: (msg) => s.start(msg),
+      stop: (msg) => s.stop(msg),
+      message: (msg) => s.message(msg),
+    };
+  }
+  return {
+    start() {},
+    stop(msg) {
+      if (msg) process.stdout.write(`${msg}\n`);
+    },
+    message() {},
+  };
 }

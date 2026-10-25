@@ -1,6 +1,6 @@
 {
   "name": "@hoox-sh/hoox-cli",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Hoox CLI — manage Cloudflare Workers, infrastructure, secrets, and deployments (@hoox-sh/hoox-cli)",
   "type": "module",
   "bin": {

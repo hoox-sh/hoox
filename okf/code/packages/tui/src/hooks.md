@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "packages/tui/src/hooks"
-description: "Hook unit tests — renderer ref, global keyboard registration, polling helpers."
+description: "Hook unit tests — renderer ref and polling helpers."
 resource: "packages/tui/src/hooks"
 tags: [code, hooks, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/tui/src/hooks"
@@ -19,12 +19,10 @@ okf_lock: generated
 # Files
 
 * `hooks.test.ts`
-* `index.ts` — KeyEvent, POLLING_MAX_BACKOFF_MS, UseKeyboardOptions, UsePollingOptions, computePollingBackoff, createPollingController, getRendererRef, isShellOverlayOpen, registerGlobalHandler, setRendererRef, useKeyboard, usePolling
+* `index.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, getRendererRef, isShellOverlayOpen, setRendererRef, usePolling, useViewKeyboard
 * `renderer-ref.ts` — getRendererRef, setRendererRef
 * `shell-overlay.ts` — ViewKeyEvent, isShellOverlayOpen, useViewKeyboard
-* `use-keyboard.ts` — KeyEvent, UseKeyboardOptions, registerGlobalHandler, useKeyboard
-* `use-polling.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, usePolling
-* `use-service-data.ts` — ServiceStoreSelector, ServiceStoreState, __setServiceStoreHookForTests, useServiceData
+* `use-polling.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, usePolling
 
 # Packages
 

@@ -49,16 +49,14 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Colors, useUIStore } from "@hoox-sh/hoox-shared";
+import { Colors, useUIStore, useConfigStore } from "@hoox-sh/hoox-shared";
 import { ErrorBoundary } from "../shared/error-boundary";
 import { Spinner, EmptyState } from "../shared/spinner";
 import { ViewHeader } from "../shared/view-header";
 import { cliBridge } from "../../services/cli-bridge";
 import type { KvKey, KvKeySnapshot } from "../../services/cli-bridge";
 import { useViewKeyboard } from "../../hooks/shell-overlay";
-
-/** Auto-refresh interval in milliseconds. */
-export const REFRESH_INTERVAL_MS = 5_000;
+import { usePolling, formatPollIntervalLabel } from "../../hooks/use-polling";
 
 /** Cap rendered rows so large namespaces stay responsive. */
 export const MAX_VISIBLE_KEYS = 200;
@@ -427,14 +425,12 @@ export function KvViewer() {
     };
   }, [refresh]);
 
-  // Auto-refresh every 5s while the view is the active view (soft = no flicker).
-  useEffect(() => {
-    if (!isActive) return;
-    const handle = setInterval(() => {
-      void refresh({ soft: true });
-    }, REFRESH_INTERVAL_MS);
-    return () => clearInterval(handle);
-  }, [isActive, refresh]);
+  const refreshIntervalMs = useConfigStore((s) => s.refreshIntervalMs);
+  usePolling({
+    callback: () => refresh({ soft: true }),
+    enabled: isActive,
+    immediate: false,
+  });
 
   // ── Derived data ─────────────────────────────────────────────────────
   const allKeys = snapshot?.keys ?? [];
@@ -558,7 +554,7 @@ export function KvViewer() {
                 ⚠ read-only
               </text>
               <text fg={Colors.info} dim>
-                {`◉ ${REFRESH_INTERVAL_MS / 1000}s auto`}
+                {`◉ ${formatPollIntervalLabel(refreshIntervalMs)}`}
               </text>
             </box>
           }

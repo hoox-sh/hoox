@@ -4,13 +4,13 @@
  */
 
 import { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { ConfigService } from "../../services/config/index.js";
 import { UpdateService } from "../../services/update/index.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 import { theme } from "../../utils/theme.js";
-import { formatDuration } from "../../utils/formatters.js";
+import { formatDuration, getFormatOptions } from "../../utils/formatters.js";
 import { startTimer } from "../../utils/timer.js";
 import {
   gitPull,
@@ -41,7 +41,8 @@ EXAMPLES:
     )
     .action(
       withErrorHandling(
-        async (target?: string) => {
+        async (target: string | undefined, cmd: Command) => {
+          const fmt = getFormatOptions(cmd);
           const cwd = process.cwd();
 
           if (target === "wrangler") {
@@ -84,7 +85,7 @@ EXAMPLES:
               );
             }
 
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             const t = startTimer();
             s.start(`Updating ${target}...`);
 
@@ -97,7 +98,7 @@ EXAMPLES:
                 : theme.muted(`${target} already up to date (${dur})`)
             );
           } else {
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             const t = startTimer();
             s.start("Pulling latest from remote...");
 

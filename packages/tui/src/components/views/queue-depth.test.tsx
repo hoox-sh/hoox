@@ -17,11 +17,8 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { createRoot } from "@opentui/react";
 import { createCliRenderer } from "@opentui/core";
-import {
-  QueueDepthView,
-  sortQueuesByPressure,
-  REFRESH_INTERVAL_MS,
-} from "./queue-depth";
+import { QueueDepthView, sortQueuesByPressure } from "./queue-depth";
+import { formatPollIntervalLabel } from "../../hooks/use-polling";
 import { Colors } from "@hoox-sh/hoox-shared";
 import { useUIStore } from "@hoox-sh/hoox-shared/stores/ui-store";
 import {
@@ -126,8 +123,9 @@ describe("QueueDepthView", () => {
 
   // ── Refresh interval contract ─────────────────────────────────────────
 
-  it("auto-refreshes every 5 seconds while active", () => {
-    expect(REFRESH_INTERVAL_MS).toBe(5_000);
+  it("labels configured poll intervals", () => {
+    expect(formatPollIntervalLabel(5_000)).toBe("5s auto");
+    expect(formatPollIntervalLabel(500)).toBe("500ms auto");
   });
 
   it("sorts queues by pressure: critical → backlogged → paused → healthy", () => {

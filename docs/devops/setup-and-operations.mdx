@@ -8,7 +8,7 @@ title: "Hoox Trading System — Complete Setup & Operations Guide"
 description: "CLI-first setup, deploy, secrets, health, and repair runbook for the HOOX Cloudflare® Workers mesh."
 ---
 
-> **CLI:** `@hoox-sh/hoox-cli` 0.15.0 (`hoox` / `hx`)  
+> **CLI:** `@hoox-sh/hoox-cli` 0.16.0 (`hoox` / `hx`)  
 > **Last Updated:** 2026-10-25  
 > **Audience:** DevOps engineers, TypeScript developers, system administrators
 
@@ -114,7 +114,7 @@ pyne-worker (cron /run) → trade-worker (mesh internal auth on live forward)
 | Tool         | Version               | Installation Command                | Verification         |
 | ------------ | --------------------- | ----------------------------------- | -------------------- |
 | Bun          | >=1.2                 | `curl -fsSL https://bun.sh \| bash` | `bun --version`      |
-| Hoox CLI     | 0.15.0                | `bun add -g @hoox-sh/hoox-cli`      | `hoox --version`     |
+| Hoox CLI     | 0.16.0                | `bun add -g @hoox-sh/hoox-cli`      | `hoox --version`     |
 | Git          | >=2.40                | `apt install git`                   | `git --version`      |
 | Wrangler CLI | latest                | `bun add -g wrangler`               | `wrangler --version` |
 
@@ -1536,4 +1536,4 @@ hoox/
 
 ---
 
-_Last updated: 2026-10-25 · CLI 0.15.0_
+_Last updated: 2026-10-25 · CLI 0.16.0_

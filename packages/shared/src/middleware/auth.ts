@@ -40,6 +40,14 @@ export function timingSafeEqual(a: string, b: string): boolean {
   return result === 0;
 }
 
+/** Workers/WebCrypto expose timingSafeEqual on SubtleCrypto; DOM/node libs often omit it. */
+type SubtleWithTimingSafe = SubtleCrypto & {
+  timingSafeEqual(
+    a: ArrayBuffer | ArrayBufferView,
+    b: ArrayBuffer | ArrayBufferView
+  ): boolean;
+};
+
 /**
  * Web Crypto constant-time string comparison (Cloudflare recommended).
  *
@@ -49,14 +57,6 @@ export function timingSafeEqual(a: string, b: string): boolean {
  * Falls back to the synchronous XOR implementation if subtle crypto is
  * unavailable (e.g. very constrained test harnesses).
  */
-/** Workers/WebCrypto expose timingSafeEqual on SubtleCrypto; DOM/node libs often omit it. */
-type SubtleWithTimingSafe = SubtleCrypto & {
-  timingSafeEqual(
-    a: ArrayBuffer | ArrayBufferView,
-    b: ArrayBuffer | ArrayBufferView
-  ): boolean;
-};
-
 export async function timingSafeEqualAsync(
   a: string,
   b: string

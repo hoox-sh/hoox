@@ -9,6 +9,8 @@
  * Currently checks wrangler version against a known minimum.
  */
 
+import { meetsMinVersion } from "../../utils/placeholder.js";
+
 interface WranglerVersionCheck {
   outdated: boolean;
   current?: string;
@@ -114,8 +116,7 @@ export class PrerequisitesService {
       });
       const stdout = await new Response(proc.stdout).text();
       const version = stdout.trim();
-      const [major, minor] = version.split(".").map(Number);
-      const passed = (major ?? 0) >= 1 && (minor ?? 0) >= 2;
+      const passed = meetsMinVersion(version, 1, 2);
       return {
         ...base,
         passed,
@@ -146,8 +147,7 @@ export class PrerequisitesService {
       const stdout = await new Response(proc.stdout).text();
       const match = stdout.match(/(\d+\.\d+)/);
       const version = match?.[1] ?? "unknown";
-      const [major, minor] = version.split(".").map(Number);
-      const passed = (major ?? 0) >= 2 && (minor ?? 0) >= 40;
+      const passed = meetsMinVersion(version, 2, 40);
       return {
         ...base,
         passed,
@@ -280,6 +280,7 @@ export class PrerequisitesService {
       required: "D1/KV/R2/Queues: Edit",
     };
     const token = process.env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
     if (!token) {
       // No explicit token — wrangler login session may still work. Advisory.
       return {
@@ -289,9 +290,17 @@ export class PrerequisitesService {
         hint: "If deploys fail with 403, set CLOUDFLARE_API_TOKEN with D1/KV/R2/Queues:Edit",
       };
     }
+    if (!accountId) {
+      return {
+        ...base,
+        passed: false,
+        version: "CLOUDFLARE_ACCOUNT_ID unset",
+        hint: "Set CLOUDFLARE_ACCOUNT_ID so token scope can be probed against D1",
+      };
+    }
     try {
       const response = await fetch(
-        "https://api.cloudflare.com/client/v4/accounts",
+        `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -307,7 +316,7 @@ export class PrerequisitesService {
         return {
           ...base,
           passed: true,
-          version: "token has account:read",
+          version: "token can list D1",
         };
       }
       const errMsg = json.errors?.[0]?.message ?? `HTTP ${response.status}`;

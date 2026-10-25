@@ -156,10 +156,10 @@ hoox check health
 
 | Package                 | Version | Published    |
 | ----------------------- | ------- | ------------ |
-| `@hoox-sh/hoox-cli`     | 0.15.0  | yes          |
-| `@hoox-sh/hoox-tui`     | 0.3.2   | yes          |
-| `@hoox-sh/hoox-shared`  | 1.5.0   | yes          |
-| workspace root (`hoox`) | 0.15.0  | no (private) |
+| `@hoox-sh/hoox-cli`     | 0.16.0  | yes          |
+| `@hoox-sh/hoox-tui`     | 0.4.0   | yes          |
+| `@hoox-sh/hoox-shared`  | 1.6.0   | yes          |
+| workspace root (`hoox`) | 0.16.0  | no (private) |
 
 ---
 

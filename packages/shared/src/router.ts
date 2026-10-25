@@ -22,6 +22,11 @@ import type {
 // Re-export types for convenience — consumers can import from "router.ts" as well
 export type { Handler, MiddlewareHandler, RouteParams } from "./types/router";
 
+/**
+ * Create a Worker router with exact-path and `:param` matching.
+ * Last registered route for a method+path wins. Unmatched methods on a
+ * known path return 405; unknown paths return 404.
+ */
 export function createRouter<TEnv = unknown>(): Router<TEnv> {
   const routes: RouteDefinition<TEnv>[] = [];
 

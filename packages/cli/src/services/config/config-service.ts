@@ -58,8 +58,7 @@ export type ConfigError =
  * `Result<T>` so callers can write the same `if (!r.ok)` checks.
  */
 export type ConfigResult =
-  | { ok: true; value: HooxConfig }
-  | { ok: false; error: ConfigError };
+  { ok: true; value: HooxConfig } | { ok: false; error: ConfigError };
 
 /**
  * Loads, parses, and validates the central wrangler.jsonc configuration.
@@ -454,8 +453,8 @@ export class ConfigService {
   /**
    * Persist the dev runtime preference to wrangler.jsonc.
    *
-   * Reads the current file, updates the dev.runtime field, and writes it
-   * back. Preserves JSONC comments where possible.
+   * Reads the current file, updates the `dev.runtime` field via jsonc-parser
+   * `modify` (preserves comments), then reloads the in-memory config.
    */
   async setDevRuntime(runtime: "native" | "docker"): Promise<void> {
     const filePath = this.configPath;
@@ -478,14 +477,11 @@ export class ConfigService {
       throw new Error(`Invalid JSONC in ${filePath}`);
     }
 
-    const config = parsed as Record<string, unknown>;
-    if (!config.dev) {
-      config.dev = {};
-    }
-    (config.dev as Record<string, unknown>).runtime = runtime;
-
-    // Write back as regular JSON (jsonc-parser doesn't support round-trip comment preservation)
-    await Bun.write(filePath, JSON.stringify(config, null, 2) + "\n");
+    const edits = modify(raw, ["dev", "runtime"], runtime, {
+      formattingOptions: JSONC_FORMAT,
+    });
+    await Bun.write(filePath, applyEdits(raw, edits));
+    await this.load(filePath);
   }
 
   /**

@@ -23,9 +23,10 @@ import {
   filterKvKeys,
   sanitizeKvValue,
   MAX_VISIBLE_KEYS,
-  REFRESH_INTERVAL_MS,
 } from "./kv-viewer";
+import { formatPollIntervalLabel } from "../../hooks/use-polling";
 import { Colors, type ViewId } from "@hoox-sh/hoox-shared";
+import { ALL_VIEWS } from "../../types";
 import { useUIStore } from "@hoox-sh/hoox-shared/stores/ui-store";
 import {
   cliBridgeDouble,
@@ -124,8 +125,8 @@ describe("KvViewer", () => {
 
   // ── Pattern contract (mirrors queue-depth subtask 02) ──────────────────
 
-  it("auto-refreshes every 5 seconds while active", () => {
-    expect(REFRESH_INTERVAL_MS).toBe(5_000);
+  it("labels configured poll intervals", () => {
+    expect(formatPollIntervalLabel(5_000)).toBe("5s auto");
   });
 
   it("filters keys case-insensitively by name", () => {
@@ -235,19 +236,6 @@ describe("KvViewer", () => {
   });
 
   it("is included in the local ALL_VIEWS list (tui/src/types.ts)", () => {
-    const ALL_VIEWS: string[] = [
-      "dashboard",
-      "workers",
-      "worker-detail",
-      "trade-monitor",
-      "logs-viewer",
-      "service-manager",
-      "config-editor",
-      "setup-wizard",
-      "settings",
-      "queue-depth",
-      "kv-viewer",
-    ];
     expect(ALL_VIEWS).toContain("kv-viewer");
     // ViewId is derived from ALL_VIEWS so the local type must include it
     // as well. The TypeScript type-check is the real assertion; this

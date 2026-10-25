@@ -17,6 +17,7 @@ export function setRendererRef(renderer: CliRenderer | null): void {
   _renderer = renderer;
 }
 
+/** Current CLI renderer, or `null` before `setRendererRef` / after teardown. */
 export function getRendererRef(): CliRenderer | null {
   return _renderer;
 }

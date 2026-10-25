@@ -17,7 +17,7 @@
 
 import { Command } from "commander";
 import * as p from "@clack/prompts";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { DbService } from "../../services/db/index.js";
 import {
   formatSuccess,
@@ -49,7 +49,7 @@ async function handleApply(
   file?: string
 ): Promise<void> {
   const svc = new DbService();
-  const s = spinner();
+  const s = createCliSpinner(opts);
   const t = startTimer();
   s.start("Applying schema...");
   try {
@@ -78,7 +78,7 @@ async function handleMigrate(
   remote: boolean
 ): Promise<void> {
   const svc = new DbService();
-  const s = spinner();
+  const s = createCliSpinner(opts);
   const t = startTimer();
   s.start("Running migrations...");
   try {
@@ -193,7 +193,7 @@ async function handleExport(
   outputPath?: string
 ): Promise<void> {
   const svc = new DbService();
-  const s = spinner();
+  const s = createCliSpinner(opts);
   const t = startTimer();
   s.start("Exporting database...");
   try {
@@ -227,7 +227,7 @@ async function handleReset(
   }
 
   const svc = new DbService();
-  const s = spinner();
+  const s = createCliSpinner(opts);
   const t = startTimer();
   s.start("Resetting database...");
   try {

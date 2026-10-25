@@ -7,34 +7,19 @@
  * TUI-specific types — Navigation, modals, keyboard shortcuts.
  */
 
-import type { CliErrorType, CliErrorDetails } from "@hoox-sh/hoox-shared";
+import {
+  VIEW_IDS,
+  type ViewId,
+  type CliErrorType,
+  type CliErrorDetails,
+} from "@hoox-sh/hoox-shared";
 
 // Re-export shared CLI error types for convenience so consumers can
 // import everything from the tui/types module.
-export type { CliErrorType, CliErrorDetails };
+export type { CliErrorType, CliErrorDetails, ViewId };
+export { VIEW_IDS as ALL_VIEWS };
 
-/** All primary views registered with the TUI. */
-export const ALL_VIEWS = [
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-] as const;
-
-export type ViewId = (typeof ALL_VIEWS)[number];
-
+/** Sidebar / tab labels for each {@link ViewId}. */
 export const VIEW_LABELS: Record<ViewId, string> = {
   dashboard: "DASHBOARD",
   workers: "WORKERS",
@@ -53,29 +38,6 @@ export const VIEW_LABELS: Record<ViewId, string> = {
   "edge-topology": "TOPOLOGY",
   "worker-settings": "W SETTINGS",
 };
-
-export const VIEW_ORDER: ViewId[] = [
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-];
-
-export function viewIndex(view: ViewId): number {
-  return VIEW_ORDER.indexOf(view);
-}
 
 export type ModalType = "confirm" | "choice" | "loading" | "prompt";
 

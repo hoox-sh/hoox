@@ -30,8 +30,14 @@ type MockEnv = AnalyticsEnv & {
 };
 
 function createMockEnv(withService: boolean, internalKey?: string): MockEnv {
+  const key =
+    internalKey !== undefined
+      ? internalKey
+      : withService
+        ? "test-internal-key"
+        : undefined;
   if (!withService) {
-    return internalKey ? { INTERNAL_KEY_BINDING: internalKey } : {};
+    return key ? { INTERNAL_KEY_BINDING: key } : {};
   }
 
   const fetchFn = mock((_request: Request): Promise<Response> => {
@@ -40,7 +46,7 @@ function createMockEnv(withService: boolean, internalKey?: string): MockEnv {
 
   return {
     ANALYTICS_SERVICE: { fetch: fetchFn } as unknown as Fetcher,
-    ...(internalKey ? { INTERNAL_KEY_BINDING: internalKey } : {}),
+    ...(key ? { INTERNAL_KEY_BINDING: key } : {}),
     _fetchMock: fetchFn,
   };
 }
@@ -118,6 +124,7 @@ describe("trackAnalytics", () => {
 
     const env = {
       ANALYTICS_SERVICE: { fetch: fetchFn } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
     };
 
     // Suppress console.error output during this test
@@ -148,29 +155,43 @@ describe("trackAnalytics", () => {
     expect(request.headers.get("X-Internal-Auth-Key")).toBe("secret-key-123");
   });
 
-  test("omits X-Internal-Auth-Key header when INTERNAL_KEY_BINDING is unset", async () => {
-    const env = createMockEnv(true) as AnalyticsEnv & {
+  test("skips fetch when INTERNAL_KEY_BINDING is unset", async () => {
+    const env = createMockEnv(true, "") as AnalyticsEnv & {
       _fetchMock: ReturnType<typeof mock>;
+      INTERNAL_KEY_BINDING?: string;
     };
+    delete env.INTERNAL_KEY_BINDING;
 
     await trackAnalytics(env, "/track/api-call", { action: "test" });
 
-    const firstCall = env._fetchMock.mock.calls[0];
-    if (!firstCall) throw new Error("expected fetch mock call");
-    const request = firstCall[0] as Request;
-    expect(request.headers.get("X-Internal-Auth-Key")).toBeNull();
+    expect(env._fetchMock.mock.calls.length).toBe(0);
   });
 
-  test("omits X-Internal-Auth-Key header when INTERNAL_KEY_BINDING is empty string", async () => {
+  test("skips fetch when INTERNAL_KEY_BINDING is empty string", async () => {
     const env = createMockEnv(true, "") as AnalyticsEnv & {
       _fetchMock: ReturnType<typeof mock>;
     };
 
     await trackAnalytics(env, "/track/api-call", { action: "test" });
 
-    const firstCall = env._fetchMock.mock.calls[0];
-    if (!firstCall) throw new Error("expected fetch mock call");
-    const request = firstCall[0] as Request;
-    expect(request.headers.get("X-Internal-Auth-Key")).toBeNull();
+    expect(env._fetchMock.mock.calls.length).toBe(0);
+  });
+
+  test("logs non-OK analytics responses without throwing", async () => {
+    const fetchFn = mock((_request: Request): Promise<Response> => {
+      return Promise.resolve(new Response("nope", { status: 401 }));
+    });
+    const env = {
+      ANALYTICS_SERVICE: { fetch: fetchFn } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
+    };
+    const originalConsoleError = console.error;
+    console.error = mock(() => {});
+    try {
+      await trackAnalytics(env, "/track/test", {});
+    } finally {
+      console.error = originalConsoleError;
+    }
+    expect(fetchFn.mock.calls.length).toBe(1);
   });
 });

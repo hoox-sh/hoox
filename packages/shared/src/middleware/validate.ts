@@ -112,6 +112,7 @@ export async function validateJsonLegacy(
   }
 }
 
+/** Require `field` on a parsed JSON body; fail with a missing-field error. */
 export function requireField<T>(
   body: Record<string, unknown>,
   field: string
@@ -122,6 +123,7 @@ export function requireField<T>(
   return { ok: true, value: body[field] as T };
 }
 
+/** Read `field` from a parsed JSON body, or `defaultValue` when absent. */
 export function optionalField<T>(
   body: Record<string, unknown>,
   field: string,

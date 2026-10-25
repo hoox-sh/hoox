@@ -33,7 +33,7 @@ import {
   chmodSync,
 } from "fs";
 import { homedir } from "os";
-import { dirname, join, resolve } from "path";
+import { dirname, join, resolve, sep } from "path";
 
 /**
  * Branded type for Hoox paths to prevent accidental string usage.
@@ -43,11 +43,7 @@ export type HooxPath = string & { readonly __brand: "HooxPath" };
 
 /** Where resolveHooxRuntimeRoot found (or failed to find) a setup monorepo. */
 export type RuntimeRootSource =
-  | "env"
-  | "cwd"
-  | "remembered"
-  | "global"
-  | "none";
+  "env" | "cwd" | "remembered" | "global" | "none";
 
 /** Result of resolveHooxRuntimeRoot(). */
 export interface RuntimeRootResult {
@@ -78,6 +74,24 @@ export interface RememberedMonorepo {
  */
 function createHooxPath(path: string): HooxPath {
   return path as HooxPath;
+}
+
+/**
+ * True when `child` is `parent` or a descendant. Uses a trailing separator
+ * so `/home/alice/.hoox-evil` is not treated as inside `/home/alice/.hoox`.
+ */
+function isInsideDir(child: string, parent: string): boolean {
+  const resolvedChild = resolve(child);
+  const resolvedParent = resolve(parent);
+  const cmpChild =
+    process.platform === "win32" ? resolvedChild.toLowerCase() : resolvedChild;
+  const cmpParent =
+    process.platform === "win32"
+      ? resolvedParent.toLowerCase()
+      : resolvedParent;
+  if (cmpChild === cmpParent) return true;
+  const prefix = cmpParent.endsWith(sep) ? cmpParent : cmpParent + sep;
+  return cmpChild.startsWith(prefix);
 }
 
 /**
@@ -366,7 +380,7 @@ export function resolveHooxPath(relativePath: string): HooxPath {
   const resolvedPath = resolve(fullPath);
   const resolvedHome = resolve(hooxHome);
 
-  if (!resolvedPath.startsWith(resolvedHome)) {
+  if (!isInsideDir(resolvedPath, resolvedHome)) {
     throw new Error(
       `Resolved path "${resolvedPath}" is outside Hoox home directory`
     );
@@ -392,7 +406,7 @@ export function isWithinHooxHome(path: string): boolean {
     const hooxHome = getHooxHome();
     const resolvedPath = resolve(path);
     const resolvedHome = resolve(hooxHome);
-    return resolvedPath.startsWith(resolvedHome);
+    return isInsideDir(resolvedPath, resolvedHome);
   } catch {
     return false;
   }

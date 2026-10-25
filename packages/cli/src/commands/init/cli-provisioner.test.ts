@@ -96,9 +96,9 @@ describe("CLIProvisioner", () => {
         kvNamespaces: [],
         r2Buckets: [],
         queues: [],
-        vectorizeIndexes: ["hoox-rag-index"],
+        vectorizeIndexes: ["my-rag-index"],
       });
-      expect(result.created).toEqual(["Vectorize:hoox-rag-index"]);
+      expect(result.created).toEqual(["Vectorize:my-rag-index"]);
     });
 
     it("lists multiple D1 and KV resources", async () => {
@@ -245,17 +245,17 @@ describe("CLIProvisioner", () => {
         kvNamespaces: [],
         r2Buckets: [],
         queues: [],
-        vectorizeIndexes: ["hoox-rag-index"],
+        vectorizeIndexes: ["my-rag-index"],
       });
 
       expect(result.success).toBe(true);
-      expect(result.created).toEqual(["Vectorize:hoox-rag-index"]);
+      expect(result.created).toEqual(["Vectorize:my-rag-index"]);
       expect(result.errors).toEqual([]);
       expect(spawnCalls[0]).toEqual([
         "wrangler",
         "vectorize",
         "create",
-        "hoox-rag-index",
+        "my-rag-index",
         "--dimensions",
         "768",
         "--metric",

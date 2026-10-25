@@ -624,8 +624,18 @@ describe("parseSecretsList", () => {
       })
     );
     expect(out).toEqual([
-      { name: "API_KEY", type: "api_key", source: "config" },
-      { name: "auth_token", type: "token", source: "config" },
+      {
+        name: "API_KEY",
+        worker: "trade-worker",
+        type: "api_key",
+        source: "config",
+      },
+      {
+        name: "auth_token",
+        worker: "trade-worker",
+        type: "token",
+        source: "config",
+      },
     ]);
   });
 
@@ -1118,7 +1128,10 @@ describe("CliBridge methods (exec stubbed)", () => {
   });
 
   it("configKvGet treats not found as success null", async () => {
-    bridge.exec = (async () => failExec("key not found")) as typeof bridge.exec;
+    bridge.exec = (async () =>
+      failExec(
+        'Key "missing" not found in KV namespace'
+      )) as typeof bridge.exec;
     const result = (await bridge.configKvGet("missing")) as CliResult<
       string | null
     >;
@@ -1127,7 +1140,10 @@ describe("CliBridge methods (exec stubbed)", () => {
   });
 
   it("configKvGet returns trimmed value", async () => {
-    bridge.exec = (async () => okExec("hello\n")) as typeof bridge.exec;
+    bridge.exec = (async () =>
+      okExec(
+        JSON.stringify({ key: "k", value: "hello" })
+      )) as typeof bridge.exec;
     const result = (await bridge.configKvGet("k")) as CliResult<string | null>;
     expect(result.data).toBe("hello");
   });

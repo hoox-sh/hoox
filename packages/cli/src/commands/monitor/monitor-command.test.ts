@@ -186,6 +186,7 @@ describe("registerMonitorCommand", () => {
         from: "user",
       });
       expect(getMock).toHaveBeenCalledWith("ns-id-123", "trade:kill_switch");
+      expect(getMock).toHaveBeenCalledWith("ns-id-123", "global:kill_switch");
     });
 
     it("turns kill switch on", async () => {
@@ -198,6 +199,11 @@ describe("registerMonitorCommand", () => {
         "trade:kill_switch",
         "true"
       );
+      expect(setMock).toHaveBeenCalledWith(
+        "ns-id-123",
+        "global:kill_switch",
+        "true"
+      );
     });
 
     it("turns kill switch off", async () => {
@@ -208,6 +214,11 @@ describe("registerMonitorCommand", () => {
       expect(setMock).toHaveBeenCalledWith(
         "ns-id-123",
         "trade:kill_switch",
+        "false"
+      );
+      expect(setMock).toHaveBeenCalledWith(
+        "ns-id-123",
+        "global:kill_switch",
         "false"
       );
     });

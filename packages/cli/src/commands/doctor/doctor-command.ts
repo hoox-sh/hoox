@@ -11,7 +11,7 @@
  * With `--security`, runs operator-plane hygiene + optional /v1/health probes.
  */
 import { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import {
@@ -319,7 +319,7 @@ EXAMPLES:
           }
 
           if (options.fixRuntime) {
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             const t = startTimer();
             s.start("Ensuring global Hoox runtime...");
             try {

@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "packages/cli/src/utils"
-description: "packages/cli/src/utils contains async.test.ts, async.ts, completion.test.ts, and 30 more files."
+description: "packages/cli/src/utils contains async.test.ts, async.ts, completion.test.ts, and 31 more files."
 resource: "packages/cli/src/utils"
 tags: [cli, code, packages, utils]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-01T17:59:04Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/cli/src/utils"
@@ -29,7 +29,7 @@ okf_lock: generated
 * `errors.test.ts`
 * `errors.ts` — CLIError, enum
 * `format-mode.test.ts`
-* `format-mode.ts` — isRichMode
+* `format-mode.ts` — CliSpinner, createCliSpinner, isRichMode
 * `formatters.test.ts`
 * `formatters.ts` — BadgeLevel, FormatOptions, FormatTableOptions, ProgressBarEta, formatBadge, formatCompletion, formatDuration, formatError, formatHeader, formatHint, formatJson, formatKeyValue
 * `fs-secure.ts` — SECRET_DIR_MODE, SECRET_FILE_MODE, ensureSecretDir, secureChmod, secureSecretFile
@@ -39,6 +39,7 @@ okf_lock: generated
 * `help-formatter.ts` — renderHelp
 * `number.test.ts`
 * `number.ts` — formatBytes, formatNumber
+* `placeholder.ts` — isPlaceholderValue, meetsMinVersion
 * `rich.test.ts`
 * `rich.ts` — RichTask, RichTaskResult, RunRichTasksOptions, runRichTasks
 * `string.test.ts`

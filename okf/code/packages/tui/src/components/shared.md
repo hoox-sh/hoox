@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/shared"
@@ -18,13 +18,11 @@ okf_lock: generated
 
 # Files
 
-* `animated-border.tsx` — AnimatedBorder, AnimatedBorderProps
 * `chrome.test.tsx`
 * `command-palette.tsx` — CommandCategory, CommandEntry, CommandPalette, CommandPaletteProps, CommandSelection
 * `cool-brackets.tsx` — CoolBrackets, CoolBracketsProps, CoolGlyph, useCoolHue
 * `crash-screen.tsx` — CrashAction, CrashScreen, CrashScreenProps, formatCrashMessage
 * `error-boundary.tsx` — ErrorBoundary, formatBoundaryErrorMessage
-* `keybinding-hint.tsx` — KeybindingHint, KeybindingHintProps
 * `panel.tsx` — Panel, PanelProps
 * `quit-modal.tsx` — QuitModal, QuitModalProps
 * `shared.test.tsx`

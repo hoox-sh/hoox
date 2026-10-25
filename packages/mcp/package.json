@@ -1,6 +1,6 @@
 {
   "name": "@hoox-sh/hoox-mcp",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "MCP server for the Hoox CLI. One tool per command, plus confirm gates, redaction, snapshot, and advise.",
   "type": "module",
   "private": true,

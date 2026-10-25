@@ -40,6 +40,14 @@ describe("validateWranglerJsonc", () => {
     expect(errors[0]?.message).toContain("INTERNAL_KEY_BINDING");
   });
 
+  it("fails closed on recovered JSONC with missing commas", () => {
+    const jsonc = `{ "name": "d1-worker" "main": "src/index.ts", "vars": { "INTERNAL_KEY_BINDING": "__SECRET__" } }`;
+    const errors = validateWranglerJsonc("d1-worker", manifest, jsonc);
+    expect(errors.some((e) => e.message.includes("Failed to parse"))).toBe(
+      true
+    );
+  });
+
   it("should detect wrong service target", () => {
     const manifest = WORKER_MANIFESTS["hoox"]!;
     const jsonc = JSON.stringify({
@@ -283,7 +291,9 @@ describe("validateAll and richer generate coverage", () => {
     const gateway = generateWranglerJsonc(WORKER_MANIFESTS["hoox"]!);
     expect(gateway).toContain("vectorize");
     expect(gateway).toContain("producers");
+    expect(gateway).toContain("TRADE_QUEUE");
     expect(gateway).toContain("durable_objects");
+    expect((gateway.match(/"queues"/g) ?? []).length).toBe(1);
 
     const analytics = generateWranglerJsonc(
       WORKER_MANIFESTS["analytics-worker"]!

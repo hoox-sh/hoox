@@ -1,7 +1,7 @@
 # Bundle update log
 
 ## 2026-10-25
-* **Update**: Compiled 137 code modules and 86 documents (digest `b367b2dd3243`).
+* **Update**: Compiled 137 code modules and 86 documents (digest `c6f8749efdf8`).
 
 ## 2026-10-12
 

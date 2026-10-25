@@ -541,16 +541,3 @@ export function showLoading(dialog: DialogHandle, message: string): () => void {
   const id = dialog.show({ message });
   return () => dialog.close(id);
 }
-
-// Re-export for select.tsx / tests that referenced dialog keyboard helpers
-export type DialogId = string | number;
-
-/** @deprecated No-op; local keyboard is handled inside overlays. */
-export function useDialogKeyboard(
-  _handler: (key: { name?: string }) => void,
-  _dialogId?: DialogId
-): void {
-  // Overlays own their own useKeyboard; this stub avoids @opentui-ui/dialog.
-  void _handler;
-  void _dialogId;
-}

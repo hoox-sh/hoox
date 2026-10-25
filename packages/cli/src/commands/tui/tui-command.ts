@@ -495,6 +495,7 @@ export function registerTUICommand(program: Command): void {
                 resolveChild();
               } else if (code !== null) {
                 console.log(theme.dim(`\nTUI exited with code ${code}\n`));
+                process.exitCode = code;
                 resolveChild();
               } else {
                 reject(

@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/monitor"
@@ -24,4 +24,4 @@ okf_lock: generated
 
 # Packages
 
-`bun:test`, `commander`
+`@hoox-sh/hoox-shared`, `bun:test`, `commander`

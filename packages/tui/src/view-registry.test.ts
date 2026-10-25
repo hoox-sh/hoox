@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from "bun:test";
-import type { ViewId } from "@hoox-sh/hoox-shared";
+import { VIEW_IDS, type ViewId } from "@hoox-sh/hoox-shared";
 import {
   VIEW_REGISTRY,
   REGISTERED_VIEW_IDS,
@@ -19,24 +19,7 @@ import {
   ALL_PALETTE_COMMANDS,
 } from "./view-registry";
 
-const ALL_VIEWS: ViewId[] = [
-  "dashboard",
-  "workers",
-  "worker-detail",
-  "trade-monitor",
-  "logs-viewer",
-  "service-manager",
-  "config-editor",
-  "setup-wizard",
-  "settings",
-  "queue-depth",
-  "kv-viewer",
-  "secrets-viewer",
-  "db-query",
-  "ai-chat",
-  "edge-topology",
-  "worker-settings",
-];
+const ALL_VIEWS: ViewId[] = [...VIEW_IDS];
 
 describe("view-registry", () => {
   it("covers every ViewId exactly once in order", () => {

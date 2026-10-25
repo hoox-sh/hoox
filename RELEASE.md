@@ -14,7 +14,7 @@ The release pipeline is fully automated via GitHub Actions. Pushing a version ta
 1. **Test & Build** — unit tests for `packages/cli` and `packages/shared`, then `bun run build:packages`
 2. **npm Publish** — publishes `@hoox-sh/hoox-cli` to the npm registry
 3. **GitHub Packages Publish** — publishes the same package to GitHub Packages
-4. **GitHub Release** — creates a tagged release on GitHub
+4. **GitHub Release** — creates a tagged release whose notes are the matching `CHANGELOG.md` section (`scripts/changelog-notes.ts`)
 
 ## Prerequisites
 

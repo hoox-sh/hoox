@@ -101,6 +101,18 @@ export function createPollingController(options: {
   };
 }
 
+/** Compact HUD label for the configured poll interval. */
+export function formatPollIntervalLabel(ms: number): string {
+  if (!Number.isFinite(ms) || ms <= 0) return "auto";
+  if (ms >= 1000 && ms % 1000 === 0) return `${ms / 1000}s auto`;
+  if (ms >= 1000) return `${(ms / 1000).toFixed(1)}s auto`;
+  return `${Math.round(ms)}ms auto`;
+}
+
+/**
+ * Poll `callback` on the Settings refresh interval while `enabled`.
+ * Backs off exponentially after thrown failures; resets after success.
+ */
 export function usePolling(options: UsePollingOptions): void {
   const { callback, enabled = true, immediate = true } = options;
   const intervalMs = useConfigStore((s) => s.refreshIntervalMs);

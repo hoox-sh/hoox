@@ -7,7 +7,7 @@ tags: [code, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T22:51:08Z
 sources:
   - id: tree
     resource: "packages/tui/src"
@@ -30,7 +30,7 @@ okf_lock: generated
 * `opentui-jsx.d.ts` — KeyEvent, createRoot, useKeyboard
 * `test-setup.ts`
 * `test-utils.ts` — ALL_VIEW_IDS, ConnectionStatus, LogLevel, MockErrorBoundary, TestLogEntry, TestTrade, TestWorkerInfo, TradeSide, WorkerStatus, abortAllSseSubscriptions, cliBridgeDouble, emitSseEvent
-* `types.ts` — ALL_VIEWS, CliCommandState, CliCommandStatus, CliErrorDetails, CliErrorType, CliResult, DEFAULT_SHORTCUTS, ModalState, ModalType, ShortcutMap, VIEW_LABELS, VIEW_ORDER
+* `types.ts` — ALL_VIEWS, CliCommandState, CliCommandStatus, CliErrorDetails, CliErrorType, CliResult, DEFAULT_SHORTCUTS, ModalState, ModalType, ShortcutMap, VIEW_LABELS, ViewId
 * `view-registry.test.ts`
 * `view-registry.tsx` — ACTION_COMMANDS, ALL_PALETTE_COMMANDS, REGISTERED_VIEW_IDS, SIDEBAR_ITEMS, VIEW_REGISTRY, ViewFactory, ViewKeyMod, ViewRegistryEntry, getCtrlAltViewMap, getSidebarItems, getViewFactory, getViewPaletteCommands
 

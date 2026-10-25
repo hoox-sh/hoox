@@ -279,6 +279,9 @@ const manifests: Record<string, WorkerManifest> = {
         type: "secret",
         description: "Inter-worker auth key",
       },
+      OPENAI_API_KEY: { type: "secret", description: "OpenAI API key" },
+      ANTHROPIC_API_KEY: { type: "secret", description: "Anthropic API key" },
+      GOOGLE_API_KEY: { type: "secret", description: "Google AI API key" },
     },
     services: [
       {

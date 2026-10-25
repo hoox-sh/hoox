@@ -79,11 +79,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract changelog for this tag
+        run: bun scripts/changelog-notes.ts "${{ github.ref_name }}" > /tmp/release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: Shared Package Release ${{ github.ref_name }}
+          body_path: /tmp/release-notes.md
+          generate_release_notes: false
           draft: false
           prerelease: false
           files: |

@@ -15,7 +15,7 @@
  *   rollback  — Rollback a worker to a previous version
  */
 import { Command } from "commander";
-import { spinner, log, select, confirm, isCancel } from "@clack/prompts";
+import { log, select, confirm, isCancel } from "@clack/prompts";
 import { ConfigService } from "../../services/config/index.js";
 import { CloudflareService } from "../../services/cloudflare/index.js";
 import { theme, icons } from "../../utils/theme.js";
@@ -29,6 +29,7 @@ import {
   getFormatOptions,
 } from "../../utils/formatters.js";
 import { runRichTasks, type RichTaskResult } from "../../utils/rich.js";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 import type { DeployResult } from "./types.js";
@@ -231,7 +232,13 @@ async function deployAll(
     run: async (): Promise<DeployResult> => {
       const result =
         name === "dashboard"
-          ? await deployDashboard(cf, forceRebuildDashboard, true, autoMode)
+          ? await deployDashboard(
+              cf,
+              forceRebuildDashboard,
+              true,
+              autoMode,
+              format
+            )
           : await deploySingle(configService, cf, name, env);
       // runRichTasks only marks failure on throw — soft DeployResult
       // failures must throw so summary shows FAILED and exitCode is set.
@@ -312,7 +319,8 @@ async function deployDashboard(
   _cf: CloudflareService,
   forceRebuild: boolean = false,
   silentMode: boolean = false,
-  autoMode: boolean = false
+  autoMode: boolean = false,
+  format: FormatOptions = {}
 ): Promise<DeployResult> {
   const dashboardPath = "workers/dashboard";
 
@@ -348,10 +356,9 @@ async function deployDashboard(
     process.stdout.write(`${theme.dim("─".repeat(50))}\n\n`);
   }
 
-  // Use clack spinner
   const actionText =
     action === "rebuild" ? "Building & deploying" : "Deploying";
-  const s = spinner();
+  const s = createCliSpinner(format);
 
   try {
     s.start(`${actionText} dashboard...`);
@@ -720,7 +727,7 @@ async function doVersionHistory(
   worker: string,
   fmt: FormatOptions
 ): Promise<void> {
-  const s = spinner();
+  const s = createCliSpinner(fmt);
   s.start(`Fetching deployment history for ${worker}...`);
 
   const cf = new CloudflareService();
@@ -759,7 +766,7 @@ async function doVersionHistory(
 // ---------------------------------------------------------------------------
 
 /**
- * Rollback a worker to a previous version via `wrangler versions rollback`.
+ * Rollback a worker to a previous version via `wrangler rollback`.
  * If no version is specified, prompts the user to select from recent versions.
  */
 async function doVersionRollback(
@@ -773,7 +780,7 @@ async function doVersionRollback(
 
   // If no version specified, fetch recent versions and prompt
   if (!targetVersion) {
-    const s = spinner();
+    const s = createCliSpinner(fmt);
     s.start(`Fetching recent versions for ${worker}...`);
 
     const result = await cf.versionsList(worker);
@@ -829,7 +836,7 @@ async function doVersionRollback(
   }
 
   // Execute the rollback
-  const s = spinner();
+  const s = createCliSpinner(fmt);
   s.start(`Rolling back ${worker} to version ${targetVersion}...`);
 
   const rollResult = await cf.versionsRollback(worker, targetVersion);
@@ -1005,7 +1012,8 @@ EXAMPLES:
     .option("--env <env>", "Cloudflare environment (e.g. production, staging)")
     .action(
       withErrorHandling(
-        async (options: { env?: string }) => {
+        async (options: { env?: string }, cmd: Command) => {
+          const fmt = getFormatOptions(cmd);
           const configService = new ConfigService();
           await configService.load();
           const cf = new CloudflareService();
@@ -1041,7 +1049,7 @@ EXAMPLES:
 
           // Deploy each worker with clack spinner
           for (const name of ordered) {
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             s.start(`Deploying ${name}...`);
 
             const result = await deploySingle(
@@ -1180,7 +1188,13 @@ EXAMPLES:
           const fmt = getFormatOptions(cmd);
           const cf = new CloudflareService();
 
-          const result = await deployDashboard(cf, options.rebuild);
+          const result = await deployDashboard(
+            cf,
+            options.rebuild,
+            false,
+            false,
+            fmt
+          );
 
           if (result.success) {
             const url = result.url ? ` — ${result.url}` : "";

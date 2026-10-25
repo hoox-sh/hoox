@@ -155,8 +155,7 @@ function validateSecrets(
 ): string[] {
   const errors: string[] = [];
   const secrets = input.secrets as
-    | Record<string, Record<string, string>>
-    | undefined;
+    Record<string, Record<string, string>> | undefined;
   if (!secrets || Object.keys(secrets).length === 0) {
     return [];
   }
@@ -257,12 +256,12 @@ export class WizardEngine {
     if (currentIdx > 0) {
       const previousStep = STEP_ORDER[currentIdx - 1];
       if (previousStep === undefined) return;
+      const leaving = this.state.step;
       this.state.step = previousStep;
-      // Remove current step from completed if this is going back from completed step
       this.state.completedSteps = this.state.completedSteps.filter(
         (s) =>
-          s !== this.state.step ||
-          STEP_ORDER.indexOf(s) <= STEP_ORDER.indexOf(previousStep)
+          s !== leaving &&
+          STEP_ORDER.indexOf(s) < STEP_ORDER.indexOf(previousStep)
       );
     }
     this.state.updatedAt = Date.now();
@@ -281,10 +280,16 @@ export class WizardEngine {
     const cf = this.state.cloudflareConfig;
     const workers: Record<string, WorkerConfig> = {};
 
-    // Base workers (always enabled)
+    const enabled = new Set(this.state.selectedWorkers);
+    for (const key of this.state.selectedIntegrations) {
+      const integration = INTEGRATIONS.find((i) => i.key === key);
+      if (integration?.workerName) enabled.add(integration.workerName);
+    }
+
+    // Catalog every base worker; only selected ones (and their deps) are on.
     for (const [name, baseCfg] of Object.entries(BASE_WORKERS)) {
       workers[name] = {
-        enabled: true,
+        enabled: enabled.has(name),
         path: baseCfg.path,
         vars: { ...baseCfg.vars },
         secrets: [...(BASE_SECRETS[name] ?? [])],
@@ -359,7 +364,6 @@ export class WizardEngine {
     };
 
     const allWorkers = [
-      ...Object.keys(BASE_WORKERS),
       ...this.state.selectedWorkers,
       ...this.state.selectedIntegrations
         .map((k) => {
@@ -382,7 +386,7 @@ export class WizardEngine {
     }
     if (workerSet.has("hoox") || workerSet.has("telegram-worker")) {
       plan.vectorizeIndexes = plan.vectorizeIndexes ?? [];
-      plan.vectorizeIndexes.push("hoox-rag-index");
+      plan.vectorizeIndexes.push("my-rag-index");
     }
 
     // Deduplicate

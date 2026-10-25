@@ -64,6 +64,7 @@ export function subscribeSSE<T>(
   options?: SubscribeSSEOptions
 ): SSESubscription {
   let aborted = false;
+  const ac = new AbortController();
 
   const profile =
     options?.transport ??
@@ -82,6 +83,7 @@ export function subscribeSSE<T>(
             Accept: "text/event-stream",
             ...buildOperatorAuthHeaders(profile),
           },
+          signal: ac.signal,
         });
 
         if (!response.ok || !response.body) {
@@ -98,7 +100,9 @@ export function subscribeSSE<T>(
 
         while (!aborted) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done) {
+            throw new Error("SSE stream ended");
+          }
 
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split("\n");
@@ -107,9 +111,12 @@ export function subscribeSSE<T>(
 
           for (const line of lines) {
             const trimmed = line.trim();
-            if (trimmed.startsWith("data: ")) {
+            // SSE: "data:" with an optional space before the payload
+            if (trimmed.startsWith("data:")) {
+              const jsonText = trimmed.slice(5).replace(/^\s/, "");
+              if (!jsonText) continue;
               try {
-                const parsed = JSON.parse(trimmed.slice(6)) as T;
+                const parsed = JSON.parse(jsonText) as T;
                 callback(parsed);
               } catch {
                 // Skip malformed events — log at debug level only
@@ -130,8 +137,18 @@ export function subscribeSSE<T>(
         );
         attempt++;
 
-        // Wait before reconnecting
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise<void>((resolve) => {
+          const timer = setTimeout(resolve, delay);
+          const onAbort = () => {
+            clearTimeout(timer);
+            resolve();
+          };
+          if (ac.signal.aborted) {
+            onAbort();
+            return;
+          }
+          ac.signal.addEventListener("abort", onAbort, { once: true });
+        });
       }
     }
 
@@ -146,6 +163,7 @@ export function subscribeSSE<T>(
   return {
     abort: () => {
       aborted = true;
+      ac.abort();
     },
   };
 }

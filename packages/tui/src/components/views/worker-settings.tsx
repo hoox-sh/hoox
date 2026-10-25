@@ -298,13 +298,13 @@ export function WorkerSettingsView() {
 
       if (isAgentConfigEmbeddedField(row.field.key)) {
         const cfgResult = await cliBridge.configKvGet(AGENT_CONFIG_KV_KEY);
-        if (!cfgResult.success && cfgResult.data == null) {
-          // Empty/missing agent:config is fine (starts from {}); only hard-fail on I/O errors
-          // when stderr indicates a real failure and data is unusable.
+        if (!cfgResult.success) {
+          setStatus(
+            `Save blocked: could not read ${AGENT_CONFIG_KV_KEY} (${cfgResult.stderr || cfgResult.stdout || "unknown error"})`
+          );
+          return;
         }
-        const current = parseAgentConfigJson(
-          cfgResult.success ? cfgResult.data : null
-        );
+        const current = parseAgentConfigJson(cfgResult.data);
         const next = applyAgentConfigFieldUpdates(current, {
           [row.field.key]: value,
         });

@@ -9,6 +9,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { isPlaceholderValue } from "../../utils/placeholder.js";
 
 const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -76,7 +77,9 @@ export function ensureSolanaPrivateKey(devVarsPath: string): {
     ? parseEnvFile(readFileSync(devVarsPath, "utf-8"))
     : new Map<string, string>();
   const current = existing.get("SOLANA_PRIVATE_KEY")?.trim();
-  if (current) return { generated: false, value: current };
+  if (current && !isPlaceholderValue(current)) {
+    return { generated: false, value: current };
+  }
 
   const value = generateSolanaSeedBase58();
   const header = existsSync(devVarsPath)

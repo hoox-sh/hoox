@@ -25,6 +25,7 @@ import {
 import { startTimer } from "../../utils/timer.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
+import { createCliSpinner, type CliSpinner } from "../../utils/format-mode.js";
 import { theme } from "../../utils/theme.js";
 
 // ---------------------------------------------------------------------------
@@ -225,7 +226,7 @@ EXAMPLES:
           }
 
           // ── Prerequisites ────────────────────────────────────────────
-          const authCheck = p.spinner();
+          const authCheck = createCliSpinner(globalOpts);
           authCheck.start("Checking Cloudflare authentication...");
 
           const tempSvc = new SetupService();
@@ -273,14 +274,14 @@ EXAMPLES:
             database: options.database as string | undefined,
           };
 
-          let currentSpinner: ReturnType<typeof p.spinner> | null = null;
+          let currentSpinner: CliSpinner | null = null;
 
-          // Create service with progress wiring to @clack spinners
+          // Create service with progress wiring to JSON-safe spinners
           const setupSvc = new SetupService(
             wireProgress(
               (msg) => {
                 if (currentSpinner) currentSpinner.stop();
-                currentSpinner = p.spinner();
+                currentSpinner = createCliSpinner(globalOpts);
                 currentSpinner.start(msg);
               },
               (msg) => {

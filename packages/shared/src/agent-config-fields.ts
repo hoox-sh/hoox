@@ -59,6 +59,7 @@ export const DASHBOARD_SECTIONS_AGENT_CONFIG: ReadonlySet<string> = new Set([
   "models",
 ]);
 
+/** True when `fieldKey` is stored inside the agent:config KV document. */
 export function isAgentConfigEmbeddedField(fieldKey: string): boolean {
   return Object.prototype.hasOwnProperty.call(
     AGENT_CONFIG_EMBEDDED_FIELDS,
@@ -66,6 +67,7 @@ export function isAgentConfigEmbeddedField(fieldKey: string): boolean {
   );
 }
 
+/** True when the dashboard section is edited via agent:config (not flat KV). */
 export function isAgentConfigSection(sectionId: string): boolean {
   return DASHBOARD_SECTIONS_AGENT_CONFIG.has(sectionId);
 }
@@ -93,6 +95,7 @@ export function parseAgentConfigJson(
   return {};
 }
 
+/** Serialize an agent:config object for CONFIG_KV. */
 export function serializeAgentConfigForKv(
   config: Record<string, unknown>
 ): string {
@@ -107,6 +110,7 @@ const NUMBER_TOP_KEYS = new Set([
   "takeProfitPercent",
 ]);
 
+/** Read one embedded agent:config field as a scalar or JSON string. */
 export function getAgentConfigEmbeddedValue(
   config: Record<string, unknown>,
   fieldKey: string
@@ -143,6 +147,7 @@ export function getAgentConfigEmbeddedValue(
   return undefined;
 }
 
+/** Immutably set one embedded agent:config field and return the next document. */
 export function setAgentConfigEmbeddedValue(
   config: Record<string, unknown>,
   fieldKey: string,

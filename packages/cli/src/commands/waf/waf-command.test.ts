@@ -175,17 +175,19 @@ describe("waf command", () => {
     it("shows WAF status when enabled", async () => {
       mockZonesList("example.com (abc123def456)");
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "on" },
-        "/firewall/rules": [
-          {
-            id: "rule-1",
-            description: "Block bad IPs",
-            action: "block",
-            filter: { id: "f1", expression: "(ip.src eq 1.2.3.4)" },
-            created_on: "2026-01-01T00:00:00Z",
-            modified_on: "2026-01-02T00:00:00Z",
-          },
-        ],
+        "/settings/security_level": { id: "security_level", value: "on" },
+        "http_request_firewall_custom/entrypoint": {
+          id: "rs-1",
+          rules: [
+            {
+              id: "rule-1",
+              description: "Block bad IPs",
+              action: "block",
+              expression: "(ip.src eq 1.2.3.4)",
+              last_updated: "2026-01-02T00:00:00Z",
+            },
+          ],
+        },
         "/analytics/dashboard": { totals: { threats: 42 } },
       });
 
@@ -200,8 +202,8 @@ describe("waf command", () => {
     it("shows WAF status when disabled", async () => {
       mockZonesList("example.com (abc123def456)");
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "off" },
-        "/firewall/rules": [],
+        "/settings/security_level": { id: "security_level", value: "off" },
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
         "/analytics/dashboard": { totals: { threats: 0 } },
       });
 
@@ -215,8 +217,8 @@ describe("waf command", () => {
     it("outputs JSON when --json flag is used", async () => {
       mockZonesList("example.com (abc123def456)");
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "on" },
-        "/firewall/rules": [],
+        "/settings/security_level": { id: "security_level", value: "on" },
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
         "/analytics/dashboard": { totals: { threats: 0 } },
       });
 
@@ -239,8 +241,8 @@ describe("waf command", () => {
     it("uses CLOUDFLARE_ZONE_ID env var when set", async () => {
       process.env.CLOUDFLARE_ZONE_ID = "direct-zone-id";
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "on" },
-        "/firewall/rules": [],
+        "/settings/security_level": { id: "security_level", value: "on" },
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
         "/analytics/dashboard": { totals: { threats: 0 } },
       });
 
@@ -256,53 +258,50 @@ describe("waf command", () => {
     it("lists firewall rules in human-readable format", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/firewall/rules": [
-          {
-            id: "rule-1-is-a-very-long-id",
-            description: "IP blocklist rule",
-            action: "block",
-            filter: {
-              id: "f1",
+        "http_request_firewall_custom/entrypoint": {
+          id: "rs-1",
+          rules: [
+            {
+              id: "rule-1-is-a-very-long-id",
+              description: "IP blocklist rule",
+              action: "block",
               expression: "(ip.src eq 10.0.0.1)",
+              last_updated: "2026-01-02T00:00:00Z",
             },
-            created_on: "2026-01-01T00:00:00Z",
-            modified_on: "2026-01-02T00:00:00Z",
-          },
-          {
-            id: "rule-2-short",
-            description: "",
-            action: "allow",
-            filter: {
-              id: "f2",
+            {
+              id: "rule-2-short",
+              description: "",
+              action: "skip",
               expression: '(http.request.uri.path contains "/api")',
+              last_updated: "2026-01-04T00:00:00Z",
             },
-            created_on: "2026-01-03T00:00:00Z",
-            modified_on: "2026-01-04T00:00:00Z",
-          },
-        ],
+          ],
+        },
       });
 
       const { stdout } = await runCommand("waf rules list");
 
       expect(stdout).toContain("IP blocklist rule");
       expect(stdout).toContain("block");
-      expect(stdout).toContain("allow");
+      expect(stdout).toContain("skip");
       expect(stdout).toContain("(ip.src eq 10.0.0.1)");
     });
 
     it("outputs JSON when --json flag is used", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/firewall/rules": [
-          {
-            id: "rule-1",
-            description: "Test rule",
-            action: "block",
-            filter: { id: "f1", expression: "(ip.src eq 1.1.1.1)" },
-            created_on: "2026-01-01T00:00:00Z",
-            modified_on: "2026-01-01T00:00:00Z",
-          },
-        ],
+        "http_request_firewall_custom/entrypoint": {
+          id: "rs-1",
+          rules: [
+            {
+              id: "rule-1",
+              description: "Test rule",
+              action: "block",
+              expression: "(ip.src eq 1.1.1.1)",
+              last_updated: "2026-01-01T00:00:00Z",
+            },
+          ],
+        },
       });
 
       const { stdout } = await runCommand("waf rules list --json");
@@ -314,7 +313,9 @@ describe("waf command", () => {
 
     it("shows empty message when no rules exist", async () => {
       mockZonesList("example.com (zone-1)");
-      mockCfFetch({ "/firewall/rules": [] });
+      mockCfFetch({
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
+      });
 
       const { stdout } = await runCommand("waf rules list");
 
@@ -324,7 +325,7 @@ describe("waf command", () => {
     it("throws when rules fetch fails", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/firewall/rules": { error: "API error" },
+        "http_request_firewall_custom/entrypoint": { error: "API error" },
       });
 
       const { stdout } = await runCommand("waf rules list");
@@ -339,18 +340,13 @@ describe("waf command", () => {
     it("adds an IP allowlist rule", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/filters": { id: "filter-1" },
-        // NOTE: the firewall/rules endpoint is matched but returns array
-        "/firewall/rules": [
-          {
-            id: "new-rule-1",
-            description: "ip-allowlist rule for 192.168.1.1",
-            action: "allow",
-            filter: { id: "filter-1", expression: "(ip.src eq 192.168.1.1)" },
-            created_on: "2026-01-01T00:00:00Z",
-            modified_on: "2026-01-01T00:00:00Z",
-          },
-        ],
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
+        "/rulesets/rs-1/rules": {
+          id: "new-rule-1",
+          description: "ip-allowlist rule for 192.168.1.1",
+          action: "skip",
+          expression: "(ip.src eq 192.168.1.1)",
+        },
       });
 
       const { stdout } = await runCommand(
@@ -369,10 +365,12 @@ describe("waf command", () => {
       expect(stdout).toContain("Invalid rule type");
     });
 
-    it("throws when filter creation fails", async () => {
+    it("throws when ruleset load fails", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/filters": { error: "Filter creation failed" },
+        "http_request_firewall_custom/entrypoint": {
+          error: "Filter creation failed",
+        },
       });
 
       const { stdout } = await runCommand(
@@ -389,7 +387,8 @@ describe("waf command", () => {
     it("removes a WAF rule by ID", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/firewall/rules/rule-to-delete": { id: "rule-to-delete" },
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
+        "/rulesets/rs-1/rules/rule-to-delete": { id: "rule-to-delete" },
       });
 
       const { stdout } = await runCommand("waf rules remove rule-to-delete");
@@ -401,7 +400,8 @@ describe("waf command", () => {
     it("throws when rule deletion fails", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/firewall/rules/bad-id": { error: "Rule not found" },
+        "http_request_firewall_custom/entrypoint": { id: "rs-1", rules: [] },
+        "/rulesets/rs-1/rules/bad-id": { error: "Rule not found" },
       });
 
       const { stdout } = await runCommand("waf rules remove bad-id");
@@ -416,7 +416,7 @@ describe("waf command", () => {
     it("enables WAF on the zone", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "on" },
+        "/settings/security_level": { id: "security_level", value: "medium" },
       });
 
       const { stdout } = await runCommand("waf mode enable");
@@ -428,7 +428,10 @@ describe("waf command", () => {
     it("disables WAF on the zone", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/settings/waf": { id: "waf", value: "off" },
+        "/settings/security_level": {
+          id: "security_level",
+          value: "essentially_off",
+        },
       });
 
       const { stdout } = await runCommand("waf mode disable");
@@ -440,7 +443,7 @@ describe("waf command", () => {
     it("throws when mode update fails", async () => {
       mockZonesList("example.com (zone-1)");
       mockCfFetch({
-        "/settings/waf": { error: "Permission denied" },
+        "/settings/security_level": { error: "Permission denied" },
       });
 
       const { stdout } = await runCommand("waf mode enable");

@@ -21,7 +21,11 @@
  * for any CLI failure, regardless of which view triggered it.
  */
 import * as path from "path";
-import { getHooxRepoPath, resolveHooxRuntimeRoot } from "@hoox-sh/hoox-shared";
+import {
+  getHooxRepoPath,
+  resolveHooxRuntimeRoot,
+  isTruthyKillSwitchFlag,
+} from "@hoox-sh/hoox-shared";
 import type { CliResult, CliErrorType, CliErrorDetails } from "../../types";
 import type {
   ExecOptions,
@@ -127,6 +131,21 @@ export function tryParseJsonLoose(stdout: string): unknown | null {
     }
   }
   return null;
+}
+
+/** Unwrap `hoox config kv get --json` `{ key, value }` into the stored string. */
+function unwrapKvGetPayload(payload: unknown): string | null | undefined {
+  if (payload == null) return undefined;
+  if (typeof payload !== "object" || Array.isArray(payload)) return undefined;
+  if (!("value" in payload)) return undefined;
+  const v = (payload as { value: unknown }).value;
+  if (v == null) return null;
+  if (typeof v === "string") return v;
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return String(v);
+  }
 }
 
 /**
@@ -369,6 +388,7 @@ export function parseSecretsList(stdout: string): SecretMetadata[] {
         if (typeof item === "string") {
           result.push({
             name: item,
+            worker: envelope.worker,
             type: inferSecretType(item),
             source: "config",
           });
@@ -383,12 +403,13 @@ export function parseSecretsList(stdout: string): SecretMetadata[] {
   if (typeof parsed === "object" && !Array.isArray(parsed)) {
     const entries = Object.entries(parsed as Record<string, unknown>);
     const result: SecretMetadata[] = [];
-    for (const [, value] of entries) {
+    for (const [worker, value] of entries) {
       if (Array.isArray(value)) {
         for (const item of value) {
           if (typeof item === "string") {
             result.push({
               name: item,
+              worker,
               type: inferSecretType(item),
               source: "config",
             });
@@ -613,14 +634,14 @@ export function parseKillSwitchStatus(
   if (valueMatch) {
     const raw = valueMatch[1] ?? null;
     return {
-      engaged: raw === "true",
+      engaged: isTruthyKillSwitchFlag(raw),
       rawValue: raw,
       timestamp,
       action,
     };
   }
 
-  // Unknown output — treat as released (fail-open for display, but flag raw)
+  // Unknown output — do not claim the switch is released
   return { engaged: false, rawValue: null, timestamp, action };
 }
 
@@ -963,7 +984,22 @@ class CliBridgeImpl {
       let data: T | null = null;
       if (options?.json && exitCode === 0 && stdout.trim()) {
         const parsed = tryParseJsonLoose(stdout);
-        if (parsed !== null) data = parsed as T;
+        if (parsed !== null) {
+          data = parsed as T;
+        } else {
+          return {
+            success: false,
+            exitCode,
+            stdout: this.truncateOutput(stdout),
+            stderr: this.truncateOutput(
+              stderrResult || "CLI --json output was not valid JSON"
+            ),
+            data: null,
+            duration: performance.now() - start,
+            command,
+            errorType: "non-zero-exit",
+          };
+        }
       }
 
       // Classify the failure (success leaves errorType=null).
@@ -1386,16 +1422,24 @@ class CliBridgeImpl {
       tag: `config:kv:get:${key}`,
     }).then((result) => {
       if (!result.success) {
-        // Missing key is not a hard error — the CLI exits non-zero with
-        // a "not found" message and the viewer should display an empty
-        // value rather than an error pill.
-        const combined = `${result.stdout}\n${result.stderr}`.toLowerCase();
-        if (combined.includes("not found")) {
+        const combined = `${result.stdout}\n${result.stderr}`;
+        const missingKey = /Key\s+"[^"]+"\s+not found in KV namespace/i.test(
+          combined
+        );
+        if (missingKey && result.errorType !== "binary-not-found") {
           return { ...result, data: null, success: true };
         }
         return { ...result, data: null };
       }
+      const fromData = unwrapKvGetPayload(result.data);
+      if (fromData !== undefined) {
+        return { ...result, data: fromData };
+      }
       const cleaned = result.stdout.replace(/\n$/, "").trim();
+      const fromStdout = unwrapKvGetPayload(tryParseJsonLoose(cleaned));
+      if (fromStdout !== undefined) {
+        return { ...result, data: fromStdout };
+      }
       return {
         ...result,
         data: cleaned.length > 0 ? cleaned : null,

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { isPlaceholderValue } from "../../utils/placeholder.js";
+
 export interface EnvVarDefinition {
   name: string;
   required: boolean;
@@ -27,6 +29,10 @@ export interface EnvValidationResult {
   warnings: string[];
 }
 
+/**
+ * Root `.env.local` and worker `.dev.vars` reader. Secret fields are
+ * masked in {@link EnvService.show}; `--json` callers must redact too.
+ */
 export class EnvService {
   static getDefinitions(): EnvVarDefinition[] {
     return [
@@ -382,7 +388,7 @@ export class EnvService {
     for (const def of EnvService.getDefinitions()) {
       if (def.required) {
         const val = vars[def.name];
-        if (!val || val.startsWith("your_") || val.startsWith("generate_")) {
+        if (isPlaceholderValue(val)) {
           missing.push(def.name);
         }
       }

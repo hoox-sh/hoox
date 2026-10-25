@@ -90,16 +90,23 @@ export async function trackAnalytics(
     // production, and test mocks add it explicitly.
     const internalKey = (env as { INTERNAL_KEY_BINDING?: string })
       .INTERNAL_KEY_BINDING;
-    if (internalKey) {
-      headers["X-Internal-Auth-Key"] = internalKey;
+    if (!internalKey) {
+      console.error("Analytics tracking skipped: INTERNAL_KEY_BINDING missing");
+      return;
     }
-    await env.ANALYTICS_SERVICE.fetch(
+    headers["X-Internal-Auth-Key"] = internalKey;
+    const response = await env.ANALYTICS_SERVICE.fetch(
       new Request(`http://localhost${endpoint}`, {
         method: "POST",
         headers,
         body: JSON.stringify(payload),
       })
     );
+    if (!response.ok) {
+      console.error(
+        `Analytics tracking failed: HTTP ${response.status} ${response.statusText}`
+      );
+    }
   } catch (e) {
     console.error("Analytics tracking failed:", e);
   }

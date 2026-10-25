@@ -341,6 +341,41 @@ describe("BaseExchangeClient", () => {
       expect(res.status).toBe("filled");
     });
 
+    it("appends GET params to the query string and omits the body", async () => {
+      mockFetch.mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), { status: 200 })
+      );
+
+      class GetClient extends BaseExchangeClient {
+        protected getDefaultBaseUrl(): string {
+          return "https://api.test.com";
+        }
+        protected async generateSignature(): Promise<string> {
+          return "s";
+        }
+        protected buildHeaders(): Headers {
+          return new Headers();
+        }
+        async setLeverage(): Promise<void> {}
+        async executeTrade(): Promise<OrderResponse> {
+          return { orderId: "g", symbol: "X", status: "filled" };
+        }
+        async getAccountInfo(): Promise<Record<string, unknown>> {
+          return this.fetch("GET", "/v1/account", { timestamp: 1 });
+        }
+        async getPositions(): Promise<Position[]> {
+          return [];
+        }
+      }
+
+      const client = new GetClient("k", "s");
+      await client.getAccountInfo();
+      const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe("https://api.test.com/v1/account?timestamp=1");
+      expect(init.method).toBe("GET");
+      expect(init.body).toBeUndefined();
+    });
+
     it("throws on HTTP error response from exchange", async () => {
       mockFetch.mockResolvedValue(
         new Response("Bad Request: invalid symbol", { status: 400 })

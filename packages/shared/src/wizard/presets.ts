@@ -148,7 +148,7 @@ export const INTEGRATIONS: IntegratedService[] = [
     label: "OpenAI (AI Agent)",
     workerName: "agent-worker",
     secrets: {
-      AGENT_INTERNAL_KEY: "OpenAI API Key",
+      OPENAI_API_KEY: "OpenAI API Key",
     },
   },
   {
@@ -156,7 +156,7 @@ export const INTEGRATIONS: IntegratedService[] = [
     label: "Anthropic (AI Agent)",
     workerName: "agent-worker",
     secrets: {
-      AGENT_INTERNAL_KEY: "Anthropic API Key",
+      ANTHROPIC_API_KEY: "Anthropic API Key",
     },
   },
   {
@@ -164,7 +164,7 @@ export const INTEGRATIONS: IntegratedService[] = [
     label: "Google AI (AI Agent)",
     workerName: "agent-worker",
     secrets: {
-      AGENT_INTERNAL_KEY: "Google AI API Key",
+      GOOGLE_API_KEY: "Google AI API Key",
     },
   },
   {

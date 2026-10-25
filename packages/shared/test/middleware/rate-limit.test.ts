@@ -470,8 +470,8 @@ describe("RateLimiter.checkKey", () => {
     const result = await limiter.checkKey("user-1");
     expect(result.allowed).toBe(true);
 
-    // The KV should contain entries with the custom prefix
-    const stored = await kv.get("my-prefix:user-1");
+    const windowStart = Math.floor(Date.now() / (60 * 1000));
+    const stored = await kv.get(`my-prefix:user-1:${windowStart}`);
     expect(stored).toBe("1");
   });
 

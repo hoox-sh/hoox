@@ -1,6 +1,6 @@
 {
   "name": "@hoox-sh/hoox-tui",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Hoox algorithmic trading terminal operations center — OpenTUI dashboard",
   "type": "module",
   "main": "./dist/main.js",

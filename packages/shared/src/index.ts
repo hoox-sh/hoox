@@ -125,7 +125,6 @@ export { createQueueHandler } from "./queue-handler";
 export type { QueueHandlerOptions } from "./queue-handler";
 export { createCronHandler } from "./cron-handler";
 export type { CronHandlerOptions } from "./cron-handler";
-export { D1Repository } from "./d1/index";
 export {
   serviceFetch,
   authenticatedServiceFetch,
@@ -153,9 +152,7 @@ export type {
   BatchStatement,
 } from "./d1/index";
 
-// ── Test utilities ─────────────────────────────────────────────────────────
-
-export * from "./test-utils";
+// Test doubles live at `@hoox-sh/hoox-shared/test-utils` (not the runtime barrel).
 
 // ── New TUI shared exports ────────────────────────────────────────────────
 
@@ -229,10 +226,11 @@ export type {
   ResolveOperatorTransportOptions,
 } from "./operator-transport";
 export { restoreSession, saveSession } from "./session";
-export type { SessionState } from "./session";
+export type { SessionState, RestoredSession } from "./session";
 export { formatRelativeTime as formatRelativeTimeFromTime } from "./format-time";
 
 // TUI-specific types
+export { VIEW_IDS } from "./types";
 export type {
   ViewId,
   ModalState,

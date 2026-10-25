@@ -23,6 +23,7 @@ import {
   formatSuccess,
 } from "../../../utils/formatters.js";
 import { withErrorHandling } from "../../../utils/error-handler.js";
+import { createCliSpinner } from "../../../utils/format-mode.js";
 import { theme, icons } from "../../../utils/theme.js";
 import { ExitCode, CLIError } from "../../../utils/errors.js";
 import type { FastPathReport } from "./types.js";
@@ -58,11 +59,11 @@ async function handleRun(opts: RunOptions, fmt: FormatOptions): Promise<void> {
   if (opts.timeout !== undefined) config.timeoutMs = parseInt(opts.timeout, 10);
   if (opts.apiKey !== undefined) config.apiKey = opts.apiKey;
 
-  const spinner = (await import("@clack/prompts")).spinner();
-  spinner.start(`Probing fast path: 0/0`);
+  const spin = createCliSpinner(fmt);
+  spin.start(`Probing fast path: 0/0`);
   const service = new FastPathService();
   const report = await service.run(config);
-  spinner.stop(
+  spin.stop(
     `${report.successful}/${report.iterations} successful (${report.failed} failed${report.degraded ? ", degraded" : ""})`
   );
 

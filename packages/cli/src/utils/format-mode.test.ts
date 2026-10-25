@@ -12,7 +12,7 @@ import {
   beforeEach,
   afterEach,
 } from "bun:test";
-import { isRichMode } from "./format-mode.js";
+import { isRichMode, createCliSpinner } from "./format-mode.js";
 
 describe("isRichMode", () => {
   // Snapshot env at describe-block time so we always restore to the
@@ -89,5 +89,55 @@ describe("isRichMode", () => {
   it("respects --json over env vars (json wins)", () => {
     process.env.NO_COLOR = "1";
     expect(isRichMode({ json: true })).toBe(false);
+  });
+});
+
+describe("createCliSpinner", () => {
+  it("is a no-op when --json is set", () => {
+    const writes: string[] = [];
+    const orig = process.stdout.write.bind(process.stdout);
+    process.stdout.write = ((chunk: string | Uint8Array) => {
+      writes.push(String(chunk));
+      return true;
+    }) as typeof process.stdout.write;
+    try {
+      const s = createCliSpinner({ json: true });
+      s.start("working");
+      s.message("still working");
+      s.stop("done");
+      expect(writes.join("")).not.toContain("working");
+      expect(writes.join("")).not.toContain("done");
+    } finally {
+      process.stdout.write = orig;
+    }
+  });
+
+  it("is a no-op when --quiet is set", () => {
+    const s = createCliSpinner({ quiet: true });
+    expect(() => {
+      s.start("working");
+      s.stop("done");
+    }).not.toThrow();
+  });
+
+  it("prints stop() lines in human non-TTY mode", () => {
+    Object.defineProperty(process.stdout, "isTTY", {
+      value: undefined,
+      configurable: true,
+    });
+    const writes: string[] = [];
+    const orig = process.stdout.write.bind(process.stdout);
+    process.stdout.write = ((chunk: string | Uint8Array) => {
+      writes.push(String(chunk));
+      return true;
+    }) as typeof process.stdout.write;
+    try {
+      const s = createCliSpinner({});
+      s.start("working");
+      s.stop("done");
+      expect(writes.join("")).toContain("done");
+    } finally {
+      process.stdout.write = orig;
+    }
   });
 });

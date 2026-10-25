@@ -5,10 +5,10 @@
 
 ---
 title: "CLI Commands Reference"
-description: "Command tree, flags, and examples for the hoox CLI (0.15.0)."
+description: "Command tree, flags, and examples for the hoox CLI (0.16.0)."
 ---
 
-The `@hoox-sh/hoox-cli` tool (**0.15.0**) manages workspace bootstrap, Cloudflare provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
+The `@hoox-sh/hoox-cli` tool (**0.16.0**) manages workspace bootstrap, Cloudflare provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
 
 <Frame caption="hoox deploy --help">
   <img src="/docs/images/cli/help-deploy.png" alt="Terminal showing hoox deploy help" />
@@ -22,7 +22,7 @@ Per-group stills: [Interface gallery](/docs/enduser/guides/screenshots#cli).
 
 Install: `bun add -g @hoox-sh/hoox-cli`. Recommended bootstrap: `hoox onboard`. Prefer CLI commands over raw Wrangler for day-to-day ops. Agents can run the same commands through the [Hoox MCP server](/docs/devops/mcp) (`bun run mcp` from a checkout — the MCP package is private and is not published to npm).
 
-**0.15.0 surface:** monorepo auto-detect + remember (run `hx` from any cwd), Linear Rail banner (`◆ H · O · O · X`), secret sync modes (`--system` / `--required`), `hoox workers catalog` / `enable` / `disable`, `hoox pyne` for **pyne-worker**, operator security plane (`doctor --security`, `tunnel check`). Global UX: `--json` task-result arrays, `--quiet` (no stdout), `--no-color` / `NO_COLOR` / `TERM=dumb`, completion footers, “did you mean …”, sectioned help.
+**0.16.0 surface:** monorepo auto-detect + remember (run `hx` from any cwd), Linear Rail banner (`◆ H · O · O · X`), secret sync modes (`--system` / `--required`), `hoox workers catalog` / `enable` / `disable`, `hoox pyne` for **pyne-worker**, operator security plane (`doctor --security`, `tunnel check`). Global UX: `--json` task-result arrays (no clack spinner mix), `--quiet` (no stdout), `--no-color` / `NO_COLOR` / `TERM=dumb`, completion footers, “did you mean …”, sectioned help. Kill-switch show/on/off covers both canonical KV keys.
 
 Older CLI releases (0.8–0.13) are not current. See [`packages/cli/CHANGELOG.md`](https://github.com/hoox-sh/hoox/blob/main/packages/cli/CHANGELOG.md) for history.
 
@@ -74,7 +74,7 @@ These options are registered globally and can be appended to any command:
 | `--quiet`    | Prints nothing (no headers, tables, or task summary).                | `hoox deploy all --quiet`       |
 | `--no-color` | Disable ANSI color output (also: `NO_COLOR=1` env var, `TERM=dumb`). | `hoox --no-color check health`  |
 | `--help`     | Prints complete parameter and option listings.                       | `hoox infra d1 --help`          |
-| `--version`  | Outputs active CLI package build version (`0.15.0`).                 | `hoox --version`                |
+| `--version`  | Outputs active CLI package build version (`0.16.0`).                 | `hoox --version`                |
 | `-y, --yes`  | Skip confirmation prompts (where supported).                         | `hoox repair rebuild --yes`     |
 
 ---
@@ -435,7 +435,7 @@ hoox tunnel check
 
 ## Older releases
 
-Commands such as `hoox onboard`, top-level `hoox secrets` / `hoox keys`, `hoox perf fastpath`, and `hoox dashboard` landed in 0.8.x. Shared formatters (`--no-color`, “did you mean”, completion footers) landed in 0.9.x. Linear Rail, monorepo remember, and quieter secrets checks landed later. **Current CLI is 0.15.0** — do not treat 0.9 as current.
+Commands such as `hoox onboard`, top-level `hoox secrets` / `hoox keys`, `hoox perf fastpath`, and `hoox dashboard` landed in 0.8.x. Shared formatters (`--no-color`, “did you mean”, completion footers) landed in 0.9.x. Linear Rail, monorepo remember, and quieter secrets checks landed later. **Current CLI is 0.16.0** — do not treat 0.9 as current.
 
 Replacements still in force:
 

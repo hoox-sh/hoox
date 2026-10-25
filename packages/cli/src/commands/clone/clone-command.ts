@@ -20,7 +20,7 @@
  * Uses @clack/prompts spinner for progress feedback.
  */
 import { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { ConfigService } from "../../services/config/index.js";
 import { getHooxHome } from "@hoox-sh/hoox-shared";
 import { icons } from "../../utils/theme.js";
@@ -320,7 +320,7 @@ EXAMPLES:
               ? `https://github.com/${options.org}`
               : await resolveRepoBase();
 
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             const cloneTimer = startTimer();
             const location = options.home ? "$HOME/.hoox/workers" : "workers/";
             s.start(`Cloning ${workers.length} worker(s) to ${location}...`);
@@ -452,7 +452,7 @@ EXAMPLES:
               ? `https://github.com/${options.org}`
               : await resolveRepoBase();
 
-            const s = spinner();
+            const s = createCliSpinner(fmt);
             const singleTimer = startTimer();
             const location = options.home ? "$HOME/.hoox/workers" : "workers/";
             s.start(`Cloning ${name} to ${location}...`);

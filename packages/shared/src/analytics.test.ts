@@ -17,6 +17,7 @@ describe("trackAnalytics indexes option", () => {
   it("forwards indexes field when option is provided", async () => {
     const env = {
       ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
     };
     await trackAnalytics(
       env,
@@ -36,6 +37,7 @@ describe("trackAnalytics indexes option", () => {
   it("omits indexes field when option is not provided", async () => {
     const env = {
       ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
     };
     await trackAnalytics(env, "/track/api-call", { foo: "bar" });
     const req = fetchMock.mock.calls[0]?.[0] as Request;
@@ -49,6 +51,7 @@ describe("trackAnalytics indexes option", () => {
   it("drops caller-supplied tenant keys when flag is off", async () => {
     const env = {
       ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
     };
     await trackAnalytics(env, "/track/api-call", {
       foo: "bar",
@@ -68,6 +71,7 @@ describe("trackAnalytics indexes option", () => {
   it("env tenant wins over caller-supplied tenant keys", async () => {
     const env = {
       ANALYTICS_SERVICE: { fetch: fetchMock } as unknown as Fetcher,
+      INTERNAL_KEY_BINDING: "test-internal-key",
       TENANT_MODE: "true",
       TENANT_ID: "acme",
     };

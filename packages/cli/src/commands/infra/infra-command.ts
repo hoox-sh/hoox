@@ -17,7 +17,7 @@
  */
 
 import { Command } from "commander";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { parse } from "jsonc-parser";
 import { resolve } from "node:path";
 import { CloudflareService } from "../../services/cloudflare/index.js";
@@ -443,7 +443,7 @@ async function doProvision(
     };
   }
 
-  const s = spinner();
+  const s = createCliSpinner(opts);
 
   for (const workerName of enabledWorkers) {
     const workerConfig = configService.getWorker(workerName);

@@ -80,11 +80,7 @@ export interface KillSwitchStatus {
  *   - no data                 → "unknown"
  */
 export type QueueDepthStatus =
-  | "healthy"
-  | "backlogged"
-  | "critical"
-  | "paused"
-  | "unknown";
+  "healthy" | "backlogged" | "critical" | "paused" | "unknown";
 
 /** Per-queue depth info. See {@link QueueDepthStatus} for status semantics. */
 export interface QueueDepth {
@@ -139,8 +135,7 @@ export interface DbQueryResult {
  * command to the local `hoox` binary.
  */
 export type SqlValidationResult =
-  | { readonly: true }
-  | { readonly: false; reason: string };
+  { readonly: true } | { readonly: false; reason: string };
 
 /**
  * A single Cloudflare Workers secret metadata (read-only, no values exposed).
@@ -152,6 +147,8 @@ export type SqlValidationResult =
 export interface SecretMetadata {
   /** Secret name / key, e.g. "EXCHANGE_KEY_BINDING" or "OPENAI_API_KEY". */
   name: string;
+  /** Worker that declared the secret (all-workers list). */
+  worker?: string;
   /**
    * Inferred type based on naming conventions. Cloudflare secrets store
    * does not expose per-secret type metadata, so we derive it from the

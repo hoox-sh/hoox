@@ -23,10 +23,15 @@ import {
   statSync,
 } from "node:fs";
 import { join } from "node:path";
-import { homedir } from "node:os";
+import { getHooxHome } from "./path-utils";
 
-const HOX_DIR = join(homedir(), ".hoox");
-const CONFIG_PATH = join(HOX_DIR, "config.json");
+function hooxDir(): string {
+  return getHooxHome();
+}
+
+function configPath(): string {
+  return join(hooxDir(), "config.json");
+}
 
 /** Owner rwx only — config dir may hold secrets and certs. */
 export const HOOX_DIR_MODE = 0o700;
@@ -74,7 +79,10 @@ const DEFAULT_CONFIG: HooxConfig = {
   defaultView: "dashboard",
 };
 
-/** Read config from disk, merging with defaults and env vars */
+/**
+ * Read operator config from `$HOOX_HOME/config.json` (default `~/.hoox`).
+ * Env `HOOX_API_URL` / `HOOX_API_TOKEN` override file values.
+ */
 export function readConfigSync(): HooxConfig {
   const envConfig: Partial<HooxConfig> = {
     apiUrl: process.env.HOOX_API_URL,
@@ -83,8 +91,8 @@ export function readConfigSync(): HooxConfig {
 
   let fileConfig: Partial<HooxConfig> = {};
   try {
-    if (existsSync(CONFIG_PATH)) {
-      fileConfig = JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
+    if (existsSync(configPath())) {
+      fileConfig = JSON.parse(readFileSync(configPath(), "utf-8"));
     }
   } catch {
     // Ignore parse errors, use defaults
@@ -99,6 +107,7 @@ export function readConfigSync(): HooxConfig {
   };
 }
 
+/** Async alias of {@link readConfigSync}. */
 export async function readConfig(): Promise<HooxConfig> {
   return readConfigSync();
 }
@@ -107,7 +116,7 @@ export async function readConfig(): Promise<HooxConfig> {
  * Ensure `~/.hoox` exists with owner-only permissions.
  * Best-effort chmod on existing dirs (may fail on some FS / Windows).
  */
-export function ensureHooxDirSecure(dir: string = HOX_DIR): void {
+export function ensureHooxDirSecure(dir: string = hooxDir()): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true, mode: HOOX_DIR_MODE });
   }
@@ -148,7 +157,7 @@ export function isUnixModeGroupOrWorldAccessible(mode: number): boolean {
  * Always false when the file is missing or mode is unavailable.
  */
 export function isConfigWorldOrGroupReadable(
-  filePath: string = CONFIG_PATH
+  filePath: string = configPath()
 ): boolean {
   try {
     if (!existsSync(filePath)) return false;
@@ -160,7 +169,7 @@ export function isConfigWorldOrGroupReadable(
 
 /** Human-readable warning when config perms are too open. */
 export function formatConfigPermissionWarning(
-  filePath: string = CONFIG_PATH
+  filePath: string = configPath()
 ): string | null {
   if (!isConfigWorldOrGroupReadable(filePath)) return null;
   return (
@@ -170,20 +179,20 @@ export function formatConfigPermissionWarning(
   );
 }
 
-/** Write config to disk with owner-only permissions. */
+/**
+ * Write operator config to `$HOOX_HOME/config.json` with owner-only mode.
+ * Throws when the directory or file cannot be written.
+ */
 export function writeConfigSync(config: HooxConfig): void {
-  try {
-    ensureHooxDirSecure(HOX_DIR);
-    writeSecureFileSync(
-      CONFIG_PATH,
-      JSON.stringify(config, null, 2),
-      HOOX_CONFIG_FILE_MODE
-    );
-  } catch (err) {
-    console.error("Failed to write config:", err);
-  }
+  ensureHooxDirSecure(hooxDir());
+  writeSecureFileSync(
+    configPath(),
+    JSON.stringify(config, null, 2),
+    HOOX_CONFIG_FILE_MODE
+  );
 }
 
+/** Async alias of {@link writeConfigSync}. Throws on I/O failure. */
 export async function writeConfig(config: HooxConfig): Promise<void> {
   writeConfigSync(config);
 }

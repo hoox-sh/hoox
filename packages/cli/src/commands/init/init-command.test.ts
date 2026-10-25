@@ -661,7 +661,7 @@ describe("init command", () => {
         select: "full",
         confirmSequence: [true, false, false],
         group: {
-          AGENT_INTERNAL_KEY: "sk-openai-123",
+          OPENAI_API_KEY: "sk-openai-123",
         },
       };
 
@@ -824,7 +824,7 @@ describe("init command", () => {
         select: "full",
         confirmSequence: [true, false, false],
         group: {
-          AGENT_INTERNAL_KEY: "sk-openai-real-value",
+          OPENAI_API_KEY: "sk-openai-real-value",
         },
       };
 
@@ -833,7 +833,7 @@ describe("init command", () => {
       const devVarsPath = "workers/agent-worker/.dev.vars";
       const devVars = captured.writes[devVarsPath];
       expect(devVars).toBeDefined();
-      expect(devVars).toContain("AGENT_INTERNAL_KEY=sk-openai-real-value");
+      expect(devVars).toContain("OPENAI_API_KEY=sk-openai-real-value");
       expect(devVars).toContain("NEVER commit this file");
     });
 

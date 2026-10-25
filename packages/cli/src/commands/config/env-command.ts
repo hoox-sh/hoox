@@ -166,7 +166,15 @@ async function handleShow(opts: FormatOptions): Promise<void> {
   const vars = await EnvService.loadDotEnvAsync(".env.local");
 
   if (opts.json) {
-    formatJson(vars, opts);
+    const defs = EnvService.getDefinitions();
+    const secretNames = new Set(
+      defs.filter((d) => d.secret).map((d) => d.name)
+    );
+    const redacted: Record<string, string> = {};
+    for (const [name, val] of Object.entries(vars)) {
+      redacted[name] = secretNames.has(name) && val ? "********" : val;
+    }
+    formatJson(redacted, opts);
   } else {
     process.stdout.write(EnvService.show(vars));
   }

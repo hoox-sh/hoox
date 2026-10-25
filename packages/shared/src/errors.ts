@@ -127,6 +127,7 @@ function sanitizeOutput(data: unknown): unknown {
   return data;
 }
 
+/** JSON Response with sanitized payload and `Content-Type: application/json`. */
 export function createJsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(sanitizeOutput(data)), {
     status,

@@ -23,7 +23,7 @@
  * Pattern established for the TUI feature-parity batch:
  *   - Pure function component, no props required
  *   - Subscribes to useUIStore (so auto-refresh can pause when not active)
- *   - Calls cliBridge.monitorQueueDepth() on mount + every 5s while active
+ *   - Calls cliBridge.monitorQueueDepth() on mount + config refreshIntervalMs while active
  *   - Wraps content in <ErrorBoundary viewName="Queue Depth">
  *   - Renders an empty/error state without throwing
  *
@@ -44,9 +44,8 @@ import { Panel } from "../shared/panel";
 import { cliBridge } from "../../services/cli-bridge";
 import type { QueueDepth, QueueDepthStatus } from "../../services/cli-bridge";
 import { useViewKeyboard } from "../../hooks/shell-overlay";
-
-/** Auto-refresh interval in milliseconds. */
-export const REFRESH_INTERVAL_MS = 5_000;
+import { usePolling, formatPollIntervalLabel } from "../../hooks/use-polling";
+import { useConfigStore } from "@hoox-sh/hoox-shared";
 
 /** Status severity for sort order (critical first). */
 const STATUS_RANK: Record<QueueDepthStatus, number> = {
@@ -255,15 +254,12 @@ export function QueueDepthView() {
     };
   }, [refresh]);
 
-  // Auto-refresh every 5s while the view is the active view.
-  // Soft poll avoids flicker; interval stops when user navigates away.
-  useEffect(() => {
-    if (!isActive) return;
-    const handle = setInterval(() => {
-      void refresh({ soft: true });
-    }, REFRESH_INTERVAL_MS);
-    return () => clearInterval(handle);
-  }, [isActive, refresh]);
+  const refreshIntervalMs = useConfigStore((s) => s.refreshIntervalMs);
+  usePolling({
+    callback: () => refresh({ soft: true }),
+    enabled: isActive,
+    immediate: false,
+  });
 
   // Keyboard: r / F5 manual refresh while active
   useViewKeyboard((key) => {
@@ -291,7 +287,7 @@ export function QueueDepthView() {
                 {queues.length} queue{queues.length === 1 ? "" : "s"}
               </text>
               <text fg={Colors.info} dim>
-                ◉ {REFRESH_INTERVAL_MS / 1000}s auto
+                ◉ {formatPollIntervalLabel(refreshIntervalMs)}
               </text>
             </box>
           }

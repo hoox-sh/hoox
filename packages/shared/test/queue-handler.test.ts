@@ -13,8 +13,9 @@ function mockMessage(
   return {
     id: opts.id ?? "msg-id",
     body,
-    attempts: opts.attempts ?? 0,
+    attempts: opts.attempts ?? 1,
     retry: vi.fn(),
+    ack: vi.fn(),
   };
 }
 
@@ -54,6 +55,8 @@ describe("createQueueHandler", () => {
     expect(onMessage).toHaveBeenCalledWith(mockMsg.body, 0);
     expect(onRetry).not.toHaveBeenCalled();
     expect(onDLQ).not.toHaveBeenCalled();
+    expect(mockMsg.ack).toHaveBeenCalledTimes(1);
+    expect(mockMsg.retry).not.toHaveBeenCalled();
   });
 
   it("should retry failed messages with exponential backoff", async () => {
@@ -83,6 +86,7 @@ describe("createQueueHandler", () => {
       0 // backoff delay
     );
     expect(mockMsg.retry).toHaveBeenCalledWith({ delaySeconds: 0 });
+    expect(mockMsg.ack).not.toHaveBeenCalled();
     expect(onDLQ).not.toHaveBeenCalled();
   });
 
@@ -101,7 +105,7 @@ describe("createQueueHandler", () => {
 
     const mockMsg = mockMessage(
       { requestId: "123", action: "buy" },
-      { attempts: 3 }
+      { attempts: 4 }
     );
 
     await handler({
@@ -111,6 +115,7 @@ describe("createQueueHandler", () => {
 
     expect(onDLQ).toHaveBeenCalledWith(mockMsg.body, 3, "Trade failed");
     expect(mockMsg.retry).not.toHaveBeenCalled();
+    expect(mockMsg.ack).toHaveBeenCalledTimes(1);
   });
 
   it("should handle multiple messages in batch", async () => {
@@ -255,7 +260,7 @@ describe("createQueueHandler", () => {
       );
       const failDlq = mockMessage(
         { id: "fail-dlq" },
-        { id: "fail-dlq", attempts: 2 }
+        { id: "fail-dlq", attempts: 3 }
       );
 
       await handler({
@@ -264,10 +269,40 @@ describe("createQueueHandler", () => {
       } as any);
 
       expect(ok.retry).not.toHaveBeenCalled();
+      expect(ok.ack).toHaveBeenCalledTimes(1);
       expect(failRetry.retry).toHaveBeenCalledWith({ delaySeconds: 10 });
+      expect(failRetry.ack).not.toHaveBeenCalled();
       expect(onRetry).toHaveBeenCalledWith(failRetry.body, 0, "retry-me", 10);
       expect(failDlq.retry).not.toHaveBeenCalled();
+      expect(failDlq.ack).toHaveBeenCalledTimes(1);
       expect(onDLQ).toHaveBeenCalledWith(failDlq.body, 2, "dlq-me");
+    });
+
+    it("acks after onDLQ even when the hook throws (does not fail the batch)", async () => {
+      const ok = mockMessage({ id: "ok" }, { id: "ok", attempts: 1 });
+      const fail = mockMessage({ id: "fail" }, { id: "fail", attempts: 1 });
+      const onOk = vi.fn();
+      const mixed = createQueueHandler({
+        maxRetries: 0,
+        backoffDelays: [0],
+        onMessage: async (msg: { id: string }) => {
+          if (msg.id === "fail") throw new Error("boom");
+          onOk();
+        },
+        onDLQ: async () => {
+          throw new Error("dlq-hook-failed");
+        },
+      });
+
+      await mixed({
+        messages: [ok, fail] as any,
+        metadata: {} as any,
+      } as any);
+
+      expect(onOk).toHaveBeenCalled();
+      expect(ok.ack).toHaveBeenCalledTimes(1);
+      expect(fail.ack).toHaveBeenCalledTimes(1);
+      expect(fail.retry).not.toHaveBeenCalled();
     });
 
     it("treats invalid concurrency as serial (1)", async () => {

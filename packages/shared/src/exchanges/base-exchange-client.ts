@@ -139,16 +139,24 @@ export abstract class BaseExchangeClient {
     path: string,
     params?: Record<string, string | number | boolean>
   ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    const encoded = params
+      ? new URLSearchParams(
+          Object.fromEntries(
+            Object.entries(params).map(([k, v]) => [k, String(v)])
+          )
+        ).toString()
+      : "";
+    const isGet = method === "GET" || method === "HEAD";
+    const url =
+      isGet && encoded
+        ? `${this.baseUrl}${path}${path.includes("?") ? "&" : "?"}${encoded}`
+        : `${this.baseUrl}${path}`;
     const headers = this.buildHeaders(method, path, params);
-    const body = params
-      ? new URLSearchParams(params as Record<string, string>).toString()
-      : undefined;
 
     const response = await fetch(url, {
       method,
       headers,
-      body: method !== "GET" ? body : undefined,
+      body: isGet || !encoded ? undefined : encoded,
     });
 
     if (!response.ok) {

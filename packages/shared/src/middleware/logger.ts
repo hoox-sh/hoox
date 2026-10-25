@@ -31,6 +31,7 @@ export interface Logger {
   error(message: string, context?: Record<string, unknown>): void;
 }
 
+/** JSON-line logger bound to a service/module context. */
 export function createLogger(ctx: LogContext): Logger {
   const base = { service: ctx.service, module: ctx.module };
 
@@ -61,6 +62,7 @@ export function createLogger(ctx: LogContext): Logger {
   };
 }
 
+/** Wrap a fetch handler so each request logs method, path, status, and duration. */
 export function withRequestLog<E>(
   handler: (
     request: Request,

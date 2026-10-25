@@ -285,8 +285,18 @@ async function handleRebuild(fmt: FormatOptions): Promise<void> {
     await config.load();
     for (const worker of config.listEnabledWorkers()) {
       const cfg = config.getWorker(worker);
-      if (cfg) {
-        await cf.deploy(cfg.path);
+      if (!cfg) continue;
+      const deployResult = await cf.deploy(cfg.path);
+      if (!deployResult.ok) {
+        formatError(
+          new CLIError(
+            `Deploy failed for ${worker}: ${deployResult.error}`,
+            ExitCode.ERROR
+          ),
+          fmt
+        );
+        process.exitCode = ExitCode.ERROR;
+        return;
       }
     }
     formatSuccess("Rebuild complete", fmt);

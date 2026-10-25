@@ -148,6 +148,13 @@ function createStorage(kv?: KVNamespace): RateLimitStorage {
   };
 }
 
+/**
+ * Create a KV- or memory-backed rate limiter.
+ *
+ * `check` / `enforce` key by client IP and a clock window.
+ * `checkKey` / `enforceKey` key by the caller string plus the same window
+ * (so a busy key does not accumulate forever).
+ */
 export function createRateLimiter(
   kv: Env["CONFIG_KV"] | undefined,
   config: RateLimitConfig
@@ -190,7 +197,9 @@ export function createRateLimiter(
     // incremented between our read and the incr call, which means we could
     // temporarily exceed the limit under extreme concurrency. The window is small.
     const newCount = await storage.incr(fullKey, {
-      expirationTtl: config.windowSeconds,
+      // Workers KV rejects expirationTtl < 60; in-memory storage still uses
+      // the configured window via the key bucket.
+      expirationTtl: Math.max(60, config.windowSeconds),
     });
 
     // Re-check after increment: if we overshot due to a race, reject this request.
@@ -239,7 +248,8 @@ export function createRateLimiter(
   }
 
   async function checkKey(key: string): Promise<RateLimitResult> {
-    const fullKey = `${prefix}:${key}`;
+    const windowStart = Math.floor(Date.now() / (config.windowSeconds * 1000));
+    const fullKey = `${prefix}:${key}:${windowStart}`;
     return checkWithKey(fullKey);
   }
 

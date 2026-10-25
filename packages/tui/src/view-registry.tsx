@@ -8,7 +8,7 @@
  * View registry — single source of truth for view factories, sidebar items,
  * keyboard shortcuts, and command-palette view commands.
  */
-import type { ViewId } from "@hoox-sh/hoox-shared";
+import { VIEW_IDS, type ViewId } from "@hoox-sh/hoox-shared";
 import type { DialogHandle } from "./components/ui/dialog";
 import type { CommandEntry } from "./components/shared/command-palette";
 
@@ -247,25 +247,7 @@ export function isRegisteredViewId(id: unknown): id is ViewId {
 /** Compile-time exhaustiveness helper (call once at module load). */
 function assertFullCoverage(entries: ViewRegistryEntry[]): void {
   const ids = new Set(entries.map((e) => e.id));
-  const required: ViewId[] = [
-    "dashboard",
-    "workers",
-    "worker-detail",
-    "trade-monitor",
-    "logs-viewer",
-    "service-manager",
-    "config-editor",
-    "setup-wizard",
-    "settings",
-    "queue-depth",
-    "kv-viewer",
-    "secrets-viewer",
-    "db-query",
-    "ai-chat",
-    "edge-topology",
-    "worker-settings",
-  ];
-  for (const id of required) {
+  for (const id of VIEW_IDS) {
     if (!ids.has(id)) throw new Error(`view-registry missing ViewId: ${id}`);
   }
   // Unique keyboard bindings within each modifier class
@@ -298,6 +280,7 @@ export const SIDEBAR_ITEMS: {
   shortcut: e.shortcut,
 }));
 
+/** Sidebar rows in registry order (id, short label, key hint). */
 export function getSidebarItems(): {
   id: ViewId;
   label: string;
@@ -306,6 +289,7 @@ export function getSidebarItems(): {
   return SIDEBAR_ITEMS;
 }
 
+/** Ctrl+digit / letter → view id (primary shortcuts). */
 export function getViewShortcutMap(): Record<string, ViewId> {
   const map: Record<string, ViewId> = {};
   for (const e of VIEW_REGISTRY) {
@@ -314,6 +298,7 @@ export function getViewShortcutMap(): Record<string, ViewId> {
   return map;
 }
 
+/** Ctrl+Alt+letter → view id (overflow chords once Ctrl+0-9 are taken). */
 export function getCtrlAltViewMap(): Record<string, ViewId> {
   const map: Record<string, ViewId> = {};
   for (const e of VIEW_REGISTRY) {
@@ -322,12 +307,14 @@ export function getCtrlAltViewMap(): Record<string, ViewId> {
   return map;
 }
 
+/** Factory for `id`, or the dashboard factory when the id is unknown. */
 export function getViewFactory(id: ViewId): ViewFactory {
   const entry = VIEW_REGISTRY.find((e) => e.id === id);
   // Fail soft to dashboard when store has a stale/unknown id
   return entry?.factory ?? VIEW_REGISTRY[0]!.factory;
 }
 
+/** Command-palette entries for every registered view. */
 export function getViewPaletteCommands(): CommandEntry[] {
   return VIEW_REGISTRY.map((e) => ({
     id: e.id,

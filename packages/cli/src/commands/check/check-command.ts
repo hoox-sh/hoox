@@ -16,7 +16,7 @@
 import { Command } from "commander";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
-import { spinner } from "@clack/prompts";
+import { createCliSpinner } from "../../utils/format-mode.js";
 import { modify, applyEdits, parse } from "jsonc-parser";
 import { ConfigService } from "../../services/config/index.js";
 import { CloudflareService } from "../../services/cloudflare/index.js";
@@ -473,14 +473,13 @@ async function runDatabaseChecks(
           });
         }
       } else {
-        // Query failed — show warning instead of hard error
         checks.push({
           name: "Required Tables",
-          success: true,
-          errors: [],
-          warnings: [
+          success: false,
+          errors: [
             `Table schema not verified: ${sqlResult.error}. Run: wrangler d1 execute ${dbName} --command="SELECT name FROM sqlite_master WHERE type='table'" --remote`,
           ],
+          warnings: [],
         });
       }
     }
@@ -788,7 +787,7 @@ async function handleHealth(
 // ---------------------------------------------------------------------------
 
 async function handleFix(opts: FormatOptions, dryRun: boolean): Promise<void> {
-  const s = spinner();
+  const s = createCliSpinner(opts);
   const actions: FixAction[] = [];
 
   try {
@@ -1062,7 +1061,6 @@ async function checkSubmoduleGitignore(
       // Create standard .gitignore
       await Bun.write(gitignorePath, WORKER_GITIGNORE_TEMPLATE);
       fixed.push(`${workerName}: created .gitignore`);
-      continue;
     }
 
     // 2. Read and check critical entries
@@ -1106,7 +1104,7 @@ async function checkSubmoduleGitignore(
  * Handle the `hoox check submodule-gitignore` subcommand.
  */
 async function handleSubmoduleGitignore(opts: FormatOptions): Promise<void> {
-  const s = spinner();
+  const s = createCliSpinner(opts);
 
   try {
     s.start("Checking submodule .gitignore files...");

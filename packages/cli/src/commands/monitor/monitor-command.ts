@@ -16,6 +16,7 @@ import type { FormatOptions } from "../../utils/formatters.js";
 import { ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 import { theme } from "../../utils/theme.js";
+import { KILL_SWITCH_KEYS, isTruthyKillSwitchFlag } from "@hoox-sh/hoox-shared";
 
 function assertSafeInteger(value: number, name: string, max: number): void {
   if (
@@ -83,20 +84,40 @@ async function doMonitorKillSwitch(
   try {
     const kv = new KvSyncService();
     const namespaceId = await kv.resolveNamespaceId();
-    const key = "trade:kill_switch";
 
     if (action === "show") {
-      const value = await kv.get(namespaceId, key);
-      const status =
-        value === "true"
-          ? "KILL SWITCH IS ON (trading halted)"
-          : value === "false"
-            ? "Kill switch is off (trading active)"
-            : `Kill switch value: ${value ?? "(not set)"}`;
-      process.stdout.write(`${theme.info(status)}\n`);
+      const pairs = await Promise.all(
+        KILL_SWITCH_KEYS.map(async (key) => {
+          const value = await kv.get(namespaceId, key);
+          return [key, value] as const;
+        })
+      );
+      const engaged = pairs.some(([, value]) => isTruthyKillSwitchFlag(value));
+      const header = engaged
+        ? "KILL SWITCH IS ON (trading halted)"
+        : "Kill switch is off (trading active)";
+      if (fmt.json) {
+        process.stdout.write(
+          JSON.stringify(
+            {
+              engaged,
+              keys: Object.fromEntries(pairs),
+            },
+            null,
+            2
+          ) + "\n"
+        );
+        return;
+      }
+      process.stdout.write(`${theme.info(header)}\n`);
+      for (const [key, value] of pairs) {
+        process.stdout.write(theme.dim(`  ${key}=${value ?? "(not set)"}\n`));
+      }
     } else {
       const newValue = action === "on" ? "true" : "false";
-      await kv.set(namespaceId, key, newValue);
+      for (const key of KILL_SWITCH_KEYS) {
+        await kv.set(namespaceId, key, newValue);
+      }
       formatSuccess(
         `Kill switch turned ${action === "on" ? "ON" : "OFF"}`,
         fmt
@@ -379,12 +400,12 @@ EXAMPLES:
     .command("kill-switch")
     .summary("Emergency stop or resume trading")
     .description(
-      `Control the trade:kill_switch KV key.
+      `Control trade:kill_switch and global:kill_switch.
 
 Commands:
-  show   Display current kill switch status
-  on     Halt all trading (set kill_switch=true)
-  off    Resume trading (set kill_switch=false)`
+  show   Display current kill switch status (either key engaged → halted)
+  on     Halt all trading (set both keys true)
+  off    Resume trading (set both keys false)`
     );
 
   ksCmd
@@ -405,7 +426,7 @@ Commands:
     .command("on")
     .summary("Halt all trading")
     .description(
-      "Set trade:kill_switch=true to stop all trading operations. WARNING: This halts ALL trading activity immediately."
+      "Set trade:kill_switch and global:kill_switch to true. WARNING: This halts ALL trading activity immediately."
     )
     .action(
       withErrorHandling(
@@ -421,7 +442,7 @@ Commands:
     .command("off")
     .summary("Resume trading")
     .description(
-      "Set trade:kill_switch=false to resume normal trading operations."
+      "Set trade:kill_switch and global:kill_switch to false to resume trading."
     )
     .action(
       withErrorHandling(
