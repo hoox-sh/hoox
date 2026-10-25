@@ -60,12 +60,13 @@ For your safety, exchange credentials (API keys and private signatures) are neve
 ```bash
 # One key pair for all venues (Binance / Bybit / MEXC).
 # Which exchange is used comes from the signal / routing config — not the secret name.
-hoox secrets set trade-worker EXCHANGE_KEY_BINDING "your_exchange_api_key"
-hoox secrets set trade-worker EXCHANGE_SECRET_BINDING "your_exchange_api_secret"
+hoox secrets set trade-worker EXCHANGE_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
 
 # Optional dedicated testnet pair (when signals use "test": true)
-# hoox secrets set trade-worker EXCHANGE_TESTNET_KEY_BINDING "..."
-# hoox secrets set trade-worker EXCHANGE_TESTNET_SECRET_BINDING "..."
+# hoox secrets set trade-worker EXCHANGE_TESTNET_KEY_BINDING
+# hoox secrets set trade-worker EXCHANGE_TESTNET_SECRET_BINDING
+# (the CLI prompts for the value; worker name is required)
 ```
 
 <Warning>
@@ -153,7 +154,7 @@ curl -X POST https://hoox.alpha-trading.workers.dev/webhook \
   }'
 
 # Testnet trade (Binance / Bybit only)
-# Prefer dedicated secrets: BYBIT_TESTNET_KEY_BINDING / BYBIT_TESTNET_SECRET_BINDING
+# Prefer dedicated secrets: EXCHANGE_TESTNET_KEY_BINDING / EXCHANGE_TESTNET_SECRET_BINDING
 curl -X POST https://hoox.alpha-trading.workers.dev/webhook \
   -H "Content-Type: application/json" \
   -d '{
@@ -190,13 +191,13 @@ Every webhook payload fired to your Gateway must match the following JSON Schema
 
 | Parameter  |   Type    | Required | Description                                                                                      |
 | :--------- | :-------: | :------: | :----------------------------------------------------------------------------------------------- |
-| `apiKey`   | `string`  | **Yes**  | Your custom webhook authorization passkey (defined in `CONFIG_KV`).                              |
-| `exchange` | `string`  | **Yes**  | Target exchange router: `binance`, `bybit`, or `mexc`.                                           |
+| `apiKey`   | `string`  | **Yes**  | Webhook passkey. Must match the `WEBHOOK_API_KEY_BINDING` secret on the hoox gateway.             |
+| `exchange` | `string`  | **Yes**  | CEX: `binance`, `bybit`, `mexc`. DEX: `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`.  |
 | `action`   | `string`  | **Yes**  | `LONG`, `SHORT`, `CLOSE_LONG`, or `CLOSE_SHORT`.                                                 |
-| `symbol`   | `string`  | **Yes**  | Standard market symbol.                                                                          |
+| `symbol`   | `string`  | **Yes**  | CEX ticker (e.g. `BTCUSDT`). DEX **must** be `BASE/QUOTE` (e.g. `ETH/USDC`).                     |
 | `quantity` | `number`  | **Yes**  | Position size / quantity.                                                                        |
-| `leverage` | `number`  |    No    | Leverage coefficient. Defaults to `1` (spot) if omitted.                                         |
-| `test`     | `boolean` |    No    | When `true`, use exchange testnet (Binance/Bybit). Rejected for MEXC. Prefer `*_TESTNET_*` secrets. Default: live. |
+| `leverage` | `number`  |    No    | Leverage coefficient. Defaults to `1` (spot) if omitted. Ignored on DEX spots.                   |
+| `test`     | `boolean` |    No    | When `true`, use exchange testnet (Binance/Bybit). Rejected for MEXC and DEX (`TEST_TRADING_UNSUPPORTED`). Prefer `EXCHANGE_TESTNET_*` secrets. Default: live. |
 
 ---
 

@@ -22,7 +22,7 @@ Before rolling out updates to Cloudflare® live edge networks:
 - **Workspace Diagnostic Sweep**: Run the automated pre-flight check to verify that all git submodules, local dependencies, and TypeScript variables compile without warnings:
   ```bash
   hoox check prerequisites
-  hoox test
+  bun test
   ```
 - **Exchange Credentials Check**: Ensure you have created dedicated exchange API keys with **Withdrawal permissions turned OFF (disabled)** to enforce least-privilege security.
 - **Gateway DO migrations**: `hoox` wrangler must declare `IDEMPOTENCY_STORE` (`v1`) and `RATE_LIMITER` / `RateLimiterStore` (`v2`). Deploy applies migrations; no fake resource IDs.
@@ -41,14 +41,18 @@ The Hoox CLI automates the entire deployment sequence, compiling the shared libr
 # 1. Execute full sequenced deployment (includes pyne-worker when enabled)
 hoox deploy all --auto
 
-# 2. Deploy a single specific worker (e.g. after a trade execution update)
+# 2. Machine-readable task list (0.15+)
+hoox deploy all --json
+
+# 3. Deploy a single specific worker (e.g. after a trade execution update)
 hoox deploy worker trade-worker
 
-# 3. PYNE tooling isolate (vendor + deploy)
+# 4. PYNE tooling isolate (vendor + deploy)
 hoox pyne deploy
 
-# 4. Post-deploy health
+# 5. Post-deploy health
 hoox check health
+hoox workers list
 ```
 
 ### Dashboard OpenNext Compilation
@@ -106,11 +110,13 @@ The public `/webhook` route inside the `hoox` gateway must **only** accept POST 
 
 ### C. Deploy WAF Rate Limit Traps
 
-Use the Hoox CLI to provisionZone-level rate limiters on Cloudflare’s global edge network, dropping packet floods before they load the V8 isolates:
+Use the Hoox CLI to provision zone-level rate limiters on Cloudflare’s global edge network, dropping packet floods before they load the V8 isolates:
 
 ```bash
-# Provision a strict rate-limit rule (e.g., max 10 requests/minute to /webhook)
-hoox waf configure --limit-requests
+# Inspect zone WAF, then add a rate-limit or IP allowlist rule
+hoox waf status
+hoox waf rules add rate-limit /webhook
+hoox waf rules add ip-allowlist <TRADINGVIEW_CIDR>
 ```
 
 ---

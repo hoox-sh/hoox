@@ -39,6 +39,9 @@ hoox tui --no-mouse
 # 3. Remote management plane (fail-closed auth)
 export HOOX_API_TOKEN=…   # or Access service-token env
 hoox tui --remote --api-url https://mgmt.example.com
+# or: hoox tui --remote --token "$HOOX_API_TOKEN"
+#     hoox tui --debug
+#     hoox tui --allow-insecure   # remote without Bearer/Access — not recommended
 
 # 4. Development: package entry
 cd packages/tui && bun run dev

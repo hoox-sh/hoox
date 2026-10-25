@@ -19,42 +19,24 @@ The `d1-worker` binds directly to the production SQLite database (`trade-data-db
 ```jsonc
 {
   "name": "d1-worker",
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "main": "src/index.ts",
-  "alias": {
-    "@hoox-sh/hoox-shared/errors": "../../packages/shared/src/errors.ts",
-    "@hoox-sh/hoox-shared/middleware": "../../packages/shared/src/middleware/index.ts",
-    "@hoox-sh/hoox-shared/router": "../../packages/shared/src/router.ts",
-    "@hoox-sh/hoox-shared/types": "../../packages/shared/src/types.ts",
-    "@hoox-sh/hoox-shared/analytics": "../../packages/shared/src/analytics.ts",
-    "@hoox-sh/hoox-shared/health": "../../packages/shared/src/health.ts",
-    "@hoox-sh/hoox-shared/types/router": "../../packages/shared/src/types/router.ts",
-  },
   "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
   "placement": {
     "mode": "smart",
   },
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 0.1,
-    "logs": { "enabled": true, "head_sampling_rate": 1 },
-    "traces": { "enabled": true, "head_sampling_rate": 0.01 },
-  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "trade-data-db",
-      "database_id": "a682f084-594e-4bd8-be2d-40ea5f8cf42e",
+      "database_id": "<D1_DATABASE_ID>",
     },
   ],
-  "vars": {
-    "INTERNAL_KEY_BINDING": "__SECRET__",
-  },
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "services": [
@@ -65,6 +47,8 @@ The `d1-worker` binds directly to the production SQLite database (`trade-data-db
   ],
 }
 ```
+
+`INTERNAL_KEY_BINDING` (and optional `D1_READ_KEY_BINDING` / `D1_WRITE_KEY_BINDING`) are secrets — not wrangler vars.
 
 ---
 
@@ -190,6 +174,8 @@ Calculates aggregated win ratios, active positions size, and time-series P&L.
 
 Raw `/api/dashboard/positions` still returns all OPEN rows (including testnet). The dashboard Positions UI filters by mode; the agent skips `*-testnet-*` ids.
 
+Also on this isolate (internal read/write auth as indicated): `GET /api/balances`, `GET /api/positions`, `GET /api/logs`, `GET`/`POST /api/settings`, `GET /health`. Free-form `POST /query` is **disabled when `TENANT_MODE` is on** — use named `/rpc/*` instead.
+
 ---
 
 ## 🛡️ 3. Security & SQL Injection Protection
@@ -208,9 +194,9 @@ To protect financial transaction ledgers and portfolios against SQL injection at
 ---
 
 <Tip>
-  If you are extending schemas or adding tables, generate migration scripts
-  locally using Drizzle: `hoox db migrate --remote`. This keeps edge schema
-  histories atomic and securely tracked.
+  Canonical DDL is `workers/trade-worker/schema.sql`. Apply it with
+  `hoox db apply --remote`. `hoox db migrate --remote` runs tracking-column
+  SQL from `scripts/migrate-tracking.sh`.
 </Tip>
 
 ### 🔗 Next Steps

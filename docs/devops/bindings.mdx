@@ -17,6 +17,7 @@ This document provides a comprehensive reference for all bindings, environment v
 - [KV Namespace Bindings](#kv-namespace-bindings)
 - [R2 Bucket Bindings](#r2-bucket-bindings)
 - [D1 Database Bindings](#d1-database-bindings)
+- [Queue Bindings](#queue-bindings)
 - [AI Bindings](#ai-bindings)
 - [Vectorize Bindings](#vectorize-bindings)
 - [Browser Bindings](#browser-bindings)
@@ -25,7 +26,8 @@ This document provides a comprehensive reference for all bindings, environment v
 
 | Variable                  | Type   | Workers                             | Description                                                    |
 | ------------------------- | ------ | ----------------------------------- | -------------------------------------------------------------- |
-| `INTERNAL_KEY_BINDING`    | Secret | telegram-worker, hoox, trade-worker | Internal authentication key for worker-to-worker communication |
+| `INTERNAL_KEY_BINDING`    | Secret | telegram-worker, hoox, trade-worker, and mesh isolates | Internal authentication key for worker-to-worker communication |
+| `OPERATOR_API_KEY`        | Secret | hoox                                | Bearer for operator `/v1/*` and `/wallet/*`. Client sends the same value as `HOOX_API_TOKEN`. |
 | `TG_BOT_TOKEN_BINDING`    | Secret | telegram-worker                     | Telegram Bot API token                                         |
 | `TG_CHAT_ID_BINDING`      | Secret | telegram-worker                     | Telegram chat ID for notifications                             |
 | `TELEGRAM_SECRET_TOKEN`   | Secret | telegram-worker                     | Webhook verification token for Telegram                        |
@@ -34,26 +36,27 @@ This document provides a comprehensive reference for all bindings, environment v
 | `WEBHOOK_API_KEY_BINDING` | Secret | hoox                                | API key for webhook endpoints                                  |
 | `WALLET_PK_SECRET`        | Secret | web3-wallet-worker                  | Private key for Web3 wallet operations                         |
 | `WALLET_MNEMONIC_SECRET`  | Secret | web3-wallet-worker                  | Mnemonic phrase for wallet generation                          |
-| `WALLET_EXECUTE_KEY_BINDING` | Secret | trade-worker, web3-wallet-worker, hoox | Mesh key for DEX `/swap` (auto via `hoox setup`)            |
+| `WALLET_EXECUTE_KEY_BINDING` | Secret | trade-worker, web3-wallet-worker, hoox | Mesh key for DEX `/swap`. `hoox setup` generates it (same value as `INTERNAL_KEY_BINDING` unless you already set one). |
 | `SOLANA_PRIVATE_KEY`      | Secret | web3-wallet-worker                  | Solana signing seed (auto-generated if unset)                  |
 | `JUPITER_API_KEY`         | Secret | web3-wallet-worker                  | Jupiter Swap V2 API key                                        |
-| `MEXC_KEY_BINDING`        | Secret | trade-worker                        | MEXC exchange API key                                          |
-| `MEXC_SECRET_BINDING`     | Secret | trade-worker                        | MEXC exchange API secret                                       |
-| `BINANCE_KEY_BINDING`     | Secret | trade-worker                        | Binance exchange API key                                       |
-| `BINANCE_SECRET_BINDING`  | Secret | trade-worker                        | Binance exchange API secret                                    |
-| `BYBIT_KEY_BINDING`       | Secret | trade-worker                        | Bybit exchange API key                                         |
-| `BYBIT_SECRET_BINDING`    | Secret | trade-worker                        | Bybit exchange API secret                                      |
+| `EXCHANGE_KEY_BINDING`    | Secret | trade-worker                        | Canonical CEX API key (Binance / Bybit / MEXC). Set with `hoox secrets set trade-worker EXCHANGE_KEY_BINDING`. |
+| `EXCHANGE_SECRET_BINDING` | Secret | trade-worker                        | Canonical CEX API secret                                       |
+| `EXCHANGE_TESTNET_KEY_BINDING` | Secret | trade-worker                   | Optional unified testnet API key (`test: true`)                |
+| `EXCHANGE_TESTNET_SECRET_BINDING` | Secret | trade-worker                | Optional unified testnet API secret                            |
+| `BINANCE_KEY_BINDING` / `BINANCE_SECRET_BINDING` | Secret | trade-worker | **Deprecated alias.** `trade-worker` still reads these (and `BYBIT_*` / `MEXC_*`) as fallbacks. Prefer `EXCHANGE_*`. |
+| `API_KEY`                 | Secret | pyne-worker                         | `X-API-Key` for PYNE evaluate / management                     |
 | `CLOUDFLARE_API_TOKEN`    | Secret | analytics-worker                    | CF API token for Analytics SQL queries                         |
 
 ## Service Bindings
 
 | Binding            | Worker                                                              | Connected Service | Description                     |
 | ------------------ | ------------------------------------------------------------------- | ----------------- | ------------------------------- |
-| `TRADE_SERVICE`    | hoox, agent-worker, email-worker                                    | trade-worker      | Access to trading functionality |
+| `TRADE_SERVICE`    | hoox, agent-worker, email-worker, pyne-worker                       | trade-worker      | Access to trading functionality |
 | `WEB3_WALLET_SERVICE` | trade-worker, hoox, dashboard                                    | web3-wallet-worker | DEX spot swaps (Uniswap / Jupiter) |
 | `TELEGRAM_SERVICE` | hoox, trade-worker, agent-worker, web3-wallet-worker, report-worker | telegram-worker   | Telegram notifications          |
 | `D1_SERVICE`       | trade-worker, agent-worker, report-worker, dashboard                | d1-worker         | Centralized D1 database service |
 | `AGENT_SERVICE`    | dashboard                                                           | agent-worker      | Agent worker access             |
+| `PYNE_SERVICE`     | dashboard                                                           | pyne-worker       | Pine Script™ edge evaluate      |
 
 ## KV Namespace Bindings
 
@@ -93,6 +96,12 @@ This document provides a comprehensive reference for all bindings, environment v
 | ------------------ | ---------------- | -------------- | ------------------------------------ |
 | `ANALYTICS_ENGINE` | analytics-worker | hoox-analytics | Time-series metrics from all workers |
 
+## Queue Bindings
+
+| Binding       | Worker                          | Queue             | Description                                      |
+| ------------- | ------------------------------- | ----------------- | ------------------------------------------------ |
+| `TRADE_QUEUE` | hoox (producer), trade-worker (consumer) | `trade-execution` | Async trade execution with retry / backpressure |
+
 ## Durable Object Bindings
 
 | Binding             | Worker | Class               | Migration | Description |
@@ -112,7 +121,7 @@ Both classes are exported from `workers/hoox-worker/src/index.ts`. `wrangler dep
 
 | Service            | `hoox dev` port | Local URL             | Called by                                              |
 | ------------------ | --------------: | --------------------- | ------------------------------------------------------ |
-| hoox (Gateway)     |            8787 | http://localhost:8787 | Webhook clients                                        |
+| hoox (hoox gateway) |           8787 | http://localhost:8787 | Webhook clients                                        |
 | trade-worker       |            8788 | http://localhost:8788 | hoox, agent-worker, email-worker                       |
 | d1-worker          |            8789 | http://localhost:8789 | trade-worker, agent-worker, report-worker, dashboard   |
 | telegram-worker    |            8790 | http://localhost:8790 | hoox, trade-worker, agent-worker, web3-wallet, report  |
@@ -128,13 +137,19 @@ Example setup for `.dev.vars` files can be found in the corresponding `.dev.vars
 
 ## Setting Up Secrets
 
-For production deployment, secrets should be set using the Wrangler CLI:
+Prefer the Hoox CLI so `.dev.vars` and Cloudflare stay in sync:
 
 ```bash
-wrangler secret put SECRET_NAME
+hoox secrets set trade-worker EXCHANGE_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
+hoox secrets sync --system    # mesh keys only (INTERNAL_KEY_BINDING, WALLET_EXECUTE_KEY_BINDING, …)
 ```
 
-This will securely store the secret and make it available to the worker at runtime.
+Raw Wrangler still works for a single isolate:
+
+```bash
+wrangler secret put EXCHANGE_KEY_BINDING --config workers/trade-worker/wrangler.jsonc
+```
 
 ---
 

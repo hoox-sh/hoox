@@ -48,6 +48,7 @@ When you run `hoox dev start`:
 # Override the saved runtime preference on the fly
 hoox dev start --runtime native
 hoox dev start --runtime docker
+# Preference is written to wrangler.jsonc → dev.runtime
 ```
 
 ---
@@ -89,7 +90,7 @@ Bindings.
 | **`d1-worker`**        |     `8789`      | `http://localhost:8789` | Relational SQLite Manager |
 | **`telegram-worker`**  |     `8790`      | `http://localhost:8790` | Notifications Hub         |
 | **`web3-wallet-worker`** |   `8792`      | `http://localhost:8792` | On-Chain DeFi Node        |
-| **`dashboard`**        |     `8794`      | `http://localhost:8794` | Next.js Dashboard         |
+| **`dashboard`**        |     `8794`      | `http://localhost:8794` | Next.js dashboard (Docker Compose). `hoox dev dashboard` (native Next.js) uses `http://localhost:3000`. |
 | **`pyne-worker`**      |     `8799`      | `http://localhost:8799` | Pine Script™ edge evaluate |
 
 ---
@@ -143,7 +144,7 @@ source scripts/helpers.sh
 wx "wrangler types"
 
 # Run typecheck across all workers
-wx "pnpm run typecheck"
+wx "bun run typecheck"
 
 # Inspect package names
 wx "cat package.json | jq .name"
@@ -161,7 +162,7 @@ Use `WX_FILTER` to target specific workers by glob pattern:
 WX_FILTER='*-worker' wx "wrangler types"
 
 # Single worker
-WX_FILTER='trade-worker' wx "pnpm run typecheck"
+WX_FILTER='trade-worker' wx "bun run typecheck"
 ```
 
 ### Custom Path
@@ -183,7 +184,7 @@ Hoox includes a **function-level dependency graph extractor** that maps all expo
 bun run graph
 ```
 
-This runs `scripts/extract-graph.ts` (ts-morph) and scans 917 source files across all 14 workspaces. During extraction, a **live progress bar** shows each phase with elapsed time:
+This runs `scripts/extract-graph.ts` (ts-morph) across the workspaces. During extraction, a **live progress bar** shows each phase with elapsed time:
 
 ```text
 🔍 Extracting exported declarations...
@@ -199,7 +200,7 @@ This runs `scripts/extract-graph.ts` (ts-morph) and scans 917 source files acros
 ⏱  Total time: 22.0s
 ```
 
-The 8 extraction phases (exports → imports → extends/implements → type refs → calls → service bindings → workspace deps → filtering) complete in **~20–25s** on average.
+The 8 extraction phases (exports → imports → extends/implements → type refs → calls → service bindings → workspace deps → filtering) typically finish in tens of seconds.
 
 ### Outputs
 
@@ -227,6 +228,8 @@ dot -Tsvg graph.dot -o graph.svg && open graph.svg
 </Tip>
 
 ### 🔗 Next Steps
+
+Off Cloudflare, `hoox init --self-hosted` prints `bun run server.js` / `bun run docker:prod` instructions and exits. Durable Objects, Vectorize, and Workers AI are unavailable in that mode.
 
 - [**Testing Standards**](/docs/devops/development/testing) — Run unit and integration tests using Bun's native test runner.
 - [**Debugging Runbook**](/docs/devops/development/debugging) — Debug local and remote isolates, tail logs, and trace queries.

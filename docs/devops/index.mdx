@@ -14,7 +14,9 @@ description: "Infrastructure provisioning, deployment sequences, secret manageme
   provisioning edge databases, orchestrating secure V8 service bindings,
   deploying multi-exchange execution workers, auditing secrets, and monitoring
   system health. Day-to-day ops are **CLI-first**: `hoox` / `hx` for
-  `onboard`, `setup`, `deploy`, `secrets`, `check health`, and `doctor`.
+  `onboard`, `init`, `setup`, `deploy all --auto`, `secrets set`, `workers
+  list`, `check health`, `doctor`, `tui`, `tunnel check`, `pyne`, `perf
+  fastpath`, and `trace`.
 </Tip>
 
 ```mermaid
@@ -66,9 +68,9 @@ HOOX docs use the same **multi-tab** layout as AXIS / PYNE. This **DevOps** tab 
 
 ### 1. Setup runbooks
 
-- **[Operations & Troubleshooting](/docs/devops/setup-and-operations)** — Deploy order, secrets modes, health probes, repair.
+- **[Operations & Troubleshooting](/docs/devops/setup-and-operations)** — Deploy order, secrets modes, health probes, repair, self-hosted.
 - **[Core Installation Flow](/docs/devops/installation-flow)** — `hoox onboard` / monorepo remember path / setup gates.
-- **[Bindings registry](/docs/devops/bindings)** — Cross-worker binding inventory.
+- **[Bindings registry](/docs/devops/bindings)** — Cross-worker binding inventory (`EXCHANGE_*`, `WALLET_EXECUTE_KEY_BINDING`).
 
 ### 2. Development
 
@@ -84,7 +86,7 @@ HOOX docs use the same **multi-tab** layout as AXIS / PYNE. This **DevOps** tab 
 ### 4. Security & tooling
 
 - **[Security overview](/docs/devops/security/overview)**
-- **[CLI features](/docs/devops/cli-features)** (0.13.x: mesh hardening notes, monorepo remember, secrets modes, Linear Rail, setup gates) · **[TUI](/docs/devops/tui)** · **[Pattern consolidation](/docs/devops/refactoring/workers-pattern-consolidation)** · **[Security](/docs/devops/security/overview)**
+- **[CLI features](/docs/devops/cli-features)** (`@hoox-sh/hoox-cli` **0.15.0**: monorepo remember, secrets modes, Linear Rail, setup gates, `deploy all --json`) · **[TUI](/docs/devops/tui)** · **[MCP server](/docs/devops/mcp)** · **[Security](/docs/devops/security/overview)**
 
 ### 5. Related tracks (other tabs)
 
@@ -101,6 +103,6 @@ HOOX docs use the same **multi-tab** layout as AXIS / PYNE. This **DevOps** tab 
 
 ### Quick links
 
-- **[Documentation home](/docs)** — All category hubs  
-- **[Enterprise](/docs/enterprise)** — Multi-tenancy and compliance notes  
-- **[OPEN_CORE.md](../../OPEN_CORE.md)** — Open-core vs commercial split
+- **[Documentation home](/docs)** — All category hubs
+- **[Enterprise](/docs/enterprise)** — Workers for Platforms, compliance, and the commercial layer
+- **[MCP server](/docs/devops/mcp)** — Drive every `hoox` command from an MCP client

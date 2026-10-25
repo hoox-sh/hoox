@@ -13,22 +13,17 @@ description: "Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leve
 > **Important – Open Core Model**
 >
 > This document describes the **commercial Enterprise extension layer**.
-> 
+>
 > HOOX follows an **Open Core** model:
 > - The core architecture, most workers, `packages/shared`, CLI, TUI, and the majority of documentation are **open source**.
-> - Advanced multi-tenancy, proprietary features, full compliance stacks, hosted SaaS platform, and certain advanced implementations live in a **separate closed-source commercial repository**.
+> - Advanced multi-tenancy (Workers for Platforms), proprietary features, full compliance stacks, hosted SaaS, and certain advanced implementations live in a **separate closed-source commercial repository**.
 >
-> See:
-> - [OPEN_CORE.md](../../OPEN_CORE.md)
-> - [OPEN_CORE_FEATURE_SPLIT.md](../../OPEN_CORE_FEATURE_SPLIT.md)
->
-> The documents in this folder describe **how the commercial layer is built on top of the open core**. They are published publicly for transparency and to support the academic paper.
+> The documents in this folder describe **how the commercial layer is built on top of the open core**.
 
-**Status:** Proposed / In Design  
 **Target:** Cloudflare Enterprise accounts (or hosted SaaS on Enterprise)  
 **Goal:** Institutional-grade, multi-tenant, highly observable, durable, secure, real-time edge-native trading platform built as an extension on the open core.
 
-This document expands the approved plan into concrete architecture for the commercial layer, leveraging the full power of Cloudflare Enterprise and 2025-2026 bleeding-edge primitives.
+The open-source mesh can attribute payloads with an optional tenant scope (`TENANT_MODE` / `TENANT_ID`, off by default). Full dispatch isolation is Enterprise.
 
 ## Vision & Principles
 
@@ -39,7 +34,7 @@ This document expands the approved plan into concrete architecture for the comme
 - **Bleeding Edge but Practical**: Use features that are GA or recently stabilized (WfP dashboard improvements, synchronous User Worker deploys, Workflows enhancements, Logpush one-click + custom fields, etc.).
 - **Evolutionary**: Existing single-tenant HOOX remains for retail/self-hosted. Enterprise is additive/parallel.
 
-Current HOOX (retail PoC) already uses advanced primitives (Service Bindings ~0.4ms, SQLite DOs for idempotency, Smart Placement, Queues, D1/R2/Vectorize, Browser Rendering). Enterprise takes this to the next level for 10x-100x volume, regulatory needs, and platform offerings.
+Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempotency, Smart Placement, Queues, D1/R2/Vectorize, and Browser Rendering. Enterprise takes this to institutional volume, regulatory needs, and platform offerings.
 
 ## Core Levers (Enterprise / Paid Unlocks)
 
@@ -207,34 +202,6 @@ Workflows can call existing services via Service Bindings and pause for external
 - Existing code in `packages/shared`, workers, etc. is reused as libraries/templates.
 - Gradual: start with WfP + Logpush + one Workflow, then add real-time WS, Bot Mgmt, etc.
 
-## Open Decisions (from plan review)
+This architecture keeps HOOX's edge-native model while adding Workers for Platforms isolation, Workflows, Logpush audit, and Cloudflare Enterprise security for institutional use.
 
-- Primary target: Hosted SaaS (heavy WfP) vs Power-user self-hosted on Ent account vs both?
-- Migration strategy for existing users?
-- Specific compliance jurisdictions / external SIEM requirements?
-- Depth of "user code" execution (full arbitrary strategies vs safe DSL / config-driven)?
-
-## Next Steps / Implementation Order
-
-1. Create `docs/devops/enterprise/` docs (this + security, multi-tenancy, observability).
-2. Prototype Dispatch Worker + minimal User Worker + one Workflow (trade-lifecycle).
-3. Extend `@hoox-sh/hoox-shared` with tenant context, Workflow client, AI Gateway wrapper.
-4. Add Logpush config examples + a Tail Worker.
-5. Update root architecture docs, ADRs, and papers (new section or companion Enterprise paper).
-6. wrangler templates in `examples/enterprise/`.
-7. (Later) Full implementation, tests, `bun run graph` validation, academic paper updates.
-
-This architecture keeps HOOX's unique edge-native soul while making it suitable for serious institutional use with the full power of Cloudflare Enterprise.
-
----
-
-**References** (use latest docs):
-- Workers for Platforms
-- Workflows
-- Logpush / Observability
-- AI Gateway
-- Durable Objects (SQLite, WS, Alarms, RPC)
-- Enterprise limits & features (higher everything + dedicated support)
-- Zero Trust, Bot Management, API Shield
-
-See the approved plan.md for the detailed "why" and phasing.
+Related: [Multi-tenancy](/docs/enterprise/multi-tenancy) · [Observability & audit](/docs/enterprise/observability-audit) · [Security & compliance](/docs/enterprise/security-compliance) · [Open-core security](/docs/devops/security/overview)

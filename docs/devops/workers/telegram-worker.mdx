@@ -20,16 +20,20 @@ The `telegram-worker` mounts multiple storage and vector search services to impl
 {
   "name": "telegram-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "placement": {
     "mode": "smart",
   },
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
+    },
+    {
+      "binding": "REPORT_KV",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "r2_buckets": [
@@ -47,15 +51,16 @@ The `telegram-worker` mounts multiple storage and vector search services to impl
   "ai": {
     "binding": "AI",
   },
-  "secrets": [
-    "INTERNAL_KEY_BINDING",
-    "TG_BOT_TOKEN_BINDING",
-    "TG_CHAT_ID_BINDING",
-    "TELEGRAM_SECRET_TOKEN",
-    "AUTHORIZED_CHAT_IDS",
+  "services": [
+    {
+      "binding": "ANALYTICS_SERVICE",
+      "service": "analytics-worker",
+    },
   ],
 }
 ```
+
+Secrets (`INTERNAL_KEY_BINDING`, `TG_BOT_TOKEN_BINDING`, `TG_CHAT_ID_BINDING`, `TELEGRAM_SECRET_TOKEN`, `AUTHORIZED_CHAT_IDS`) are set with `wrangler secret put`.
 
 ---
 

@@ -6,7 +6,7 @@
 * [bindings.mdx](bindings.md) - description: "Stub — the canonical Cloudflare Workers bindings registry lives at /docs/devops/bindings.".
 * [communication.mdx](communication.md) - description: "Detailed specification of Cloudflare Service Bindings, zero-overhead V8 isolate routing, and standard cross-worker auth middleware.".
 * [data-flow.mdx](data-flow.md) - description: "Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.".
-* [design-system.mdx](design-system.md) - description: "Production design system and visual token specifications, covering OKLCH color palettes, typography, and visual SVG icon maps.".
+* [design-system.mdx](design-system.md) - description: "Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI.".
 * [endpoints.mdx](endpoints.md) - description: "Architectural routing flow and service-binding topology for the Hoox microservice mesh, with the canonical endpoint directory living under the API reference.".
 * [index.mdx](index.md) - description: "System topology, data flow, bindings, storage, and ADRs for the HOOX edge mesh.".
 * [overview.mdx](overview.md) - description: "High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models.".

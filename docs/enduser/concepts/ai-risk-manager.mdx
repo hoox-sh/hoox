@@ -91,15 +91,15 @@ Behind the scenes, `agent-worker` governs a **Multi-Provider AI Gateway** (suppo
      Fail? ──► [3. Google AI] (Gemini 1.5 Pro) ──► Fail? ──► [4. OpenAI] (GPT-4o)
 ```
 
-### B. Custom Telemetry & Chat Endpoints
+### B. Agent isolate endpoints
 
-The gateway exposes professional endpoints for secure inter-worker and external integrations:
+These routes live on **`agent-worker`** (Service Bindings / dashboard / TUI), not on the public hoox gateway:
 
-- `POST /agent/chat` — Accepts user prompts and handles SSE (Server-Sent Events) streaming responses.
-- `POST /agent/vision` — Analyzes charts, balance screenshots, or trading signals from Base64 images.
-- `POST /agent/reasoning` — Extended thinking queries with reasoning models (o1, DeepSeek). Respects `thinking_effort` levels.
-- `GET /agent/usage` — Detailed token usage and cost metrics across all 5 providers, including per-provider input/output tokens and cumulative USD cost.
-- `GET /agent/health` — Health check for all AI providers — returns latency and status for each provider in the fallback chain.
+- `POST /agent/chat` — User prompts (optional SSE).
+- `POST /agent/vision` — Chart / screenshot analysis (`imageBase64` or `imageUrl`).
+- `GET /agent/health` — Provider latency and status in the fallback chain.
+- `GET /agent/models` — Catalog of configured models.
+- `POST /agent/risk-override` — Engage/release kill switch or set trailing stop.
 
 ---
 

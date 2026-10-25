@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "deploy-workers"
+title: "Deploying to production"
+description: "Deploy the worker mesh and dashboard with hoox deploy all --auto, then bind Telegram and KV."
 ---
 
 # 🚀 Deploying to Production
@@ -61,12 +62,15 @@ hoox deploy dashboard
 
 ### Deploy All Flags
 
-| Flag             | Description                               | Example                                 |
-| ---------------- | ----------------------------------------- | --------------------------------------- |
-| `--auto`         | Automatically resolves dependency order   | `hoox deploy all --auto`                |
-| `--skip-tests`   | Skip pre-deploy test suite                | `hoox deploy all --auto --skip-tests`   |
-| `--dry-run`      | Preview deployment plan without uploading | `hoox deploy all --auto --dry-run`      |
-| `--workers-only` | Skip dashboard deployment                 | `hoox deploy all --auto --workers-only` |
+| Flag        | Description                                                       | Example                          |
+| ----------- | ----------------------------------------------------------------- | -------------------------------- |
+| `--auto`    | Skip dashboard rebuild prompt; use existing OpenNext build if any | `hoox deploy all --auto`         |
+| `--rebuild` | Force rebuild the dashboard before deploying                      | `hoox deploy all --rebuild`      |
+| `--dry-run` | Preview the worker order without uploading                        | `hoox deploy all --dry-run`      |
+| `--env`     | Cloudflare environment name                                       | `hoox deploy all --env production` |
+| `--json`    | Print the task-result array (0.15.0)                              | `hoox deploy all --json`         |
+
+Workers only (skip dashboard): `hoox deploy workers`.
 
 ---
 
@@ -136,7 +140,7 @@ When you run `hoox deploy dashboard`:
 hoox deploy dashboard
 
 # Rebuild dashboard only (after UI changes)
-hoox deploy dashboard --force-rebuild
+hoox deploy dashboard --rebuild
 ```
 
 ### Dashboard Features
@@ -163,7 +167,7 @@ git pull --recurse-submodules
 bun install
 
 # 3. Execute the full local CI verification pipeline
-hoox test
+hoox test all
 
 # 4. Run pre-deploy health check
 hoox repair check
@@ -174,14 +178,17 @@ hoox deploy all --auto
 
 ### Rollback Procedure
 
-If the new deployment causes issues:
+If the new deployment causes issues, roll a worker back to a previous Cloudflare version:
 
 ```bash
-# 1. Revert git to previous release
-git checkout v2.0.0  # or your previous tag
+# Interactive: pick from the last 5 versions
+hoox deploy rollback trade-worker
 
-# 2. Redeploy the stable version
-hoox deploy all --auto
+# Explicit version id
+hoox deploy rollback trade-worker <version-id> --yes
+
+# Inspect history first
+hoox deploy history trade-worker
 ```
 
 ---
@@ -192,7 +199,7 @@ hoox deploy all --auto
 | :---------------------------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- |
 | **`502 Bad Gateway`**         | Service binding target is missing or has crashed. | Ensure the dependency worker (e.g., `trade-worker`) has been deployed successfully. Run `hoox deploy all` to rebuild all bonds.   |
 | **`503 Service Unavailable`** | The Global Kill Switch is active in KV.           | Verify switch state: `hoox monitor kill-switch show`. If safe, restore trading: `hoox monitor kill-switch off`.                   |
-| **`401 Unauthorized`**        | Webhook request failed passkey check.             | Audit KV authorization key: `hoox config kv get webhooks:api_key`. Verify the payload `apiKey` matches this value.                |
+| **`403 Forbidden`**           | Webhook request failed passkey check.             | Body `apiKey` must match `WEBHOOK_API_KEY_BINDING` on the hoox gateway (`hoox secrets list hoox`).                                |
 | **`409 Conflict`**            | Durable Object intercepted a duplicate trace ID.  | Verify TV alert settings. Do not configure rapid-fire duplicate alerts within the same minute unless idempotency keys are unique. |
 | **Dashboard shows 500**       | Next.js build failed or D1 schema mismatch.       | Re-run `hoox deploy dashboard` and check logs: `hoox logs worker dashboard`.                                                        |
 | **Telegram bot unresponsive** | Webhook URL expired or token rotated.             | Re-register: `hoox deploy telegram-webhook` and verify token: `hoox secrets list telegram-worker`.                                 |

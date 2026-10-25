@@ -46,16 +46,16 @@ MEXC has no public REST sandbox for automated trading (UI demo only). DEX venues
 Prefer **dedicated testnet secrets** so live keys never touch sandbox hosts:
 
 ```bash
-hoox secrets set trade-worker BINANCE_TESTNET_KEY_BINDING
-hoox secrets set trade-worker BINANCE_TESTNET_SECRET_BINDING
-hoox secrets set trade-worker BYBIT_TESTNET_KEY_BINDING
-hoox secrets set trade-worker BYBIT_TESTNET_SECRET_BINDING
+hoox secrets set trade-worker EXCHANGE_TESTNET_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_TESTNET_SECRET_BINDING
 ```
 
 | Mode | Secret bindings used |
 | ---- | -------------------- |
-| Live (`test` omitted/false) | `BINANCE_KEY_BINDING` / `BINANCE_SECRET_BINDING`, `BYBIT_*`, `MEXC_*` |
-| Test (`test: true`) | `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*` if both key+secret are set; otherwise **fall back** to live bindings (worker logs a warning) |
+| Live (`test` omitted/false) | `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING` |
+| Test (`test: true`) | `EXCHANGE_TESTNET_*` if both key+secret are set; otherwise **fall back** to the live pair (worker logs a warning) |
+
+Deprecated per-venue aliases (`BINANCE_TESTNET_*`, `BYBIT_TESTNET_*`, and live `BINANCE_*` / `BYBIT_*` / `MEXC_*`) still resolve if the unified pair is unset.
 
 Create API keys on the exchange testnet portal (not the production account) and inject them with the CLI above.
 

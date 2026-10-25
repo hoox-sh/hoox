@@ -60,7 +60,7 @@ export interface CexOrderPayload {
   orderType?: "MARKET" | "LIMIT"; // Default: MARKET
   /**
    * When true, route the order to the exchange testnet/sandbox API
-   * (Binance Futures testnet, Bybit testnet). MEXC and DEX venues
+   * (Binance Futures testnet, Bybit testnet). MEXC and spot DEX venues
    * reject with TEST_TRADING_UNSUPPORTED.
    * Live trading is the default when omitted or false.
    */
@@ -82,7 +82,7 @@ export interface CexOrderPayload {
 
 | Field    | Type      | Required | Notes                                                                 |
 | -------- | --------- | :------: | --------------------------------------------------------------------- |
-| `test`   | `boolean` |    No    | `true` → testnet host for Binance/Bybit; rejected for MEXC and DEX    |
+| `test`   | `boolean` |    No    | `true` → testnet host for Binance/Bybit; rejected for MEXC and spot DEX |
 | `symbol` | `string`  | **Yes**  | CEX compact ticker or DEX `BASE/QUOTE` (`ETH/USDC`)                   |
 
 DEX venues (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) are ExactIn spots through `web3-wallet-worker`. See [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
@@ -105,26 +105,26 @@ See [Test Trading](/docs/enduser/guides/test-trading) for operator setup.
 
 ---
 
-### B. On-Chain DeFi Swap Payload (`/dex`)
+### B. Spot DEX signal (same `/webhook` envelope)
 
-```typescript
-export interface DexSwapPayload {
-  chain: "ethereum" | "arbitrum" | "polygon"; // EVM target network
-  to: string; // Recipient address or Uniswap Router
-  value: string; // Transaction value in Wei (as string)
-  data: string; // Encoded contract call data bytes
-  gasLimit?: number; // Optional transaction gas limit
-}
-```
+DEX venues use the CEX intent vocabulary. Pair syntax is `BASE/QUOTE`. `test: true` is rejected (`TEST_TRADING_UNSUPPORTED`).
 
 ```json
 {
-  "chain": "arbitrum",
-  "to": "0x6b175474e89094c44da98b954eedeac495271d0f",
-  "value": "100000000000000000",
-  "data": "0xa9059cbb000000000000000000000000..."
+  "apiKey": "your-hoox-webhook-passkey",
+  "exchange": "uniswap-ethereum",
+  "action": "LONG",
+  "symbol": "ETH/USDC",
+  "quantity": 100
 }
 ```
+
+| Action | Swap |
+| ------ | ---- |
+| `LONG` / `CLOSE_SHORT` | Spend QUOTE to buy BASE (ExactIn) |
+| `SHORT` / `CLOSE_LONG` | Sell BASE for QUOTE |
+
+Operator-driven swaps (not webhook) go through the gateway [wallet proxy](/docs/devops/api/endpoints) (`POST /wallet/swap`) with Bearer `OPERATOR_API_KEY`.
 
 ---
 

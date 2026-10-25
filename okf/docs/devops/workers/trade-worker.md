@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/workers/trade-worker.mdx"
@@ -25,7 +25,7 @@ Repo path `docs/devops/workers/trade-worker.mdx`.
 * ⚡ 1. Declared Wrangler Configurations & Bindings
 * 🔄 Position reconciliation
 * 🧪 Test trading (test: true)
-* DEX venues (P1)
+* Spot DEX venues
 * 🔀 2. The Provider-Based ExchangeRouter Pattern
   * A. Generic Exchange Provider Interface
   * B. Dynamic Runtime Routing

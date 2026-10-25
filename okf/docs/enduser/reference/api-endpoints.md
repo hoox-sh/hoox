@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "api-endpoints.mdx"
-description: "description: \"Complete REST API reference for the Hoox gateway, webhooks, health checks, AI chat streams, and edge error models.\"."
+description: "description: \"Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway.\"."
 resource: "docs/enduser/reference/api-endpoints.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/api-endpoints.mdx"
@@ -22,19 +22,16 @@ Repo path `docs/enduser/reference/api-endpoints.mdx`.
 
 # Outline
 
-* 🔒 Request Headers & Security Policy
-  * CORS & Origin Policies
-* 🎯 1. Ingest Trade Signal Webhook
-  * Request Payload (JSON Schema)
-  * Response Models
-* 🟢 2. System Health Check
-  * Success Response (200 OK)
-* 🤖 3. Conversational AI Chat & Telemetry
-  * A. Conversational Chat Stream
-  * B. AI Gateway Telemetry
-* 🚨 4. Standard Platform Error Models
-  * A. 400 Bad Request (Payload Validation Failure)
-  * B. 401 Unauthorized (Invalid API Key / IP Address)
-  * C. 409 Conflict (Duplicate Request Intercepted)
-  * D. 503 Service Unavailable (Kill Switch Engaged)
+* 🔒 Request headers
+* 🎯 1. Ingest trade signal webhook
+  * Request payload
+  * Response models
+* 🟢 2. System health check
+* 🛡️ 3. Operator plane (/v1/)
+* 💱 4. Wallet proxy (/wallet/)
+* 🚨 5. Standard platform errors
+  * A. 400 Bad Request
+  * B. 403 Forbidden (invalid apiKey or IP)
+  * C. 409 Conflict (duplicate idempotency key)
+  * D. 503 Service Unavailable (kill switch or missing DO)
   * 🔗 Next Steps

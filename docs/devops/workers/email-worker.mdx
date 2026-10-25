@@ -167,9 +167,9 @@ The worker also exposes an `email()` handler that processes incoming emails via 
 
 ### KV Namespaces
 
-| Binding     | ID                                 | Purpose                      |
-| ----------- | ---------------------------------- | ---------------------------- |
-| `CONFIG_KV` | `c5917667a21745e390ff969f32b1847d` | Signal pattern configuration |
+| Binding     | ID                   | Purpose                      |
+| ----------- | -------------------- | ---------------------------- |
+| `CONFIG_KV` | `"<KV_NAMESPACE_ID>"` | Signal pattern configuration |
 
 ---
 
@@ -255,15 +255,15 @@ Full observability enabled with 100% head sampling:
 {
   "name": "email-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-04-17",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "placement": {
     "mode": "smart",
   },
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1,
+    "head_sampling_rate": 0.1,
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
@@ -277,7 +277,7 @@ Full observability enabled with 100% head sampling:
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "services": [

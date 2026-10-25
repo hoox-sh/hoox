@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/workers/d1-worker.mdx"
@@ -33,6 +33,4 @@ Repo path `docs/devops/workers/d1-worker.mdx`.
 
 # Mentions
 
-* [packages/shared/src](/code/packages/shared/src.md)
-* [packages/shared/src/middleware](/code/packages/shared/src/middleware.md)
-* [packages/shared/src/types](/code/packages/shared/src/types.md)
+* [scripts](/code/scripts.md)

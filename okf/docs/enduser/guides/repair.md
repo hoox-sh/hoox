@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🛠️ Self-Healing & Repair"
-description: "Algorithmic trading environments must be resilient and self-healing. If you experience deployment failures, database routing discrepancies, expired authentication tokens, or…"
+description: "description: \"Diagnose empty submodules, missing secrets, and broken bindings with hoox repair.\"."
 resource: "docs/enduser/guides/repair.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/repair.mdx"

@@ -19,10 +19,11 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 | --- | --------------------------------------------- | -------- | ------- |
 | 001 | Cloudflare Workers as Execution Platform      | Accepted | 2025-04 |
 | 002 | SQLite-backed Durable Objects for Idempotency | Accepted | 2025-05 |
-| 003 | 9-Microservice Architecture                   | Accepted | 2025-06 |
+| 003 | Mesh of specialized Workers (now 11 surfaces) | Accepted | 2025-06 |
 | 004 | Dual-Layer Configuration (Env \+ KV)          | Accepted | 2025-06 |
 | 005 | Multi-Provider AI Gateway with Fallback Chain | Accepted | 2026-03 |
 | 006 | Bun Workspaces for Monorepo Management        | Accepted | 2025-04 |
+| 007 | Opt-in Tenant Isolation (`TenantEnv`)         | Accepted | 2026-10 |
 
 ---
 
@@ -58,31 +59,33 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 ---
 
-## ADR-003: 9-Microservice Architecture
+## ADR-003: Mesh of specialized Workers
 
-**Status:** Accepted
+**Status:** Accepted (evolved: **11 compute surfaces** as of 0.15.0)
 
 **Context:** Monolithic trading systems are fragile — a crash in any component (portfolio calculation, notification, database) takes down the entire system. Microservices provide isolation but increase operational complexity.
 
-**Decision:** Split the platform into 9 specialized workers, each with a single responsibility:
+**Decision:** Split the platform into specialized Workers, each with a single responsibility. The original nine isolates remain; **pyne-worker** (Python Pine evaluate) and the **dashboard** (Next.js 16 / OpenNext) bring the mesh to 11 compute surfaces.
 
 | Worker               | Responsibility                                  |
 | -------------------- | ----------------------------------------------- |
-| `hoox`               | Gateway, validation, rate limiting, idempotency |
-| `trade-worker`       | CEX order execution + DEX spots via wallet binding |
+| `hoox`               | Gateway, validation, rate limiting, idempotency, operator `/wallet` proxy |
+| `trade-worker`       | CEX REST (Binance / Bybit / MEXC) + spot DEX via `WEB3_WALLET_SERVICE` |
 | `agent-worker`       | AI risk management, trailing stops, cron jobs   |
 | `d1-worker`          | All SQLite read/write operations                |
 | `telegram-worker`    | Push notifications, chat command handling       |
-| `web3-wallet-worker` | On-chain DeFi swap execution                    |
+| `web3-wallet-worker` | On-chain signing; Uniswap V3 + Jupiter Swap V2  |
 | `email-worker`       | Email signal parsing (Mailgun / Email Routing)  |
-| `analytics-worker`   | Metrics collection and reporting                |
+| `analytics-worker`   | Metrics collection (Analytics Engine writes)    |
 | `report-worker`      | PDF portfolio report generation                 |
+| `pyne-worker`        | Pine Script™ edge evaluate (Python tooling isolate) |
+| `dashboard`          | Next.js ops console (public)                    |
 
 **Consequences:**
 
 - **Positive:** Independent scaling; failure isolation; focused development; clean ownership boundaries
 - **Negative:** More deployment units to manage; Service Binding dependency chain complexity; inter-worker communication overhead
-- **Mitigation:** CLI automates dependency-ordered deployment; health check endpoints on every worker; TUI provides real-time status of all 9 workers
+- **Mitigation:** CLI automates dependency-ordered deployment; health check endpoints on every worker; TUI shows mesh status
 
 ---
 
@@ -143,7 +146,7 @@ Each provider is health-checked before use. On failure, the gateway automaticall
 
 **Status:** Accepted
 
-**Context:** The project contains multiple packages (CLI, TUI, shared library, 9 workers) that need to share types, utilities, and be tested/developed locally.
+**Context:** The project contains multiple packages (CLI, TUI, shared library, 11 compute surfaces) that need to share types, utilities, and be tested/developed locally.
 
 **Decision:** Use Bun Workspaces as the monorepo manager instead of npm/yarn/pnpm workspaces. Rationale:
 
@@ -158,3 +161,21 @@ Each provider is health-checked before use. On failure, the gateway automaticall
 - **Positive:** Zero-config TypeScript; fast CI; unified tooling; shared types resolve at compile time
 - **Negative:** Bun is less mature than npm ecosystem; some packages may have compatibility issues; harder to onboard developers unfamiliar with Bun
 - **Mitigation:** Comprehensive `hoox check prerequisites` validation; Docker runtime as fallback; documentation covers both native and Docker workflows
+
+---
+
+## ADR-007: Opt-in Tenant Isolation (`TenantEnv`)
+
+**Status:** Accepted (shipped 0.14; **off by default**)
+
+**Context:** Self-hosted installs are single-tenant. Platform deploys need namespaced KV, D1, R2, and Durable Object keys without changing the default self-host path.
+
+**Decision:** Export `TenantEnv` / `TenantScope` from `@hoox-sh/hoox-shared/tenant`. Isolation is a no-op unless `TENANT_MODE` is `"true"` or `"1"` **and** `TENANT_ID` matches `[A-Za-z0-9_-]{1,64}`. Setting `TENANT_ID` alone does not enable scoping. When on, helpers namespace KV/DO keys (`t/<id>/…`), R2 keys (`t-<id>/…`), stamp D1 `tenant_id`, and attach `tenantId` on outbound payloads.
+
+Entitlement types (`EntitlementScope`, `hasScope()`) classify bearers only. They do **not** enforce product entitlements on the request path.
+
+**Consequences:**
+
+- **Positive:** Existing single-tenant installs unchanged; fail-closed when the flag is on without a valid id
+- **Negative:** Shared queue consumers must treat message-carried `tenantId` as untrusted
+- **Mitigation:** Lenient validation on message-carried ids (never throw); env tenant is authoritative when the flag is on

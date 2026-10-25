@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "📈 Monitoring Operations"
-description: "Algorithmic trading demands high-integrity, real-time observability. Because Hoox microservices are distributed across Cloudflare®'s global edge network, tracking health, logs,…"
+description: "description: \"Probe worker health, toggle the kill switch, inspect trades and queues, and tail edge logs.\"."
 resource: "docs/enduser/guides/monitor-trading.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/monitor-trading.mdx"
@@ -32,7 +32,6 @@ Repo path `docs/enduser/guides/monitor-trading.mdx`.
 * 📨 4. Inspecting Queue Depth (Guaranteed Delivery Backlog)
   * Queue Health Indicators
 * 📝 5. Real-Time Log Streaming & Telemetry
-  * Downloading Logs for Off-Line Analysis
 * 📊 6. System Metrics Overview
   * Key Metrics Tracked
   * 🔗 Next Steps

@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/overview.mdx"
@@ -30,14 +30,6 @@ Repo path `docs/devops/architecture/overview.mdx`.
   * Layer 3: Service Binding Encrypted Isolation
   * Layer 4: Standardized Internal Authorization
   * Layer 5: Durable Object Idempotency Locks
-* 📊 Codebase Dependency Graph
-  * Generating the Graph
-  * Node Types & Color Coding (DOT)
-  * Edge Color Legend
-  * Rendering to SVG
-  * Key Extraction Rules
-  * 🔗 Next Steps
-
-# Mentions
-
-* [scripts](/code/scripts.md)
+* Opt-in tenant isolation
+* Bindings graph (local)
+  * Next Steps

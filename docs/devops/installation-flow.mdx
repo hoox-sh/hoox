@@ -22,12 +22,12 @@ This document details the step-by-step installation, bootstrapping, and validati
 
 The recommended entry point is **`hoox onboard`** (alias: `hx onboard`). It chains `init` (configuration) and `setup` (infrastructure) into a single command. Running `hoox` / `hx` with no arguments on an uninitialized workspace auto-launches `onboard` (or `onboard --resume` when `.wizard-state.json` exists).
 
-**Setup gates (0.11+ / current 0.13.x):** onboard will **not** run setup if `init` was cancelled or never wrote `wrangler.jsonc`. Setup also aborts when worker trees are still missing after the submodule clone attempt, and requires Cloudflare® auth (`wrangler login` or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`).
+**Setup gates (`@hoox-sh/hoox-cli` 0.15.0):** onboard will **not** run setup if `init` was cancelled or never wrote `wrangler.jsonc`. Setup also aborts when worker trees are still missing after the submodule clone attempt, and requires Cloudflare® auth (`wrangler login` or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`).
 
-To start the system bootstrap, run the one-shot wizard from the monorepo root
-(the CLI remembers that path so later `hx` calls work from any directory):
+Install the CLI with Bun only (`npm install -g` aborts on `workspace:*`). Run the one-shot wizard from the monorepo root — the CLI remembers that path so later `hx` calls work from any directory:
 
 ```bash
+bun add -g @hoox-sh/hoox-cli
 cd /path/to/hoox   # first discovery writes ~/.hoox/config/monorepo.json
 hoox onboard
 # later, from any directory:
@@ -39,8 +39,10 @@ For fine-grained control, run the two steps separately:
 
 ```bash
 hoox init    # 1. Write wrangler.jsonc, collect integration secrets
-hoox setup   # 2. Generate keys, apply D1 schema, push secrets, deploy dashboard
+hoox setup   # 2. Generate keys (including WALLET_EXECUTE_KEY_BINDING), apply D1 schema, push secrets, deploy dashboard
 ```
+
+Self-hosted (no Cloudflare) is a separate path: `hoox init --self-hosted` prints Docker / `server.js` instructions and exits. It does not write a Cloudflare-free `wrangler.jsonc`.
 
 The setup wizard guides you through these critical onboarding phases:
 
@@ -56,13 +58,13 @@ Chooses a **preset** rather than free-form per-worker toggles in the wizard:
 | :--------- | :-------------------------------------------------------------------- |
 | `minimal`  | Gateway + D1 + analytics — webhook processing only                    |
 | `standard` | Trading + analytics + Telegram notifications                          |
-| `full`     | All workers (AI agent, DeFi wallet, email, pyne-worker / Pine Script™, …) + integrations |
+| `full`     | All workers (AI agent, spot DEX wallet, email, pyne-worker / Pine Script™, …) + integrations |
 
 Pass `--preset minimal|standard|full` for non-interactive runs (`hoox onboard` / `hoox init`). You can still edit `wrangler.jsonc` afterward to refine enabled workers.
 
 ### Phase 3: Integration Secrets
 
-Collects any integration secrets required by the selected preset (exchange API keys, Telegram bot tokens, AI provider keys) and writes them to local `.dev.vars` files.
+Collects any integration secrets required by the selected preset (canonical `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING`, Telegram bot tokens, AI provider keys, optional wallet / Jupiter keys) and writes them to local `.dev.vars` files. `hoox setup` then generates the mesh key `WALLET_EXECUTE_KEY_BINDING` for spot DEX.
 
 ### Phase 4: Configuration Write
 
@@ -89,7 +91,7 @@ This file represents the declarative single source of truth for your monorepo's 
 ```jsonc
 {
   "global": {
-    "cloudflare_account_id": "debc6545e63bea36be059cbc82d80ec8",
+    "cloudflare_account_id": "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
     "subdomain_prefix": "hoox",
   },
   "workers": {
@@ -101,8 +103,16 @@ This file represents the declarative single source of truth for your monorepo's 
     "trade-worker": {
       "enabled": true,
       "path": "workers/trade-worker",
-      "secrets": ["BYBIT_API_KEY", "BYBIT_API_SECRET", "TELEGRAM_BOT_TOKEN"],
+      "secrets": [
+        "EXCHANGE_KEY_BINDING",
+        "EXCHANGE_SECRET_BINDING",
+        "INTERNAL_KEY_BINDING",
+        "WALLET_EXECUTE_KEY_BINDING",
+      ],
     },
+  },
+  "dev": {
+    "runtime": "native", // "native" | "docker" — saved by `hoox dev start`
   },
 }
 ```
@@ -128,8 +138,9 @@ During local development, wrangler dev looks for a local, gitignored file called
 
 ```bash
 # workers/trade-worker/.dev.vars
-BYBIT_API_KEY=mock_bybit_development_key
-BYBIT_API_SECRET=mock_bybit_development_secret
+EXCHANGE_KEY_BINDING=mock_exchange_development_key
+EXCHANGE_SECRET_BINDING=mock_exchange_development_secret
+WALLET_EXECUTE_KEY_BINDING=mock_wallet_execute_key
 ```
 
 ---
@@ -143,9 +154,9 @@ When deploying to production, wrangler binds these variables using direct encryp
   "secrets_store": {
     "bindings": [
       {
-        "binding": "BYBIT_API_KEY_BINDING",
-        "store_id": "48433bc559a943f09d9d6c622e188fd5",
-        "secret_name": "BYBIT_API_KEY"
+        "binding": "EXCHANGE_KEY_BINDING",
+        "store_id": "<YOUR_SECRET_STORE_ID>",
+        "secret_name": "EXCHANGE_KEY_BINDING"
       }
     ]
   }
@@ -168,3 +179,4 @@ This guarantees that secrets are never logged, never cached in plain text on dis
 - **[DevOps Setup & Operations Manual](/docs/devops/setup-and-operations)** — Dive into complete operations, variable matrices, and troubleshooting.
 - **[Terminal UI Cockpit](/docs/devops/tui)** — Run, hot-reload, and monitor your local workers via TUI.
 - **[CLI features](/docs/devops/cli-features)** — Monorepo remember path, secrets modes, Linear Rail banner.
+- **[MCP server](/docs/devops/mcp)** — Drive the same CLI from an MCP client.

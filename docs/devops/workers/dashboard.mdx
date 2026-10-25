@@ -33,6 +33,18 @@ The **Positions** table integrates with exchange testnet fills produced when web
 
 See [Test Trading](/docs/enduser/guides/test-trading).
 
+### Agent Reasoning & Usage pages
+
+These dashboard pages call **dashboard** `/api/agent/*` routes, not agent-worker:
+
+| Page | Route | Behavior |
+| ---- | ----- | -------- |
+| Reasoning | `POST /api/agent/reasoning` | Workers AI when the model id includes `deepseek`; otherwise a mock reasoning/answer plus a note to configure keys |
+| Usage | `GET /api/agent/usage` | Reads `CONFIG_KV` `agent:usage`; empty object when unset |
+| Chat streaming | `POST /api/agent/chat` | SSE from the dashboard `AI` binding when `stream` is true |
+
+agent-worker itself has chat, vision, embedding, risk-override, status, config, models, health, and housekeeping — and **does not** implement `/agent/reasoning` or `/agent/usage`. See [agent-worker](/docs/devops/workers/agent-worker).
+
 ---
 
 ## 🏗️ Next.js to Cloudflare Edge Architecture
@@ -68,11 +80,11 @@ The dashboard's `wrangler.jsonc` maps out its internal service links to extract 
 
 ```jsonc
 {
-  "name": "hoox-dashboard",
+  "name": "dashboard",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
@@ -80,27 +92,26 @@ The dashboard's `wrangler.jsonc` maps out its internal service links to extract 
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
+    },
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "services": [
     { "binding": "D1_SERVICE", "service": "d1-worker" },
     { "binding": "AGENT_SERVICE", "service": "agent-worker" },
-    { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
+    { "binding": "WEB3_WALLET_SERVICE", "service": "web3-wallet-worker" },
+    { "binding": "PYNE_SERVICE", "service": "pyne-worker" },
   ],
-  "vars": {
-    "D1_SERVICE_URL": "https://d1-worker.hoox.example.com",
-    "AGENT_SERVICE_URL": "https://agent-worker.hoox.example.com",
-    "TELEGRAM_SERVICE_URL": "https://telegram-worker.hoox.example.com",
+  "ai": {
+    "binding": "AI",
   },
-  "secrets": [
-    "DASHBOARD_USER",
-    "DASHBOARD_PASS",
-    "SESSION_SECRET",
-    "INTERNAL_KEY_BINDING",
-  ],
 }
 ```
+
+Worker name is **`dashboard`**. Smart Placement is **off** so the UI stays close to operators. Secrets (`DASHBOARD_USER`, `DASHBOARD_PASS`, `SESSION_SECRET`, `INTERNAL_KEY_BINDING`, optional `PYNE_API_KEY`) are set with `wrangler secret put`. Do not put live `*.workers.dev` URLs in committed wrangler.
 
 ---
 
@@ -108,7 +119,8 @@ The dashboard's `wrangler.jsonc` maps out its internal service links to extract 
 
 - **`DASHBOARD_USER`** & **`DASHBOARD_PASS`**: Administrative credentials required to access the visual panel.
 - **`SESSION_SECRET`**: A secure 32-character encryption key used to cryptographically sign session cookies at the edge.
-- **`INTERNAL_KEY_BINDING`**: Shared key used to validate calls to the `d1-worker` and `agent-worker` service bindings.
+- **`INTERNAL_KEY_BINDING`**: Shared key used to validate calls to `d1-worker`, `agent-worker`, and `web3-wallet-worker`.
+- **`PYNE_API_KEY`**: Optional; match **pyne-worker** `API_KEY` when the dashboard calls `PYNE_SERVICE`.
 
 ### Local Development Mocking (`.env.local`)
 

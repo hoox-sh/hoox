@@ -89,8 +89,8 @@ When a signal hits your public endpoint, the **`hoox` gateway** interceptor imme
 <ol>
   <li>
     <strong>API Key Authorization</strong>: Authenticates the payload's{" "}
-    <code>apiKey</code> property against your secure manifest stored in
-    Cloudflare® KV.
+    <code>apiKey</code> property against the{" "}
+    <code>WEBHOOK_API_KEY_BINDING</code> secret on the hoox gateway.
   </li>
   <li>
     <strong>IP Allow-listing</strong>: Verifies that the client IP matches a

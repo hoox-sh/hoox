@@ -34,34 +34,43 @@ graph TD
 
 ## ⚡ Running Tests: CLI Commands
 
+Day-to-day, use **Bun** from the monorepo root. The Hoox CLI wraps the same suites.
+
 ### A. Core Platform Verification (Excluding Live)
 
 ```bash
-# 1. Run all unit, integration, and E2E smoke tests in parallel
+# 1. Run unit tests (excludes tests/live and packages/tui; then runs test:tui)
 bun test
 
-# 2. Run the suite and output a detailed V8 coverage report
+# 2. Coverage for a package
 bun test --coverage
+bun test packages/cli/ --coverage
+
+# 3. CLI wrappers
+hoox test unit
+hoox test all            # lint → typecheck → unit → integration
+hoox test worker trade-worker
+hoox test live           # needs tests/live/.env
 ```
 
 ### B. Workspace-Specific Targeted Runs
 
-To optimize developer feedback loops, you can target specific workspaces or workers:
+Root `package.json` scripts:
 
 ```bash
-# Run CLI commands tests only (packages/cli/)
-bun run test:cli
+bun run test:cli         # packages/cli/
+bun run test:tui         # packages/tui/ (preload test-setup)
+bun run test:shared      # packages/shared/
+bun run test:workers     # workers/*
+bun run test:trade-worker
+bun run test:integration # tests/integration/
+bun run test:e2e         # tests/e2e/
+bun run test:security    # tests/security/
+bun run test:live        # tests/live/ --jobs 1
+bun run test:load        # k6 (requires k6 CLI)
+bun run test:all         # lint && typecheck && test && test:live
 
-# Run Terminal UI tests only (packages/tui/)
-bun run test:tui
-
-# Run shared helper tests only (packages/shared/)
-bun run test:shared
-
-# Run all edge workers unit tests (workers/*)
-bun run test:workers
-
-# Run a single specific test file with hot-reload watch mode
+# Single file with watch
 bun test workers/agent-worker/src/index.test.ts --watch
 ```
 
@@ -80,16 +89,18 @@ bun test tests/security/fuzz.test.ts
 ### D. Advanced Integration & Live Runs
 
 ```bash
-# Run Miniflare 3 gateway integration tests
+# Gateway / mesh integration tests
 bun run test:integration
+hoox test integration    # CLI wrapper; prefer `bun run test:integration`
 
-# Run E2E CLI lifecycle smoke tests
+# E2E CLI lifecycle smoke tests
 bun run test:e2e
 
-# Run live Cloudflare API integration tests (requires tests/live/.env credentials)
-bun run test:live --jobs 1
+# Live Cloudflare API tests (requires tests/live/.env credentials)
+bun run test:live
+hoox test live --service d1
 
-# Run k6 performance/load tests (requires k6 CLI)
+# k6 performance/load tests (requires k6 CLI)
 bun run test:load
 ```
 

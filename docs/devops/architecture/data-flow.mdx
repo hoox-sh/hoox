@@ -10,7 +10,7 @@ description: "Comprehensive data routing, transaction sequence diagrams, time-se
 
 Hoox operates as a highly orchestrated **distributed event loop**. Because execution logic is split into isolated compute nodes, data flows recursively through multiple V8 transitions, asynchronous queues, time-series datasets, and database ledgers.
 
-This document provides complete, low-level technical specifications and Mermaid sequence diagrams for our primary data routing pipelines: Webhook Trade execution, AI Risk management, PDF browser rendering, Observability tracking, and Pine strategy bar-close → trade-worker.
+This document covers the primary pipelines: webhook trade execution (CEX and spot DEX), operator wallet proxy, AI risk management, PDF rendering, observability, and Pine strategy bar-close → trade-worker.
 
 ---
 
@@ -42,8 +42,8 @@ sequenceDiagram
             GW-->>TV: 409 Conflict
         else New reservation
             GW->>TW: Service Binding POST /webhook (X-Internal-Auth-Key)
-            Note over TW: Secrets + HMAC-SHA256 REST order (not WS order path)
-            TW->>TW: Place order on exchange API
+            Note over TW: CEX HMAC REST, or DEX via WEB3_WALLET_SERVICE POST /swap
+            TW->>TW: Place CEX order or wallet swap
             TW->>D1: /rpc/insert-trade · /rpc/upsert-position (safeWaitUntil)
             TW->>TG: POST /webhook or /process (chatId allowlist)
             TW->>AE: /track/* via safeWaitUntil
@@ -58,6 +58,36 @@ sequenceDiagram
         end
     end
 ```
+
+Spot DEX venues (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) take the same webhook body (`exchange` + `LONG`/`SHORT`/`CLOSE_*` + `BASE/QUOTE`). **trade-worker** does not sign on-chain; it calls **web3-wallet-worker** `POST /swap` over `WEB3_WALLET_SERVICE`. Perps are not supported. `"test": true` is rejected on DEX venues (`TEST_TRADING_UNSUPPORTED`).
+
+---
+
+## 1b. Operator wallet proxy (`/wallet/*`)
+
+The gateway does **not** expose web3-wallet-worker on the public internet. Operators call allowlisted `/wallet/*` paths with Bearer `OPERATOR_API_KEY`. The gateway injects mesh `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` preferred) and forwards `Idempotency-Key`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Op as Operator
+    participant GW as hoox Gateway
+    participant W3 as web3-wallet-worker
+
+    Op->>GW: GET/POST/PUT /wallet/{status|config|balance|transfer|approve|quote|swap|transactions}
+    Note over GW: requireOperatorAuth · path allowlist
+    alt Path not allowlisted
+        GW-->>Op: 404
+    else WEB3_WALLET_SERVICE missing
+        GW-->>Op: 500
+    else Allowlisted
+        GW->>W3: Service Binding + X-Internal-Auth-Key (+ Idempotency-Key)
+        W3-->>GW: JSON (status / quote / txHash / …)
+        GW-->>Op: Same status + JSON (gateway security headers)
+    end
+```
+
+Allowlisted upstream paths: `/`, `/status`, `/config`, `/balance`, `/transfer`, `/approve`, `/quote`, `/swap`, `/transactions`. See [hoox gateway](/docs/devops/workers/hoox) and [web3-wallet-worker](/docs/devops/workers/web3-wallet-worker).
 
 ---
 
@@ -75,23 +105,17 @@ sequenceDiagram
     participant TG as telegram-worker (Alerts)
 
     Cron->>AW: Fire trigger: triggers.crons (default */15 * * * *)
-    AW->>D1: Service Binding invoke: POST /query (Get open margin positions)
-    D1-->>AW: Return position matrices (Average price, leverage, unrealized P&L)
-    Note over AW: Evaluate Max Daily Drawdown threshold against balance
-    alt Drawdown Limit Hit (USDT Daily loss > max_daily_drawdown_percent)
-        Note over AW: EMERGENCY HALT TRIGGERED 🚨
-        AW->>AW: Set trade:kill_switch = true in CONFIG_KV
-        AW->>TW: Service Binding invoke: POST /close-all (Flatten all active exposure)
-        TW-->>AW: All positions flattened successfully
-        AW->>TG: Service Binding invoke: POST /alert (Dispatch Emergency Alert)
-        TG-->>AW: User notified on phone
-    else Normal Operation (Within Safe Margins)
-        Note over AW: Calculate Trailing Stop-Loss price deviations
-        alt Deviation Triggered (Price crossed dynamic stop-loss boundary)
-            AW->>TW: Service Binding invoke: POST /order (Close target position)
-            TW-->>AW: Order filled
-            AW->>TG: Service Binding invoke: POST /alert (Stop-Loss Triggered Notification)
-        end
+    AW->>D1: GET /api/dashboard/positions and /api/dashboard/balances
+    D1-->>AW: OPEN positions + balances (skip *-testnet-* ids)
+    Note over AW: Mark price from public CEX REST; trailing stop / take-profit
+    alt Trailing stop or take-profit hit
+        AW->>TW: POST /webhook CLOSE_LONG or CLOSE_SHORT (Idempotency-Key)
+        TW-->>AW: Fill result
+    end
+    alt Unrealized PnL % below max_daily_drawdown_percent
+        AW->>AW: Put trade:kill_switch = true in CONFIG_KV
+        AW->>TG: POST /alert (kill switch engaged)
+        Note over AW: Does not flatten positions — new entries stop at the gateway
     end
 ```
 
@@ -206,14 +230,18 @@ sequenceDiagram
 
 | Storage Platform | Namespace / Database Name      | Data Payload Details                                           | Associated Compute Workers                  |
 | :--------------- | :----------------------------- | :------------------------------------------------------------- | :------------------------------------------ |
-| **D1 Database**  | `trade-data-db` (SQLite)       | Executed fills, open position matrices, Drizzle tracking logs. | `d1-worker`, `trade-worker`, `agent-worker` |
+| **D1 Database**  | `trade-data-db` (SQLite)       | Executed fills, open positions, signals, balances, system logs. | `d1-worker`, `trade-worker`, `agent-worker` |
 | **CONFIG_KV**    | `CONFIG_KV` (Key-Value)        | 16-key global runtime manifest, emergency Kill Switch.         | **All Workers** + Next.js Dashboard         |
 | **SESSIONS_KV**  | `SESSIONS_KV` (Key-Value)      | Session access states and API authorization cookies.           | `hoox` Gateway                              |
 | **R2 Storage**   | `trade-reports` (S3 Bucket)    | Compiled PDF portfolio reports.                                | `report-worker`                             |
 | **R2 Storage**   | `hoox-system-logs` (S3 Bucket) | Verbose JSON exchange API payloads (REST & WebSocket logs).    | `trade-worker`                              |
 | **Vectorize**    | `my-rag-index` (768-d)         | Semantic chat and history vector embeddings.                   | `hoox`, `telegram-worker`                   |
+| **D1 Database**  | `web3-wallet-transactions`     | On-chain tx records (wallet isolate).                          | `web3-wallet-worker`                        |
+| **R2 Storage**   | `pyne-worker-ohlcv`            | OHLCV bars + script registry.                                  | `pyne-worker`                               |
+
+When `TENANT_MODE` is on, D1 rows stamp `tenant_id`, KV/DO keys use `t/<id>/…`, and R2 keys use `t-<id>/…`. Off by default.
 
 ### 🔗 Next Steps
 
 - **[Bindings Catalog](/docs/devops/architecture/bindings)** — Check wrangler settings and resource declarations.
-- **[Storage Engineering Manual](/docs/devops/architecture/storage)** — Dive into Drizzle database schemas and SQLite properties.
+- **[Storage Engineering Manual](/docs/devops/architecture/storage)** — D1 DDL (`schema.sql`), R2, and KV.

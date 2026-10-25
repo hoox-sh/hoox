@@ -3,6 +3,11 @@
   SPDX-License-Identifier: CC-BY-4.0
 -->
 
+---
+title: "FAQ"
+description: "Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.15.x."
+---
+
 # ❓ Frequently Asked Questions (FAQ)
 
 Answers to the most common questions about setting up, operating, and troubleshooting the Hoox trading platform.
@@ -47,7 +52,11 @@ Yes! All components — Workers, D1, KV, R2, Queues, Vectorize, Workers AI, Brow
 
 ### Q: Do I need to know Solidity or blockchain development?
 
-No. Hoox is designed for **algorithmic traders**, not blockchain developers. On-chain execution is handled by `web3-wallet-worker` (Uniswap V3 + Jupiter Swap V2). Send the same webhook as CEX with `exchange: "uniswap-ethereum"` (or `uniswap-arbitrum` / `jupiter-solana`) and a `BASE/QUOTE` symbol. See [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
+No. Hoox is designed for **algorithmic traders**, not blockchain developers. On-chain execution is handled by `web3-wallet-worker` (Uniswap V3 + Jupiter Swap V2). Send the same webhook as CEX with `exchange: "uniswap-ethereum"` (or `uniswap-arbitrum` / `jupiter-solana`) and a `BASE/QUOTE` symbol. See [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps). Perpetual DEX venues are not supported.
+
+### Q: Can I drive Hoox from an editor / agent?
+
+Yes. `@hoox-sh/hoox-mcp` is a stdio MCP server (`bun run mcp`). One tool per `hoox` command plus catalog/plan/snapshot/advise. Mutating calls return a confirm token. Operator page: [MCP server](/docs/devops/mcp).
 
 ---
 
@@ -75,8 +84,8 @@ Yes. API keys are stored as **Cloudflare® Workers Secrets** — encrypted at re
 Add `"test": true` to the webhook (or queue) JSON. Binance and Bybit route to their public Futures testnet REST hosts; MEXC rejects the request (no public REST sandbox). Prefer dedicated secrets:
 
 ```bash
-hoox secrets set trade-worker BYBIT_TESTNET_KEY_BINDING
-hoox secrets set trade-worker BYBIT_TESTNET_SECRET_BINDING
+hoox secrets set trade-worker EXCHANGE_TESTNET_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_TESTNET_SECRET_BINDING
 ```
 
 Test fills are stored as `TEST_EXECUTED` with `*-testnet-*` position ids so they do not mix with live exposure. DEX venues reject `test: true`. See **[Test Trading](/docs/enduser/guides/test-trading)**.
@@ -90,9 +99,11 @@ Use `exchange: "uniswap-ethereum"` | `"uniswap-arbitrum"` | `"jupiter-solana"` a
 Yes. Simply update the secret (worker name is the first argument):
 
 ```bash
-hoox secrets set trade-worker BYBIT_KEY_BINDING "new_key_here"
-hoox secrets set trade-worker BYBIT_SECRET_BINDING "new_secret_here"
+hoox secrets set trade-worker EXCHANGE_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
 ```
+
+The CLI prompts for each value. Deprecated per-venue names (`BINANCE_*`, `BYBIT_*`, `MEXC_*`) still resolve if the unified pair is unset.
 
 The change takes effect on the next worker request — no redeployment needed.
 
@@ -110,19 +121,18 @@ The initial deployment provisions Cloudflare resources (D1 databases, KV namespa
 
 ### Q: How do I change the exchange routing?
 
-Dynamically — no code changes required:
+The `exchange` field on each webhook chooses the venue. Enable or skip a venue in `CONFIG_KV` (unset means enabled):
 
 ```bash
-# Change default exchange from Bybit to Binance
-hoox config kv set exchanges:default_routing binance
-
-# Enable dynamic symbol-based routing
-hoox config kv set routing:dynamic:enabled true
+hoox config kv set exchange:binance:enabled true
+hoox config kv set exchange:bybit:enabled true
+hoox config kv set exchange:mexc:enabled false
+hoox config kv set exchange:uniswap-ethereum:enabled true
 ```
 
 ### Q: What happens when I toggle the kill switch on?
 
-The `trade:kill_switch` flag is set to `true` in KV. On the next incoming webhook request, the `hoox` gateway checks this flag and immediately returns a `503 Service Unavailable` response. The agent-worker also runs this check before executing any trailing-stop operations. **Active existing positions are NOT automatically closed** — you must manually flatten them.
+The `trade:kill_switch` flag is set to `true` in KV. On the next incoming webhook request, the `hoox` gateway checks this flag and immediately returns a `503` with code `KILL_SWITCH`. The agent-worker also runs this check before trailing-stop operations. **Open positions are not closed automatically** — send an explicit `CLOSE_LONG` / `CLOSE_SHORT` signal.
 
 ---
 
@@ -135,13 +145,13 @@ This means the Durable Object idempotency engine detected a duplicate request. T
 - TradingView fires multiple alerts for the same signal (configure `alert.freq_once_per_bar_close`)
 - You accidentally reused the same `idempotencyKey` in a manual test
 
-This is **by design** — it protects you from accidentally executing a trade twice. Wait for the TTL expiry (24 hours) or use a unique ID for subsequent signals.
+This is **by design** — it protects you from accidentally executing a trade twice. Wait for the TTL to expire, or send a unique `idempotencyKey` / `Idempotency-Key` header. Auto fingerprints already include a per-minute time bucket.
 
 ### Q: My webhooks work locally but fail in production. Why?
 
 Common causes:
 
-1. **WAF IP blocking** — Enable TradingView IP allow-listing: `hoox waf configure --TradingView-only`
+1. **WAF IP blocking** — `hoox waf status` / `hoox waf rules add ip-allowlist <ip>`, and `webhook:tradingview:ip_check_enabled` in KV
 2. **Missing secrets** — Run `hoox secrets list <worker>` to verify all required secrets are bound
 3. **Service binding not deployed** — Run `hoox deploy all --auto` to ensure all internal workers are live
 
@@ -169,7 +179,7 @@ Follow the guided repair prompts:
 2. Dependency failure → `bun install`
 3. Type error → `bun run typecheck`
 4. Missing Cloudflare binding → `hoox repair infra`
-5. Missing secret → `hoox secret set <NAME> <VALUE>`
+5. Missing secret → `hoox secrets set <worker> <NAME>`
 
 ---
 
@@ -179,9 +189,8 @@ Follow the guided repair prompts:
 
 No. The `agent-worker` can run trailing-stop and kill-switch logic **without any AI provider**. AI providers are only needed for:
 
-- Conversational chat (`/agent/chat`)
-- Chart image analysis (`/agent/vision`)
-- Complex strategy reasoning (`/agent/reasoning`)
+- Conversational chat (`POST /agent/chat` on `agent-worker`)
+- Chart image analysis (`POST /agent/vision`)
 - Natural language Telegram bot interactions
 
 ### Q: Which AI provider is best?
@@ -231,6 +240,10 @@ When a direct exchange API call fails (timeout, rate limit, HTTP 5xx), the gatew
 - Retry 4: 15 minutes
 - Retry 5: 30 minutes
   After max retries, the trade is logged as failed (not lost).
+
+### Q: Is multi-tenant isolation on by default?
+
+No. Opt-in tenant isolation exists in open core and is **off by default**. Existing single-tenant installs are unchanged. D1 tables include a `tenant_id` column (`''` for unscoped rows).
 
 ### Q: Can I use a custom domain?
 

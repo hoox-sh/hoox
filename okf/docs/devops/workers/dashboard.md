@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/workers/dashboard.mdx"
@@ -23,6 +23,7 @@ Repo path `docs/devops/workers/dashboard.mdx`.
 # Outline
 
   * Positions & test trading
+  * Agent Reasoning & Usage pages
 * 🏗️ Next.js to Cloudflare Edge Architecture
 * ⚡ 1. Declared Wrangler Configurations & Bindings
 * 🔑 2. Environmental Variables & Encrypted Secrets

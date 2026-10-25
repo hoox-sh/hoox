@@ -18,13 +18,19 @@ The **`hoox`** gateway is the public-facing entry point of the trading ecosystem
 graph TD
     Alert["🔔 External Webhook"] -->|Signal| WAF["🧱 Cloudflare WAF / Firewall"]
     WAF -->|IP & Auth Checks| Gateway["🔐 Gateway: hoox<br/>Public Isolate"]
-    Gateway -->|V8 Service Bindings<br/>Private, Encrypted, Zero-TCP| Compute["Background Nodes"]
+    Op[Operator Bearer] -->|/v1/* and /wallet/*| Gateway
 
     subgraph Compute ["Background Compute Isolates"]
         Trade["📈 trade-worker"]
         Tele["💬 telegram-worker"]
         Anal["📊 analytics-worker"]
+        Wallet["🌐 web3-wallet-worker"]
     end
+
+    Gateway -->|TRADE_SERVICE| Trade
+    Gateway -->|TELEGRAM_SERVICE| Tele
+    Gateway -->|ANALYTICS_SERVICE| Anal
+    Gateway -->|WEB3_WALLET_SERVICE /wallet/*| Wallet
 
     style Alert fill:#CCCCCC,stroke:#3b82f6,stroke-width:2
     style WAF fill:#CCCCCC,stroke:#f59e0b,stroke-width:2
@@ -32,6 +38,7 @@ graph TD
     style Trade fill:#CCCCCC,stroke:#10b981,stroke-width:1
     style Tele fill:#CCCCCC,stroke:#10b981,stroke-width:1
     style Anal fill:#CCCCCC,stroke:#10b981,stroke-width:1
+    style Wallet fill:#CCCCCC,stroke:#10b981,stroke-width:1
 ```
 
 ---
@@ -44,28 +51,27 @@ The gateway's `wrangler.jsonc` defines its private service binding links and res
 {
   "name": "hoox",
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "placement": {
     "mode": "smart",
-  },
-  "vars": {
-    "ENVIRONMENT": "production",
   },
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
     },
     {
       "binding": "SESSIONS_KV",
-      "id": "ff70a58b492e45d79880a7a8213c745c",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "services": [
     { "binding": "TRADE_SERVICE", "service": "trade-worker" },
     { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
+    { "binding": "WEB3_WALLET_SERVICE", "service": "web3-wallet-worker" },
+    { "binding": "ANALYTICS_SERVICE", "service": "analytics-worker" },
   ],
   "queues": {
     "producers": [{ "queue": "trade-execution", "binding": "TRADE_QUEUE" }],
@@ -99,7 +105,8 @@ For security, build-time credentials are never stored in plain text. They are bo
 
 - **`WEBHOOK_API_KEY_BINDING`**: The shared secret expected in the JSON body field `apiKey` on `POST /webhook` (and `POST /`). **Fail-closed** — if unset, all webhook requests return `403`.
 - **`INTERNAL_KEY_BINDING`**: Shared service-to-service key sent as `X-Internal-Auth-Key` when calling trade-worker / telegram-worker.
-- **`OPERATOR_API_KEY`** (preferred) or legacy **`INTERNAL_API_KEY`**: Bearer token for the operator management plane (`/v1/*`). Fail-closed when unset.
+- **`OPERATOR_API_KEY`** (preferred) or legacy **`INTERNAL_API_KEY`**: Bearer token for the operator management plane (`/v1/*`) **and** the `/wallet/*` proxy. Fail-closed when unset.
+- **`WALLET_EXECUTE_KEY_BINDING`**: Preferred mesh key injected as `X-Internal-Auth-Key` on `/wallet/*` → `WEB3_WALLET_SERVICE`. Falls back to `INTERNAL_KEY_BINDING`.
 - **`TELEGRAM_ALLOWED_CHAT_IDS`**: Comma-separated numeric chat IDs allowed on webhook **notify** payloads. **Fail-closed** when unset (notify rejected). Alias: `AUTHORIZED_CHAT_IDS`. Optional union with `CONFIG_KV` key `telegram:allowed_chat_ids` (JSON array). Align with telegram-worker `AUTHORIZED_CHAT_IDS`.
 
 ### Local Development Mocking (`.dev.vars`)
@@ -201,6 +208,7 @@ Applied on the webhook critical path **before** dispatch:
       "queue": "configured",
       "trade": "configured",
       "telegram": "configured",
+      "wallet": "configured",
       "idempotency": "configured",
       "rateLimiter": "configured"
     }
@@ -220,6 +228,30 @@ Bearer `OPERATOR_API_KEY` (or legacy `INTERNAL_API_KEY`). Prefer Cloudflare Acce
 | `GET` | `/v1/trades/stream` | SSE trade feed (polls trade-worker `/api/signals`) |
 | `GET` | `/v1/logs/stream` | SSE log feed (polls trade-worker `/api/system-logs`) |
 | `GET` | `/workers` | Legacy alias of `/v1/workers` |
+
+---
+
+### D. Operator wallet proxy (`/wallet/*`)
+
+Operator Bearer (`OPERATOR_API_KEY` or legacy `INTERNAL_API_KEY`). Forwards to **web3-wallet-worker** over `WEB3_WALLET_SERVICE`. The gateway injects mesh `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` preferred, else `INTERNAL_KEY_BINDING`) and passes `Idempotency-Key` through. Query strings are preserved. JSON bodies are size-capped like other gateway POSTs.
+
+Allowlisted upstream paths (GET and POST on every path; PUT on `/config`):
+
+| Gateway path | Upstream |
+| ------------ | -------- |
+| `GET`/`POST` `/wallet` | `/` |
+| `GET`/`POST` `/wallet/status` | `/status` |
+| `GET`/`PUT`/`POST` `/wallet/config` | `/config` |
+| `GET`/`POST` `/wallet/balance` | `/balance` |
+| `GET`/`POST` `/wallet/transfer` | `/transfer` |
+| `GET`/`POST` `/wallet/approve` | `/approve` |
+| `GET`/`POST` `/wallet/quote` | `/quote` |
+| `GET`/`POST` `/wallet/swap` | `/swap` |
+| `GET`/`POST` `/wallet/transactions` | `/transactions` |
+
+Anything else under `/wallet` returns **404**. Missing `WEB3_WALLET_SERVICE` returns **500**. Upstream errors are logged server-side and returned with the wallet isolate’s status. This is the operator-facing path onto the wallet isolate — web3-wallet-worker itself has no public URL.
+
+See [web3-wallet-worker](/docs/devops/workers/web3-wallet-worker) for payload shapes and [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps) for trade-worker routing.
 
 ---
 

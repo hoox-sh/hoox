@@ -66,7 +66,7 @@ if (bot && !bot.verifiedBot && bot.score < 30) {
 
 ## Immutable Audit (Compliance Core)
 
-Every security-relevant event flows to Logpush → R2 (see observability-audit.mdx).
+Every security-relevant event flows to Logpush → R2 (see [Observability & audit](/docs/enterprise/observability-audit)).
 
 Key events:
 - All webhook / signal ingress (with bot score, WAF decision)
@@ -100,8 +100,6 @@ Retention: typically 7 years for financial services (configurable via R2 lifecyc
 
 ## Threat Model Updates (Enterprise)
 
-See original threat model (papers/appendices/C-threat-model.tex and docs).
-
 New / amplified threats addressed:
 - Malicious or compromised tenant code (mitigated by WfP isolation + review gates).
 - Supply-chain attacks on customer strategies (AI Gateway + sandboxing patterns).
@@ -117,7 +115,6 @@ New / amplified threats addressed:
 
 ## Related Documents
 
-- Root security overview: `docs/devops/security/overview.mdx`
-- Architecture: `docs/devops/enterprise/architecture.mdx`
-- Multi-tenancy isolation guarantees: `multi-tenancy.mdx`
-- Original 5-layer model in the academic paper.
+- [Security overview](/docs/devops/security/overview)
+- [Enterprise architecture](/docs/enterprise/architecture)
+- [Multi-tenancy isolation](/docs/enterprise/multi-tenancy)

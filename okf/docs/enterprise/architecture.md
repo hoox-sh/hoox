@@ -7,7 +7,7 @@ tags: [architecture, doc, docs, enterprise]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enterprise/architecture.mdx"
@@ -33,5 +33,3 @@ Repo path `docs/enterprise/architecture.mdx`.
   * 5. Security Hardening
 * Tenant Isolation Model
 * Migration & Coexistence
-* Open Decisions (from plan review)
-* Next Steps / Implementation Order

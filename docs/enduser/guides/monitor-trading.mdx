@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "monitor-trading"
+title: "Monitoring operations"
+description: "Probe worker health, toggle the kill switch, inspect trades and queues, and tail edge logs."
 ---
 
 # 📈 Monitoring Operations
@@ -100,7 +101,8 @@ When activated, the following sequence occurs automatically:
   When the Kill Switch is turned `ON`, the `hoox` gateway router immediately
   rejects all incoming TradingView® alerts and API webhook requests with a `503
   Service Unavailable` error and logs a `KILL_SWITCH_ACTIVE` warning. Active
-  positions must be flattened manually or via `hoox monitor trades close-all`.
+  positions must be flattened with an explicit `CLOSE_LONG` / `CLOSE_SHORT`
+  webhook (the CLI has no `close-all` command).
 </Warning>
 
 ---
@@ -113,14 +115,8 @@ To review execution history directly from your terminal:
 # Print the 10 most recent trades executed across all exchanges
 hoox monitor trades
 
-# Print the 50 most recent trades
+# Print the 50 most recent trades (max 100)
 hoox monitor trades 50
-
-# Filter by specific exchange
-hoox monitor trades --exchange bybit
-
-# Filter by date range (ISO format)
-hoox monitor trades --from 2026-05-15 --to 2026-05-20
 ```
 
 This aggregates entries from your production D1 database and prints a formatted terminal table outlining: `TIMESTAMP | REQUEST_ID | EXCHANGE | SYMBOL | ACTION | QUANTITY | PRICE | STATUS`
@@ -160,7 +156,7 @@ This displays the number of pending messages in the queue:
 | :---------: | :---------: | -------------------------------------------------------------------------------------------------- |
 |      0      |  🟢 Normal  | No action needed                                                                                   |
 |     1–5     | 🟡 Watchful | Monitor exchange health pages                                                                      |
-|    6–20     | 🟠 Elevated | Check exchange maintenance schedule; consider `hoox config kv set webhooks:queue_mode direct_only` |
+|    6–20     | 🟠 Elevated | Check exchange maintenance schedule; consider `hoox config kv set webhook:queue_mode queue_disabled` |
 |    20\+     | 🔴 Critical | Verify exchange API keys are valid; check rate limit headers; scale manually if needed             |
 
 ---
@@ -179,20 +175,14 @@ hoox logs worker hoox
 # C. Stream all workers simultaneously (diagnostic mode)
 hoox logs all
 
-# D. Filter logs by severity level
+# D. Filter logs by severity level (log, info, warn, error, debug, all)
 hoox logs worker trade-worker --level error
+
+# E. Snapshot recent logs and exit
+hoox logs worker hoox --no-follow
 ```
 
-### Downloading Logs for Off-Line Analysis
-
-To download historical logs offloaded to your R2 storage bucket for compliance audits or tax reports:
-
-```bash
-hoox logs worker hoox --output logs/gateway-backup.log
-
-# Download trade-worker logs for the last 24 hours
-hoox logs worker trade-worker --output logs/trade-execution.log --since 24h
-```
+`--level`, `--follow` / `--no-follow`, and `--json` are the supported flags. D1 `system_logs` snapshots: `hoox monitor logs [worker]`.
 
 ---
 
@@ -201,11 +191,12 @@ hoox logs worker trade-worker --output logs/trade-execution.log --since 24h
 Hoox tracks key performance indicators via Cloudflare® Analytics Engine. Access summary metrics via:
 
 ```bash
-# View current system metrics snapshot
-hoox monitor metrics
+# Event rollup from D1 system_logs
+hoox monitor analytics summary
+hoox monitor analytics errors --hours 24
 
-# Or use the Dashboard Command Center for visual charts
-hoox dashboard
+# Visual charts: local dashboard
+hoox dashboard dev
 ```
 
 ### Key Metrics Tracked

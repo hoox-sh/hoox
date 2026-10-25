@@ -7,7 +7,7 @@ tags: [devops, doc, docs, security]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/security/overview.mdx"
@@ -23,7 +23,7 @@ Repo path `docs/devops/security/overview.mdx`.
 # Outline
 
 * Overview
-  * Gateway mesh hardening (v0.13+)
+  * Gateway mesh hardening (ships with 0.13+)
 * 1. Auth Middleware Hardening
   * requireInternalAuth — Fail-Closed
   * timingSafeEqual — Exported for Cross-Worker Use

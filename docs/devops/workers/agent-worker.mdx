@@ -8,8 +8,6 @@ title: "agent-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Agent Cron Worker, covering multi-provider AI Gateway configurations, vision analysis, and risk protection loops."
 ---
 
-**Last Updated:** May 2026 (Post-Enhancement)
-
 The `agent-worker` serves as the proactive intelligence layer of the Hoox trading ecosystem. Rather than waiting for webhooks, it runs on a **configurable Cloudflare Cron schedule (1–1440 minutes)** to monitor portfolio health, enforce risk limits, and optimize position exits. The default in this repo is every **15 minutes** (`*/15 * * * *`).
 
 ## Core Capabilities
@@ -22,7 +20,7 @@ The `agent-worker` serves as the proactive intelligence layer of the Hoox tradin
 | 💸 **Scale-Out Take Profits**  | Detects when a position reaches a specific profit target and automatically sends partial close commands to secure gains.                      |
 | 🤖 **AI System Summarization** | Periodically fetches `system_logs` from the `d1-worker`, analyzes them via LLAMA 3 8B, and sends natural language health reports to Telegram. |
 | 🌐 **Multi-Provider AI**       | Seamlessly switches between Workers AI, OpenAI, Anthropic, Google AI, and Azure OpenAI with automatic fallbacks.                              |
-| 🧠 **Advanced Models**         | Supports vision, embeddings, reasoning (extended thinking), and code generation models.                                                       |
+| 🧠 **Advanced Models**         | Vision, embeddings, and code models on the isolate. Dashboard Reasoning/Usage pages call dashboard `/api/agent/*` routes (not this worker). |
 
 ## Architecture & Flow
 
@@ -112,7 +110,7 @@ Returns health status of all configured AI providers.
 
 #### `POST /agent/chat`
 
-Send a chat request with automatic provider fallback and **SSE streaming support**.
+Send a chat request with automatic provider fallback. The isolate returns **JSON** (not SSE). User content is sanitized for prompt-injection markers.
 
 **Request:**
 
@@ -121,18 +119,13 @@ Send a chat request with automatic provider fallback and **SSE streaming support
   "messages": [{ "role": "user", "content": "Analyze BTC market sentiment" }],
   "systemPrompt": "You are a professional crypto trading analyst.",
   "temperature": 0.7,
-  "maxTokens": 500,
-  "stream": true
+  "maxTokens": 500
 }
 ```
 
-**Streaming Response (SSE):**
+**Response:** `{ "success": true, "response": "…", "model": "…", "provider": "…" }`
 
-```
-data: {"content": "Based on current market conditions..."}
-data: {"content": " technical indicators suggest..."}
-data: [DONE]
-```
+The dashboard Chat page calls **`POST /api/agent/chat`** on the dashboard isolate. That Next.js route can SSE-stream from the dashboard’s Workers AI binding when `stream` is true. That streaming path is **not** `POST /agent/chat` on this worker.
 
 #### `POST /agent/vision`
 
@@ -155,17 +148,6 @@ Or with base64:
 }
 ```
 
-#### Planned / not yet shipped
-
-The following endpoints appear in earlier design notes but are **not implemented** in the current isolate. Prefer `/agent/chat` with a reasoning model id, and track usage via Cloudflare AI Gateway dashboards until these land:
-
-| Endpoint | Status |
-| -------- | ------ |
-| `POST /agent/reasoning` | Not shipped — use `/agent/chat` with a reasoning model |
-| `GET /agent/usage` | Not shipped — use AI Gateway / provider dashboards |
-| `GET /agent/prompts` | Not shipped — system prompts are request-scoped |
-| SSE streaming on `/agent/chat` | Not shipped — responses are JSON only |
-
 #### `POST /agent/embedding`
 
 Generate text embeddings using Workers AI embedding models.
@@ -177,7 +159,7 @@ Generate text embeddings using Workers AI embedding models.
 }
 ```
 
-### Legacy Endpoints
+### Risk & status
 
 #### `POST /agent/risk-override`
 
@@ -205,6 +187,20 @@ You may also pass `trailingStopPercent` (0–1) alone or with `set_trailing_stop
 
 Retrieve the real-time health of the agent and active trailing stops.
 
+#### Isolate routes (complete)
+
+Chat, vision, embedding, risk-override, status, config, models, health, and housekeeping exist on this isolate (internal auth except `GET /` and `GET /health`). There is **no** `/agent/reasoning`, `/agent/usage`, or `/agent/prompts` on the worker.
+
+### Dashboard-only agent pages
+
+The dashboard Agent **Reasoning** and **Usage** pages call dashboard Next.js routes, not this isolate:
+
+| Dashboard route | Behavior |
+| --------------- | -------- |
+| `POST /api/agent/reasoning` | Uses the dashboard `AI` binding when the model id includes `deepseek`; otherwise returns a mock reasoning/answer plus a note to configure provider keys in `CONFIG_KV`. |
+| `GET /api/agent/usage` | Reads `CONFIG_KV` key `agent:usage`. Empty object when unset (`"No usage data yet"`). |
+| `GET /api/agent/prompts` | Returns a static template-name list (`trading-analyst`, `risk-assessor`, …). Not stored on the isolate. |
+
 ## Configuration
 
 ### Cron schedule (1–1440 minutes)
@@ -218,7 +214,7 @@ The schedule is **not** hard-coded to 5 minutes. Set `triggers.crons` in `worker
 | 60      | `0 * * * *`         |
 | 1440    | `0 0 * * *`         |
 
-- Align `dashboard.jsonc` → `cron.interval_minutes` (free number, validated 1–1440) with your wrangler expression for operator docs.
+- Align the dashboard isolate profile cron interval (1–1440 minutes) with your wrangler expression.
 - Disable scheduled runs with `"crons": []`; manual `POST /agent/housekeeping` still works.
 - Redeploy after changing the schedule.
 
@@ -300,6 +296,7 @@ The `agent-worker` requires the following bindings to operate:
 - `D1_SERVICE`: To fetch open positions and system logs.
 - `TRADE_SERVICE`: To execute trailing stops and profit-taking.
 - `TELEGRAM_SERVICE`: To broadcast AI summaries and emergency alerts.
+- `ANALYTICS_SERVICE`: Non-blocking `/track/*` writes.
 - `CONFIG_KV`: For dynamic configuration and state.
 - `AI`: Workers AI binding for inference.
 

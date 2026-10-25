@@ -44,7 +44,7 @@ plotshape(shortCondition, title="Short Cross", style=shape.triangledown, locatio
 // Live:
 longAlertJson = '{"apiKey": "your-hoox-webhook-passkey", "exchange": "bybit", "action": "LONG", "symbol": "BTCUSDT", "quantity": 0.001, "leverage": 10}'
 shortAlertJson = '{"apiKey": "your-hoox-webhook-passkey", "exchange": "bybit", "action": "SHORT", "symbol": "BTCUSDT", "quantity": 0.001, "leverage": 10}'
-// Testnet rehearsal (optional — add "test": true; prefer BYBIT_TESTNET_* secrets):
+// Testnet rehearsal (optional — add "test": true; prefer EXCHANGE_TESTNET_* secrets):
 // longAlertJson = '{"apiKey": "your-hoox-webhook-passkey", "exchange": "bybit", "action": "LONG", "symbol": "BTCUSDT", "quantity": 0.001, "leverage": 10, "test": true}'
 
 // 5. Trigger Alerts
@@ -56,12 +56,13 @@ if (shortCondition)
 ```
 
 <Tip>
-  Replace `"your-hoox-webhook-passkey"` in your Pine Script™ with the actual
-  passkey configured in your `CONFIG_KV` store (`webhooks:api_key`). This is a
-  critical security step—the gateway will reject any alerts with mismatched keys
-  with a `401 Unauthorized` error. For exchange testnet rehearsal, add
-  `"test": true` to the JSON and configure dedicated testnet secrets — see
-  [Test Trading](/docs/enduser/guides/test-trading).
+  Replace `"your-hoox-webhook-passkey"` in your Pine Script™ with the value of
+  `WEBHOOK_API_KEY_BINDING` on the hoox gateway (`hoox setup` writes it). A
+  mismatch is rejected (`403 Forbidden`). For exchange testnet rehearsal, add
+  `"test": true` to the JSON and configure `EXCHANGE_TESTNET_*` secrets — see
+  [Test Trading](/docs/enduser/guides/test-trading). DEX spots use
+  `exchange: "uniswap-ethereum"` (or `uniswap-arbitrum` / `jupiter-solana`) and
+  `symbol: "ETH/USDC"` — they reject `"test": true`.
 </Tip>
 
 ---
@@ -105,7 +106,7 @@ When the Moving Average crossover occurs on your chart:
 | Symptom / Error                       | Primary Cause                           | Resolution                                                                                                                                    |
 | :------------------------------------ | :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Alert fires but no trade executes** | Mismatched API keys or WAF block.       | Run `hoox logs worker hoox` to stream traffic. Check if the client IP was dropped by Cloudflare® WAF.                                         |
-| **`401 Unauthorized`**                | Incorrect `apiKey` in Pine Script™.     | Run `hoox config kv get webhooks:api_key` to check your key. Paste the exact string into your Pine Script™ alert payload.                     |
+| **`403 Forbidden`**                   | Incorrect `apiKey` in Pine Script™.     | The body `apiKey` must match the `WEBHOOK_API_KEY_BINDING` secret on the hoox gateway (`hoox secrets list hoox`).                             |
 | **`409 Conflict`**                    | Double-alert fired within the same bar. | Adjust the alert frequency in Pine Script™: use `alert.freq_once_per_bar_close` instead of `alert.freq_all` to prevent rapid-fire retries.    |
 | **`Invalid Symbol` API reject**       | Symbol format mismatch.                 | Hoox automatically converts variations (like `BTC-USDT` or `btc/usdt`) to `BTCUSDT`, but ensure your script sends standard uppercase symbols. |
 

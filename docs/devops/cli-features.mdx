@@ -8,9 +8,9 @@ title: "CLI Architecture & Features"
 description: "Detailed specification of the Hoox Command-Line Interface, monorepo workspaces compilation, and task-management engines."
 ---
 
-The **`hoox` CLI** (`packages/cli`) is the unified lifecycle engine of the trading platform monorepo. It governs local sandboxes, compiles TypeScript structures, coordinates Cloudflare infrastructure resources, deploys edge isolates, manages encrypted secrets, and executes self-healing diagnostics.
+The **`hoox` CLI** (`packages/cli`, **0.15.0**) is the unified lifecycle engine of the trading platform monorepo. It governs local sandboxes, compiles TypeScript structures, coordinates Cloudflare infrastructure resources, deploys edge isolates, manages encrypted secrets, and executes self-healing diagnostics.
 
-Agents drive that same command tree through the [Hoox MCP server](/docs/devops/mcp) (`bun run mcp`).
+Agents drive that same command tree through the [Hoox MCP server](/docs/devops/mcp) (`bun run mcp` from a checkout). `@hoox-sh/hoox-mcp` is a **private** workspace package and is **not** published to npm.
 
 ---
 
@@ -95,10 +95,10 @@ hoox repair infra
 ---
 
 <Tip>
-  Every single command supports the `--json` global flag. This outputs
-  machine-parseable JSON payloads (e.g. `hoox check health --json`), allowing
-  you to integrate the CLI with external telemetry dashboards or alert scripts
-  effortlessly!
+  Every command honors `--json` and `--quiet`. Commands that run through the
+  shared task runner (`hoox deploy all`, `hoox check setup`, `hoox check health`,
+  …) write a **task-result array** on stdout when `--json` is set (`title`,
+  `ok`, `ms`, optional `value` / `error` / `details`). `--quiet` prints nothing.
 </Tip>
 
 ---
@@ -247,7 +247,7 @@ declared in workspace `wrangler.jsonc`:
 | ---- | ------- | -------- |
 | **System / mesh only** | `hoox secrets sync --system` | Syncs internal auth + gateway keys only (`INTERNAL_KEY_BINDING`, `WEBHOOK_API_KEY_BINDING`, session keys, …). Skips exchange keys, bot tokens, and other integration secrets. Alias: `--required`. Prefer after `hoox keys generate` / key rotation. |
 | **Full sync** | `hoox secrets sync` / `hoox secrets sync <worker>` | Puts all declared secrets present in local `.dev.vars`. Reports **synced** / **skipped** (placeholders or missing) / **failed**. |
-| **Single secret** | `hoox secrets set <worker> <name>` | Writes `.dev.vars` and `wrangler secret put` for one name. |
+| **Single secret** | `hoox secrets set <worker> <name>` | Worker is required. Prompts for the value (hidden stdin). Writes `.dev.vars` and `wrangler secret put`. Canonical trade secrets: `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING`. |
 | **List / delete** | `hoox secrets list [worker]`, `hoox secrets delete …` | Inventory or remove. |
 
 `hoox check setup` only fails remote secret checks when declared names are
@@ -256,7 +256,27 @@ values no longer produce noisy warnings.
 
 ---
 
-## 🚪 6. Setup gates (`hoox onboard` / `hoox setup`)
+## 👷 6. Worker catalog (`hoox workers`)
+
+The shared worker catalog is the source of known isolates and default enabled
+flags. Enable/disable writes `workers.<name>.enabled` in the root
+`wrangler.jsonc`. Missing catalog workers are seeded on enable.
+
+| Command | Behavior |
+| ------- | -------- |
+| `hoox workers list` | Catalog + config merge: status, default, path, membership |
+| `hoox workers catalog` | Canonical names and default enabled flags |
+| `hoox workers enable <name...>` | Set `enabled: true` (seed from catalog if absent) |
+| `hoox workers disable <name...>` | Set `enabled: false` (skipped by deploy/logs/all) |
+| `hoox workers dev <name>` | Delegates to `hoox dev worker` |
+| `hoox workers logs <name>` | Delegates to `hoox logs worker` |
+
+Health checks stay on `hoox check health`. Deploy stays on `hoox deploy workers`
+/ `hoox deploy worker <name>`.
+
+---
+
+## 🚪 7. Setup gates (`hoox onboard` / `hoox setup`)
 
 | Gate | Behavior |
 | ---- | -------- |
@@ -270,5 +290,6 @@ values no longer produce noisy warnings.
 ### 🔗 Next Steps
 
 - **[CLI Reference Manual](/docs/enduser/reference/cli-commands)** — Review the complete command tree, positional arguments, and flags.
+- **[Hoox MCP server](/docs/devops/mcp)** — Same command tree from an MCP client (`bun run mcp`).
 - **[Wrangler Setup & Tooling](/docs/devops/development/local-dev)** — Configure Wrangler to bind local D1 and KV instances for dev testing.
 - **[Setup & Operations](/docs/devops/setup-and-operations)** — Deploy order, health probes, runbooks.

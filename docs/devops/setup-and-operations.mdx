@@ -8,14 +8,13 @@ title: "Hoox Trading System — Complete Setup & Operations Guide"
 description: "CLI-first setup, deploy, secrets, health, and repair runbook for the HOOX Cloudflare® Workers mesh."
 ---
 
-> **CLI:** `@hoox-sh/hoox-cli` 0.13.x (`hoox` / `hx`)  
-> **Last Updated:** 2026-08-13  
-> **Classification:** Internal Operations Manual  
-> **Audience:** DevOps Engineers, Senior TypeScript Developers, System Administrators
+> **CLI:** `@hoox-sh/hoox-cli` 0.15.0 (`hoox` / `hx`)  
+> **Last Updated:** 2026-10-25  
+> **Audience:** DevOps engineers, TypeScript developers, system administrators
 
 <Tip>
   Prefer the **CLI** for day-to-day ops: `hoox onboard` → `hoox setup` →
-  `hoox deploy all` → `hoox check health`. After the first monorepo discovery,
+  `hoox deploy all --auto` → `hoox check health`. After the first monorepo discovery,
   `hx` works from any directory (remembered path under
   `~/.hoox/config/monorepo.json`). Diagnose layout with `hoox doctor`; operator
   plane with `hoox doctor --security`.
@@ -29,7 +28,7 @@ description: "CLI-first setup, deploy, secrets, health, and repair runbook for t
 2. [Pre-Flight Requirements](#2-pre-flight-requirements)
 3. [Complete Environment Matrix](#3-complete-environment-matrix)
 4. [Development Setup](#4-development-setup)
-5. [Production Setup](#5-production-setup)
+5. [Production Setup](#5-production-setup) (includes [self-hosted](#511-self-hosted-no-cloudflare))
 6. [Infrastructure Provisioning](#6-infrastructure-provisioning)
 7. [Worker Deployment Sequence](#7-worker-deployment-sequence)
 8. [Dashboard Setup & Deployment](#8-dashboard-setup--deployment)
@@ -95,7 +94,7 @@ pyne-worker (cron /run) → trade-worker (mesh internal auth on live forward)
 | **Durable Objects**   | `RateLimiterStore` | `RATE_LIMITER`       | hoox (atomic trade rate limits, migration `v2`)   |
 | **Browser Rendering** | —                  | `BROWSER`            | report-worker (`quickAction("pdf")`, not the REST API) |
 | **AI**                | —                  | `AI`                 | hoox, telegram-worker, agent-worker, dashboard    |
-| **Smart Placement**   | —                  | (wrangler config)    | hoox, trade, agent, d1, telegram, report          |
+| **Smart Placement**   | —                  | (wrangler config)    | hoox, trade-worker, agent-worker, d1-worker, telegram-worker, report-worker, web3-wallet-worker, email-worker, analytics-worker, pyne-worker |
 
 ---
 
@@ -115,9 +114,9 @@ pyne-worker (cron /run) → trade-worker (mesh internal auth on live forward)
 | Tool         | Version               | Installation Command                | Verification         |
 | ------------ | --------------------- | ----------------------------------- | -------------------- |
 | Bun          | >=1.2                 | `curl -fsSL https://bun.sh \| bash` | `bun --version`      |
+| Hoox CLI     | 0.15.0                | `bun add -g @hoox-sh/hoox-cli`      | `hoox --version`     |
 | Git          | >=2.40                | `apt install git`                   | `git --version`      |
 | Wrangler CLI | latest                | `bun add -g wrangler`               | `wrangler --version` |
-| Node.js      | >=18 (for some tools) | —                                   | `node --version`     |
 
 ### 2.3 Required Cloudflare® Permissions
 
@@ -165,12 +164,11 @@ hoox clone my-hoox-app
 | `INTERNAL_KEY_BINDING`    | hoox, trade-worker, telegram-worker | `wrangler secret put` | Production   | Inter-worker auth                      |
 | `AGENT_INTERNAL_KEY`      | agent-worker                        | `wrangler secret put` | Production   | Agent worker auth                      |
 | `API_SERVICE_KEY`         | trade-worker                        | `wrangler secret put` | Production   | Trade worker service key               |
-| `BINANCE_API_KEY`         | trade-worker                        | `wrangler secret put` | Optional     | Binance exchange API                   |
-| `BINANCE_API_SECRET`      | trade-worker                        | `wrangler secret put` | Optional     | Binance exchange secret                |
-| `MEXC_API_KEY`            | trade-worker                        | `wrangler secret put` | Optional     | MEXC exchange API                      |
-| `MEXC_API_SECRET`         | trade-worker                        | `wrangler secret put` | Optional     | MEXC exchange secret                   |
-| `BYBIT_API_KEY`           | trade-worker                        | `wrangler secret put` | Optional     | Bybit exchange API                     |
-| `BYBIT_API_SECRET`        | trade-worker                        | `wrangler secret put` | Optional     | Bybit exchange secret                  |
+| `EXCHANGE_KEY_BINDING`    | trade-worker                        | `hoox secrets set`    | Optional     | Canonical CEX API key (Binance / Bybit / MEXC) |
+| `EXCHANGE_SECRET_BINDING` | trade-worker                        | `hoox secrets set`    | Optional     | Canonical CEX API secret               |
+| `EXCHANGE_TESTNET_KEY_BINDING` | trade-worker                   | `hoox secrets set`    | Optional     | Unified testnet API key                |
+| `EXCHANGE_TESTNET_SECRET_BINDING` | trade-worker                | `hoox secrets set`    | Optional     | Unified testnet API secret             |
+| `BINANCE_KEY_BINDING` / `BYBIT_KEY_BINDING` / `MEXC_KEY_BINDING` | trade-worker | `hoox secrets set` | Deprecated | Legacy per-venue aliases; `trade-worker` still reads them as fallback |
 | `TG_BOT_TOKEN_BINDING`    | telegram-worker                     | `wrangler secret put` | Optional     | Telegram bot token                     |
 | `TG_CHAT_ID_BINDING`      | telegram-worker                     | `wrangler secret put` | Optional     | Default Telegram chat ID               |
 | `TELEGRAM_SECRET_TOKEN`   | telegram-worker                     | `wrangler secret put` | Optional     | Telegram webhook secret                |
@@ -178,13 +176,14 @@ hoox clone my-hoox-app
 | `TELEGRAM_ALLOWED_CHAT_IDS` | hoox                              | `wrangler secret put` | Required for notify | Comma-separated chat IDs for public webhook notify (fail-closed when unset); alias `AUTHORIZED_CHAT_IDS` |
 | `WALLET_PK_SECRET`        | web3-wallet-worker                  | `wrangler secret put` | Optional     | Wallet private key                     |
 | `WALLET_MNEMONIC_SECRET`  | web3-wallet-worker                  | `wrangler secret put` | Optional     | Wallet mnemonic phrase                 |
-| `WALLET_EXECUTE_KEY_BINDING` | trade-worker, web3-wallet-worker, hoox | `hoox setup` (auto) | DEX P1 | Mesh key for wallet `/swap` (falls back to INTERNAL_KEY_BINDING) |
+| `WALLET_EXECUTE_KEY_BINDING` | trade-worker, web3-wallet-worker, hoox | `hoox setup` (auto) | Spot DEX | Mesh key for wallet `/swap` (falls back to `INTERNAL_KEY_BINDING`) |
 | `SOLANA_PRIVATE_KEY`      | web3-wallet-worker                  | `hoox setup` (auto if unset) | Optional | Solana seed (base58). Replace with a Phantom export to use an existing wallet |
 | `JUPITER_API_KEY`         | web3-wallet-worker                  | `hoox secrets set` / init wizard | Solana DEX | Jupiter Swap V2 key from developers.jup.ag/portal |
 | `MAILGUN_API_KEY`         | email-worker                        | `wrangler secret put` | Production   | HMAC key for `POST /webhook`           |
-| `EMAIL_HOST`              | email-worker                        | `wrangler secret put` | Reserved     | Not read. IMAP polling is not implemented. |
-| `EMAIL_USER`              | email-worker                        | `wrangler secret put` | Reserved     | Not read.                              |
-| `EMAIL_PASS`              | email-worker                        | `wrangler secret put` | Reserved     | Not read.                              |
+| `EMAIL_HOST_BINDING`      | email-worker                        | `wrangler secret put` | Reserved     | Wizard name. IMAP polling is not implemented. |
+| `EMAIL_USER_BINDING`      | email-worker                        | `wrangler secret put` | Reserved     | Not used for live ingest.              |
+| `EMAIL_PASS_BINDING`      | email-worker                        | `wrangler secret put` | Reserved     | Not used for live ingest.              |
+| `OPERATOR_API_KEY`        | hoox                                | `wrangler secret put` | Operator plane | Bearer for `/v1/*` and `/wallet/*`. Match client `HOOX_API_TOKEN`. |
 | `INTERNAL_KEY_BINDING`    | email-worker                        | `wrangler secret put` | Optional     | Email worker auth                      |
 | `D1_INTERNAL_KEY`         | d1-worker (header check)            | `wrangler secret put` | Optional     | D1 worker API auth                     |
 | `HA_TOKEN_BINDING`        | hoox                                | `wrangler secret put` | Optional     | Home Assistant token                   |
@@ -197,8 +196,8 @@ hoox clone my-hoox-app
 ```bash
 # === CLOUDFLARE ACCOUNT ===
 CLOUDFLARE_API_TOKEN="cfut_..."
-CLOUDFLARE_ACCOUNT_ID="debc6545e63bea36be059cbc82d80ec8"
-CLOUDFLARE_SECRET_STORE_ID="48433bc559a943f09d9d6c622e188fd5"
+CLOUDFLARE_ACCOUNT_ID="<YOUR_CLOUDFLARE_ACCOUNT_ID>"
+CLOUDFLARE_SECRET_STORE_ID="<YOUR_SECRET_STORE_ID>"
 SUBDOMAIN_PREFIX="hoox"
 
 # === INTERNAL AUTH KEYS ===
@@ -207,20 +206,19 @@ TRADE_INTERNAL_KEY="<generate-secure-random-string>"
 AGENT_INTERNAL_KEY="<generate-secure-random-string>"
 
 # === TELEGRAM ===
-TELEGRAM_BOT_TOKEN="<your-bot-token>"
+TG_BOT_TOKEN_BINDING="<your-bot-token>"
 
 # === AI PROVIDERS (optional) ===
 AGENT_OPENAI_KEY="sk-..."
 AGENT_ANTHROPIC_KEY="sk-ant-..."
 AGENT_GOOGLE_KEY="..."
 
-# === EXCHANGE API KEYS (optional) ===
-BINANCE_API_KEY="..."
-BINANCE_API_SECRET="..."
-MEXC_API_KEY="..."
-MEXC_API_SECRET="..."
-BYBIT_API_KEY="..."
-BYBIT_API_SECRET="..."
+# === EXCHANGE API KEYS (optional; canonical names) ===
+EXCHANGE_KEY_BINDING="..."
+EXCHANGE_SECRET_BINDING="..."
+# Optional testnet pair:
+# EXCHANGE_TESTNET_KEY_BINDING="..."
+# EXCHANGE_TESTNET_SECRET_BINDING="..."
 
 # === DASHBOARD AUTH ===
 DASHBOARD_USER="admin"
@@ -248,47 +246,62 @@ DASHBOARD_PASS=admin
 {
   "global": {
     "cloudflare_api_token": "<USE_WRANGLER_SECRET_PUT>",
-    "cloudflare_account_id": "debc6545e63bea36be059cbc82d80ec8",
-    "cloudflare_secret_store_id": "48433bc559a943f09d9d6c622e188fd5",
+    "cloudflare_account_id": "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+    "cloudflare_secret_store_id": "<YOUR_SECRET_STORE_ID>",
     "subdomain_prefix": "hoox",
   },
   "workers": {
     "d1-worker": {
       "enabled": true,
       "path": "workers/d1-worker",
-      "vars": { "database_name": "my-database" },
+      "vars": { "database_name": "trade-data-db" },
     },
     "telegram-worker": {
       "enabled": true,
       "path": "workers/telegram-worker",
       "vars": {},
-      "secrets": ["TELEGRAM_BOT_TOKEN"],
+      "secrets": [
+        "TG_BOT_TOKEN_BINDING",
+        "TG_CHAT_ID_BINDING",
+        "TELEGRAM_SECRET_TOKEN",
+        "AUTHORIZED_CHAT_IDS",
+        "INTERNAL_KEY_BINDING",
+      ],
     },
     "trade-worker": {
       "enabled": true,
       "path": "workers/trade-worker",
       "vars": {},
       "secrets": [
-        "API_SERVICE_KEY",
-        "BINANCE_API_KEY",
-        "BINANCE_API_SECRET",
-        "MEXC_API_KEY",
-        "MEXC_API_SECRET",
-        "BYBIT_API_KEY",
-        "BYBIT_API_SECRET",
+        "EXCHANGE_KEY_BINDING",
+        "EXCHANGE_SECRET_BINDING",
+        "INTERNAL_KEY_BINDING",
+        "WALLET_EXECUTE_KEY_BINDING",
       ],
     },
     "web3-wallet-worker": {
       "enabled": true,
       "path": "workers/web3-wallet-worker",
       "vars": {},
-      "secrets": ["WALLET_MNEMONIC_SECRET", "WALLET_PK_SECRET"],
+      "secrets": [
+        "WALLET_MNEMONIC_SECRET",
+        "WALLET_PK_SECRET",
+        "INTERNAL_KEY_BINDING",
+        "WALLET_EXECUTE_KEY_BINDING",
+        "SOLANA_PRIVATE_KEY",
+        "JUPITER_API_KEY",
+      ],
     },
     "hoox": {
       "enabled": true,
       "path": "workers/hoox-worker",
       "vars": {},
-      "secrets": ["WEBHOOK_API_KEY_BINDING"],
+      "secrets": [
+        "WEBHOOK_API_KEY_BINDING",
+        "INTERNAL_KEY_BINDING",
+        "OPERATOR_API_KEY",
+        "WALLET_EXECUTE_KEY_BINDING",
+      ],
     },
     "agent-worker": {
       "enabled": true,
@@ -432,8 +445,8 @@ For local development, some infrastructure is optional. You need:
 wrangler d1 create trade-data-db
 
 # Create KV namespace
-wrangler kv:namespace create CONFIG_KV
-wrangler kv:namespace create SESSIONS_KV
+wrangler kv namespace create CONFIG_KV
+wrangler kv namespace create SESSIONS_KV
 
 # Note the IDs and update wrangler.jsonc files
 ```
@@ -468,7 +481,8 @@ hoox dev worker <name> [--runtime native|docker]
 hoox dev dashboard                         # dashboard only
 
 # TUI (interactive terminal UI)
-./hoox-tui
+hoox tui
+# or: ./hoox-tui
 ```
 
 ### 4.9 Step 9: Dashboard Local Dev
@@ -481,7 +495,7 @@ hoox dev dashboard
 cd workers/dashboard && bun run dev
 ```
 
-The dashboard runs at `http://localhost:3000`.
+`hoox dev dashboard` (native Next.js) runs at `http://localhost:3000`. Docker Compose publishes the dashboard at `http://localhost:8794`.
 
 ---
 
@@ -542,7 +556,8 @@ wrangler secret put WEBHOOK_API_KEY_BINDING --config workers/hoox-worker/wrangle
 ```bash
 # Preferred
 hoox setup --skip-keys --skip-secrets --skip-dashboard
-# or: hoox db apply (when using db command group)
+# or:
+hoox db apply --remote
 
 # Manual
 wrangler d1 execute trade-data-db --file=workers/trade-worker/schema.sql --remote
@@ -555,21 +570,17 @@ bun run migrate:tracking
 # Manifest-driven (when configured)
 hoox deploy kv-config
 
-# Or set required KV keys manually
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d \
-  "webhook:tradingview:ip_check_enabled" "false"
-
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d \
-  "trade:kill_switch" "false"
-
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d \
-  "trade:max_daily_drawdown_percent" "10"
+# Preferred: Hoox CLI (no raw namespace IDs)
+hoox config kv set webhook:tradingview:ip_check_enabled false
+hoox config kv set trade:kill_switch false
+hoox config kv set trade:max_daily_drawdown_percent 10
 ```
 
 ### 5.8 Phase 8: Worker Deployment
 
 ```bash
 hoox deploy all --auto
+hoox deploy all --json          # task-result array (0.15+)
 # Order: see Section 7 (includes pyne-worker)
 ```
 
@@ -589,6 +600,25 @@ bun run opennext:deploy
 ### 5.10 Phase 10: Verification
 
 See Section 10 for validation procedures.
+
+### 5.11 Self-hosted (no Cloudflare)
+
+`hoox init --self-hosted` prints the Docker / Bun path and **exits**. It does not write a Cloudflare-free `wrangler.jsonc`. Durable Objects, Vectorize, and Workers AI are unavailable off Cloudflare.
+
+```bash
+hoox init --self-hosted
+
+# Bun server
+bun run server.js
+
+# Production image
+bun run docker:prod
+# or:
+docker build -f Dockerfile.prod . --tag hoox:prod
+docker run -p 8080:8080 -e HOOX_SERVER_API_KEY=your-key hoox:prod
+```
+
+The production path on Cloudflare remains `hoox onboard && hoox deploy all --auto`.
 
 ---
 
@@ -621,12 +651,11 @@ wrangler d1 execute trade-data-db --file=workers/trade-worker/schema.sql --remot
 
 ```bash
 # Create CONFIG_KV (shared across all workers)
-wrangler kv:namespace create CONFIG_KV
-# ID: c5917667a21745e390ff969f32b1847d
+wrangler kv namespace create CONFIG_KV
+# Copy the printed id into each worker wrangler.jsonc
 
-# Create SESSIONS_KV (for hoox gateway)
-wrangler kv:namespace create SESSIONS_KV
-# ID: ff70a58b492e45d79880a7a8213c745c
+# Create SESSIONS_KV (for the hoox gateway)
+wrangler kv namespace create SESSIONS_KV
 
 # Update all wrangler.jsonc files with these IDs
 ```
@@ -733,6 +762,8 @@ Unknown workers (not in the list) are appended before `dashboard`.
 # Preferred: deploy all enabled workers + dashboard (CLI applies order)
 hoox deploy all
 hoox deploy all --auto          # non-interactive
+hoox deploy all --json          # task-result array
+hoox workers list               # catalog + enabled status
 
 # Workers only (skip dashboard)
 hoox deploy workers
@@ -742,6 +773,11 @@ hoox deploy worker trade-worker
 hoox deploy worker pyne-worker
 # pyne also has vendor+deploy helper:
 hoox pyne deploy                # sync-vendor then wrangler deploy
+
+# Enable / disable workers in wrangler.jsonc
+hoox workers catalog
+hoox workers enable web3-wallet-worker
+hoox workers disable email-worker
 ```
 
 ### 7.3 Post-Deployment: Telegram Webhook
@@ -787,10 +823,10 @@ hoox deploy update-internal-urls
 ```jsonc
 // workers/dashboard/wrangler.jsonc
 {
-  "name": "hoox-dashboard",
+  "name": "dashboard",
   "main": ".open-next/worker.js",
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
-  "compatibility_date": "2026-04-17",
+  "account_id": "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
@@ -799,15 +835,15 @@ hoox deploy update-internal-urls
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<CONFIG_KV_NAMESPACE_ID>",
     },
   ],
-  "vars": {
-    "D1_WORKER_URL": "https://d1-worker.hoox.workers.dev",
-    "AGENT_SERVICE_URL": "https://agent-worker.hoox.workers.dev",
-    "TRADE_SERVICE_URL": "https://trade-worker.hoox.workers.dev",
-    "TELEGRAM_SERVICE_URL": "https://telegram-worker.hoox.workers.dev",
-  },
+  "services": [
+    { "binding": "D1_SERVICE", "service": "d1-worker" },
+    { "binding": "AGENT_SERVICE", "service": "agent-worker" },
+    { "binding": "WEB3_WALLET_SERVICE", "service": "web3-wallet-worker" },
+    { "binding": "PYNE_SERVICE", "service": "pyne-worker" },
+  ],
 }
 ```
 
@@ -844,7 +880,7 @@ bun run opennext:build
 bun run opennext:deploy
 
 # Or from root:
-bun run pages:deploy
+hoox deploy dashboard
 ```
 
 ### 8.5 Dashboard Environment Variables
@@ -877,6 +913,7 @@ wrangler secret put <SECRET_NAME> --config workers/<worker>/wrangler.jsonc
 # You will be prompted to enter the value (hidden input)
 
 # Set one secret via hoox CLI (writes .dev.vars + puts to Cloudflare)
+hoox secrets set trade-worker EXCHANGE_KEY_BINDING
 hoox secrets set <WORKER_NAME> <SECRET_NAME>
 
 # Sync mesh/system secrets only (INTERNAL_KEY_BINDING, WEBHOOK_*, …)
@@ -900,9 +937,9 @@ INTERNAL_KEY_BINDING=dev-internal-key
 
 # workers/trade-worker/.dev.vars
 INTERNAL_KEY_BINDING=dev-internal-key
-MEXC_KEY_BINDING=dev-mexc-key
-MEXC_SECRET_BINDING=dev-mexc-secret
-# ... etc
+EXCHANGE_KEY_BINDING=dev-exchange-key
+EXCHANGE_SECRET_BINDING=dev-exchange-secret
+WALLET_EXECUTE_KEY_BINDING=dev-wallet-execute-key
 ```
 
 ### 9.3 Secret Security Best Practices
@@ -939,7 +976,9 @@ hoox pyne health              # pyne-worker GET /health
 
 # Run tests
 bun test
-bun run tests:coverage
+bun test --coverage
+hoox test unit
+hoox test all
 
 # Type checking
 bun run typecheck
@@ -1041,10 +1080,10 @@ wrangler d1 execute trade-data-db --command="SELECT * FROM system_logs ORDER BY 
 
 ```bash
 # List KV keys
-wrangler kv:key list --namespace-id=c5917667a21745e390ff969f32b1847d
+hoox config kv list
 
 # Check kill switch
-wrangler kv:key get --namespace-id=c5917667a21745e390ff969f32b1847d "trade:kill_switch"
+hoox config kv get trade:kill_switch
 ```
 
 ### 10.5 Complete System Validation Checklist
@@ -1083,7 +1122,7 @@ bun test
 
 # 5. Verify infrastructure exists
 wrangler d1 list
-wrangler kv:namespace list
+wrangler kv namespace list
 wrangler r2 bucket list
 wrangler queues list
 wrangler vectorize list
@@ -1105,8 +1144,8 @@ hoox deploy workers
 hoox deploy worker <worker-name>
 
 # Check worker logs
-hoox workers logs <worker-name>
-# or: hoox logs worker <worker-name>
+hoox logs worker <worker-name>
+# alias: hoox workers logs <worker-name>
 
 # Tail logs in real-time
 wrangler tail --config workers/<worker-name>/wrangler.jsonc
@@ -1143,9 +1182,9 @@ hoox secrets set <WORKER_NAME> <SECRET_NAME>
 
 ```bash
 # Reset critical KV keys
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d "trade:kill_switch" "false"
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d "webhook:tradingview:ip_check_enabled" "false"
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d "trade:max_daily_drawdown_percent" "10"
+hoox config kv set trade:kill_switch false
+hoox config kv set webhook:tradingview:ip_check_enabled false
+hoox config kv set trade:max_daily_drawdown_percent 10
 ```
 
 ### 11.6 Dashboard Repair
@@ -1211,10 +1250,10 @@ wrangler d1 execute trade-data-db --command="SELECT * FROM system_logs ORDER BY 
 
 ```bash
 # Emergency stop all trading
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d "trade:kill_switch" "true"
+hoox config kv set trade:kill_switch true
 
 # Resume trading
-wrangler kv:key put --namespace-id=c5917667a21745e390ff969f32b1847d "trade:kill_switch" "false"
+hoox config kv set trade:kill_switch false
 ```
 
 ### 12.3 Updating Workers
@@ -1288,7 +1327,6 @@ wrangler d1 export trade-data-db --output=backup-$(date +%Y%m%d).sql --remote
 | `package.json`     | Root workspace manifest      | **Yes**  |
 | `bunfig.toml`      | Bun test configuration       | **Yes**  |
 | `tsconfig.json`    | TypeScript configuration     | **Yes**  |
-| `vitest.config.ts` | Integration test config      | **Yes**  |
 
 ### 13.2 Worker Configuration Files
 
@@ -1303,6 +1341,7 @@ wrangler d1 export trade-data-db --output=backup-$(date +%Y%m%d).sql --remote
 | `email-worker`       | `workers/email-worker/wrangler.jsonc`       | `workers/email-worker/src/index.ts`       | —                                 |
 | `analytics-worker`   | `workers/analytics-worker/wrangler.jsonc`   | `workers/analytics-worker/src/index.ts`   | —                                 |
 | `report-worker`      | `workers/report-worker/wrangler.jsonc`      | `workers/report-worker/src/index.ts`      | —                                 |
+| `pyne-worker`        | `workers/pyne-worker/wrangler.jsonc`        | `workers/pyne-worker/src/index.ts`        | —                                 |
 
 ### 13.3 Dashboard Files
 
@@ -1320,6 +1359,8 @@ wrangler d1 export trade-data-db --output=backup-$(date +%Y%m%d).sql --remote
 | Package           | Main Export    | Purpose                          |
 | ----------------- | -------------- | -------------------------------- |
 | `packages/cli`    | `bin/hoox.js`  | CLI management tool              |
+| `packages/tui`    | `bin/hoox-tui.js` | Terminal UI (`hoox tui`)      |
+| `packages/mcp`    | `bin/hoox-mcp.js` | MCP server (`bun run mcp`)    |
 | `packages/shared` | `src/index.ts` | Shared types, router, middleware |
 
 ### 13.5 Script Files
@@ -1334,17 +1375,17 @@ wrangler d1 export trade-data-db --output=backup-$(date +%Y%m%d).sql --remote
 
 ### 13.6 Documentation Files
 
-| Document                                | Purpose                      |
-| --------------------------------------- | ---------------------------- |
-| `docs/home.md`                          | Project home                 |
-| `docs/getting-started/installation.md`  | Installation guide           |
-| `docs/getting-started/configuration.md` | Configuration guide          |
-| `docs/deployment/production.md`         | Production deployment        |
-| `docs/development/local-dev.md`         | Local development            |
-| `docs/workers/*.md`                     | Per-worker documentation     |
-| `docs/architecture/*.md`                | Architecture documentation   |
-| `openapi.yaml`                          | OpenAPI REST specification   |
-| `asyncapi.yaml`                         | AsyncAPI event specification |
+| Document                                         | Purpose                      |
+| ------------------------------------------------ | ---------------------------- |
+| `docs/index.mdx`                                 | Docs home                    |
+| `docs/devops/setup-and-operations.mdx`           | This operations runbook      |
+| `docs/devops/installation-flow.mdx`              | Onboard / init / setup       |
+| `docs/devops/deployment/production.mdx`          | Production deployment        |
+| `docs/devops/development/local-dev.mdx`          | Local development            |
+| `docs/devops/workers/`                           | Per-isolate profiles         |
+| `docs/devops/architecture/`                      | Architecture documentation   |
+| `docs/devops/api/`                               | HTTP endpoints               |
+| `docs/openapi-minimal.yaml`                      | OpenAPI surface              |
 
 ---
 
@@ -1383,15 +1424,16 @@ hoox secrets sync             # Push all .dev.vars (partial reporting)
 
 # Development
 hoox dev start                # Start all workers (choose runtime)
-hoox dashboard dev            # Dashboard only
+hoox dev dashboard            # Dashboard only (alias: hoox dashboard dev)
 hoox tui                      # Interactive TUI
-hoox workers dev <name>       # Dev single worker
-bun run dev                   # Dashboard dev
+hoox dev worker <name>        # Dev single worker
+hoox workers list             # Catalog + enabled status
 
 # Testing
 bun test                      # Unit tests
-bun run tests:coverage        # Coverage
+bun test --coverage           # Coverage
 bun run test:integration      # Integration tests
+hoox test all                 # lint → typecheck → unit → integration
 
 # Deployment
 hoox deploy all               # Workers + dashboard (ordered)
@@ -1403,20 +1445,24 @@ hoox pyne deploy              # Vendor pynescript + deploy pyne-worker
 
 # Operations
 hoox doctor                   # Paths / remembered monorepo / TUI entry
+hoox doctor --security        # Operator-plane hygiene
 hoox check health             # Worker health (GET /health; single source of truth)
-hoox workers logs <name>      # View worker logs
+hoox logs worker <name>       # View worker logs
 hoox check setup              # Validate setup
 hoox secrets list <worker>    # Check secrets
 hoox secrets sync --system    # Mesh keys only
-hoox secrets sync             # All .dev.vars (partial reporting)
+hoox tunnel check             # cloudflared / Access probe
+hoox perf fastpath run --n 50
+hoox trace events
 
 # Database
 wrangler d1 execute trade-data-db --file=workers/trade-worker/schema.sql --remote
 bun run migrate:tracking
 
 # KV
-wrangler kv:key put --namespace-id=<ID> <key> <value>
-wrangler kv:key list --namespace-id=<ID>
+hoox config kv set <key> <value>
+hoox config kv list
+hoox config kv get trade:kill_switch
 
 # Secrets
 wrangler secret put <NAME> --config workers/<worker>/wrangler.jsonc
@@ -1438,7 +1484,6 @@ hoox/
 ├── package.json                  # Root workspace manifest
 ├── bunfig.toml                   # Bun config
 ├── tsconfig.json                 # TypeScript config
-├── vitest.config.ts              # Vitest config
 ├── hoox-tui                      # TUI launcher (if exists)
 │
 ├── packages/
@@ -1491,6 +1536,4 @@ hoox/
 
 ---
 
-_Document Version: 1.0.0_  
-_Last Updated: 2026-05-05_  
-_Maintainer: Hoox Development Team_
+_Last updated: 2026-10-25 · CLI 0.15.0_

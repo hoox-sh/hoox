@@ -11,10 +11,9 @@ description: "How HOOX Enterprise achieves strong multi-tenant isolation using C
 # Multi-Tenancy with Workers for Platforms
 
 > **This document describes commercial Enterprise capabilities.**
-> Basic Workers for Platforms concepts and examples are part of the open core.
-> Full production multi-tenant SaaS platform, billing, and advanced isolation live in the closed-source Enterprise layer.
+> Full production multi-tenant SaaS, billing, and Workers for Platforms dispatch isolation live in the closed-source Enterprise layer.
 >
-> See [OPEN_CORE_FEATURE_SPLIT.md](../../OPEN_CORE_FEATURE_SPLIT.md).
+> The open-source mesh can stamp an optional `tenantId` on payloads and isolate D1 rows by `tenant_id` when `TENANT_MODE` is enabled. That is attribution, not dispatch isolation.
 
 HOOX Enterprise uses **Workers for Platforms (WfP)** as the foundation for multi-tenancy in the commercial offering.
 
@@ -119,6 +118,5 @@ Enterprise customers get:
 
 ## Related
 
-- See [architecture.mdx](/docs/enterprise/architecture) for overall topology.
-- [observability-audit.mdx](/docs/enterprise/observability-audit) for per-tenant log isolation.
-- Existing `wrangler.jsonc` patterns will be extended with `dispatch` and namespace bindings in Enterprise templates.
+- See [Architecture](/docs/enterprise/architecture) for overall topology.
+- [Observability & audit](/docs/enterprise/observability-audit) for per-tenant log isolation.

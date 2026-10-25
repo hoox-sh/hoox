@@ -82,14 +82,14 @@ jobs:
       - name: "Setup Bun Runtime"
         uses: "oven-sh/setup-bun@v2"
         with:
-          bun-version: "latest"
+          bun-version: "1.4.0"
 
       # 3. Cache Bun dependency modules to optimize pipeline speeds
       - name: "Cache Workspace Dependencies"
         uses: "actions/cache@v4"
         with:
           path: "~/.bun/install/cache"
-          key: "${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}"
+          key: "${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}"
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -121,7 +121,7 @@ jobs:
           bun run build:cli
 
           # Deploy D1 SQL schemas to production
-          npx wrangler d1 execute trade-data-db --file=workers/trade-worker/schema.sql --remote --yes
+          wrangler d1 execute trade-data-db --file=workers/trade-worker/schema.sql --remote --yes
 
           # Sequentially upload all enabled workers
           ./packages/cli/bin/hoox.js deploy all --auto --quiet

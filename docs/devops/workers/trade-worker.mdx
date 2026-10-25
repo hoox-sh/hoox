@@ -8,7 +8,7 @@ title: "trade-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers."
 ---
 
-The **`trade-worker`** is the execution engine of the Hoox trading platform. Deployed as a private compute isolate behind the edge firewall, this worker is responsible for calculating order parameters, executing leverage scaling, performing cryptographic HMAC-SHA256 signature calculations, placing trades on Bybit, Binance, and MEXC, routing DEX spots (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) through `WEB3_WALLET_SERVICE`, and offloading transactional metrics.
+The **`trade-worker`** is the execution engine of the Hoox trading platform. Deployed as a private compute isolate behind the edge firewall, this worker is responsible for calculating order parameters, executing leverage scaling, performing cryptographic HMAC-SHA256 signature calculations, placing **spot** trades on Bybit, Binance, and MEXC, routing **spot DEX** (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) through `WEB3_WALLET_SERVICE` `POST /swap`, and offloading transactional metrics. Perps are not supported.
 
 ---
 
@@ -20,53 +20,49 @@ The `trade-worker` does not expose a public URL, communicating internally via V8
 {
   "name": "trade-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "placement": {
     "mode": "smart",
   },
-  "d1_databases": [
+  "kv_namespaces": [
     {
-      "binding": "DB",
-      "database_name": "trade-data-db",
-      "database_id": "c5917667a21745e390ff969f32b1847a",
+      "binding": "CONFIG_KV",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
   "r2_buckets": [
     { "binding": "REPORTS_BUCKET", "bucket_name": "trade-reports" },
     { "binding": "SYSTEM_LOGS_BUCKET", "bucket_name": "hoox-system-logs" },
   ],
-  "kv_namespaces": [
-    {
-      "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
-    },
-  ],
   "queues": {
     "consumers": [
       {
         "queue": "trade-execution",
-        "max_batch_size": 10,
-        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "dead_letter_queue": "trade-execution-dlq",
       },
     ],
   },
-  "secrets": [
-    "INTERNAL_KEY_BINDING",
-    // Unified exchange API (venue selected by signal / routing)
-    "EXCHANGE_KEY_BINDING",
-    "EXCHANGE_SECRET_BINDING",
-    // Optional testnet pair (preferred when payload.test === true)
-    "EXCHANGE_TESTNET_KEY_BINDING",
-    "EXCHANGE_TESTNET_SECRET_BINDING",
-    "WALLET_EXECUTE_KEY_BINDING",
-  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "EXCHANGE_CONNECTION_MANAGER",
+        "class_name": "ExchangeConnectionManager",
+      },
+    ],
+  },
   "services": [
+    { "binding": "D1_SERVICE", "service": "d1-worker" },
+    { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
+    { "binding": "ANALYTICS_SERVICE", "service": "analytics-worker" },
     { "binding": "WEB3_WALLET_SERVICE", "service": "web3-wallet-worker" },
   ],
 }
 ```
+
+Secrets (`INTERNAL_KEY_BINDING`, `EXCHANGE_KEY_BINDING`, `EXCHANGE_SECRET_BINDING`, optional `EXCHANGE_TESTNET_*`, `WALLET_EXECUTE_KEY_BINDING`) are set with `wrangler secret put` — they are not declared in wrangler. D1 is reached over `D1_SERVICE`, not a local `DB` binding.
 
 ---
 
@@ -76,7 +72,7 @@ Fills write D1 positions via non-blocking `waitUntil` for latency. To recover le
 
 | Body field | Effect |
 | ---------- | ------ |
-| `exchanges` | Optional list (`binance` / `bybit` / `mexc`) |
+| `exchanges` | Optional list (`binance` / `bybit` / `mexc` / `uniswap-ethereum` / `uniswap-arbitrum` / `jupiter-solana`) |
 | `testnet` | Reconcile testnet namespace + clients |
 | `dryRun` | Diff only — no D1 writes |
 
@@ -100,17 +96,17 @@ Operator guide: [Test Trading](/docs/enduser/guides/test-trading).
 
 ---
 
-## DEX venues (P1)
+## Spot DEX venues
 
-Spot swaps route through `WEB3_WALLET_SERVICE` (`web3-wallet-worker`). P1 is spot-only; perps venues land in P2–P4.
+Spot swaps route through `WEB3_WALLET_SERVICE` (`web3-wallet-worker` `POST /swap`). **Spot only — perps are not supported.**
 
 | Name | Chain | Kind | Toggle | Quantity | Test flag |
 | ---- | ----- | ---- | ------ | -------- | --------- |
-| `uniswap-ethereum` | ethereum | spot | `exchange:uniswap-ethereum:enabled` | `openLong` spends QUOTE (ExactIn) to buy BASE; `openShort` sells BASE | Rejected (`TEST_TRADING_UNSUPPORTED`) — mainnet-only |
+| `uniswap-ethereum` | ethereum | spot | `exchange:uniswap-ethereum:enabled` | `LONG` spends QUOTE (ExactIn) to buy BASE; `SHORT` sells BASE | Rejected (`TEST_TRADING_UNSUPPORTED`) — mainnet-only |
 | `uniswap-arbitrum` | arbitrum | spot | `exchange:uniswap-arbitrum:enabled` | same | Rejected — mainnet-only |
 | `jupiter-solana` | solana | spot | `exchange:jupiter-solana:enabled` | same | Rejected — mainnet-only |
 
-Uniswap venues send `dexVersion: "v3"` (ETH/USDC liquidity is V3; Arbitrum's V2 router in the wallet worker is SushiSwap). Native `ETH`/`SOL` map to the wrapped mint on contract paths. Credential source is `wallet-binding` (mesh key), not CEX API secrets.
+Uniswap venues send `dexVersion: "v3"` (ETH/USDC liquidity is V3; Arbitrum's V2 router in the wallet worker is SushiSwap). Native `ETH`/`SOL` map to the wrapped mint on contract paths. Credential source is `wallet-binding` (mesh key), not CEX API secrets. Symbols must be `BASE/QUOTE` (slash). Unset venue toggles mean enabled; `"false"` skips the venue.
 
 Operator guide: [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps). `hoox setup` writes `WALLET_EXECUTE_KEY_BINDING` automatically.
 
@@ -140,7 +136,7 @@ The `ExchangeRouter` evaluates the incoming symbol and parses settings in `CONFI
 
 1. **Default Path**: Routes trades to the default CEX declared in `exchanges:default_routing` (typically `bybit`).
 2. **Dynamic Symbol Redirects**: Parses overrides in KV (e.g. `exchanges:routing:SOLUSDT = binance`). If present, the router bypasses Bybit and instantiates the `BinanceProvider` instantly without redeploying code.
-3. **Test trading**: When the payload includes `"test": true`, the router creates the client with `testnet: true` (Binance → `testnet.binancefuture.com`, Bybit → `api-testnet.bybit.com`). MEXC rejects with `TEST_TRADING_UNSUPPORTED`. Test mode always uses REST (live WebSocket Durable Objects are skipped). Credentials prefer `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*` secrets, falling back to live bindings.
+3. **Test trading**: When the payload includes `"test": true`, the router creates the client with `testnet: true` (Binance → `testnet.binancefuture.com`, Bybit → `api-testnet.bybit.com`). MEXC and all spot DEX venues reject with `TEST_TRADING_UNSUPPORTED`. Test mode always uses REST (live WebSocket Durable Objects are skipped). Credentials prefer `EXCHANGE_TESTNET_*` secrets (legacy `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*` still resolve as fallbacks), then live bindings.
 4. **Live WS perf**: when `exchange:{name}:use_websocket=true` and the trade is live, the router skips REST client construction entirely and hands off to the Durable Object.
 
 ---
@@ -149,11 +145,23 @@ The `ExchangeRouter` evaluates the incoming symbol and parses settings in `CONFI
 
 > **Note:** For the canonical endpoint directory with full request/response examples across all workers, see [`/docs/devops/api/endpoints`](/docs/devops/api/endpoints).
 
+Internal routes (mesh auth; prefer `TRADE_EXECUTE_KEY_BINDING`, else `INTERNAL_KEY_BINDING`):
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/webhook` | Gateway / pyne / email dispatch |
+| `POST` | `/process` | Legacy / queue-shaped body |
+| `GET`/`POST` | `/api/signals` | Signal list / insert |
+| `GET` | `/api/system-logs` | Operator SSE log feed |
+| `POST` | `/api/positions/reconcile` | Exchange ↔ D1 position sync |
+| `GET` | `/report` | Report payload for report-worker |
+| `GET` | `/health` | Liveness |
+
 ### A. Process Order Pipeline
 
-Invoked by the `hoox` gateway or the `TRADE_QUEUE` consumer batch runner.
+Invoked by the `hoox` gateway (`POST /webhook`) or the `TRADE_QUEUE` consumer.
 
-- **Endpoint**: `/process`
+- **Endpoint**: `/process` (legacy alias of the same execution path)
 - **Method**: `POST`
 - **Headers**: `X-Internal-Auth-Key: <INTERNAL_KEY_BINDING>`
 - **JSON Payload**:
@@ -224,4 +232,4 @@ try {
 ### 🔗 Next Steps
 
 - **[hoox Gateway Profile](/docs/devops/workers/hoox)** — Review WAF rules and Durable Object idempotency locks.
-- **[D1 Database Operations](/docs/enduser/guides/database-ops)** — Manage Drizzle schemas, migrations, and query operations.
+- **[D1 Database Operations](/docs/enduser/guides/database-ops)** — Apply schema.sql, run tracking migrations, and query the ledger.

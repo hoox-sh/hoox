@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/workers/hoox.mdx"
@@ -31,4 +31,5 @@ Repo path `docs/devops/workers/hoox.mdx`.
   * A. Ingest Signal Webhook
   * B. Gateway Health Diagnostics
   * C. Operator management plane (/v1/)
+  * D. Operator wallet proxy (/wallet/)
   * 🔗 Next Steps

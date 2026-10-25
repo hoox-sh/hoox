@@ -5,199 +5,57 @@
 
 ---
 title: "Visual Tokens & Design System"
-description: "Production design system and visual token specifications, covering OKLCH color palettes, typography, and visual SVG icon maps."
+description: "Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI."
 ---
 
-To maintain visual cohesion across the entire Hoox ecosystem (web landing pages, Astro documentation sites, Zustand Next.js dashboards, and terminal UIs), the platform implements a standardized, high-integrity design system.
-
-This document catalogs our color tokens, spacing densities, border-radius behaviors, and provides the complete **SVG Icon Mapping Catalog** used inside the documentation navigation chrome.
+The **dashboard** (Next.js 16) is the visual source of truth. Tokens live in `workers/dashboard/src/app/globals.css`. Landing pages and docs follow the same accent and type language.
 
 ---
 
 ## 🎨 1. OKLCH Color Palette
 
-Hoox utilizes OKLCH color values to ensure perceptually uniform brightness and high contrast across all edge screens and operating systems:
+Hoox uses OKLCH for perceptually uniform brightness. Dark is the primary theme; light is the optional toggle.
 
-### Dark Mode (Primary Visual Standard)
+### Dark Mode (Primary)
 
-- **Background (`--background`)**: `oklch(0.08 0 0)` — Deep charcoal/black.
-- **Foreground (`--foreground`)**: `oklch(0.95 0 0)` — Bright neutral Zinc/white.
-- **Card (`--card`)**: `oklch(0.12 0 0)` — Slightly elevated dark panel grey.
-- **Accent (`--accent`)**: `oklch(0.70 0.20 45)` — High-contrast bright orange (used for focal actions and headers).
-- **Muted Foreground (`--muted-foreground`)**: `oklch(0.68 0 0)` — Secondary readability text.
-- **Borders (`--border`)**: `oklch(0.30 0 0)` — Low-contrast dark grey dividers.
+- **Background (`--background`)**: `oklch(0.12 0.006 260)` — near-black canvas.
+- **Foreground (`--foreground`)**: `oklch(0.96 0.005 90)` — warm off-white.
+- **Card (`--card`)**: `oklch(0.18 0.007 260)` — elevated panel.
+- **Accent (`--accent`)**: `oklch(0.72 0.17 48)` — orange focal actions.
+- **Muted Foreground (`--muted-foreground`)**: `oklch(0.7 0.015 260)`.
+- **Borders (`--border`)**: `oklch(0.32 0.012 260)`.
+- **Sidebar (`--sidebar`)**: `oklch(0.145 0.006 260)` — between canvas and card.
 
 ---
 
 ## 📐 2. Layout, Borders & Density
 
-- **Border Radius (`--radius`)**: Restored globally to `0.5rem` (8px) to soften panel boundaries without losing the clean command-center aesthetic.
-- **Shadows**: Cards and active modal prompts bind a highly contrasting deep shadow:
-  `shadow-2xl` -> `box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);`
-- **Spacing Density**: Standardize grid gutters using Tailwind flex/grid spaces:
-  - Cards Grid: `gap-6` (24px) for dashboard cards.
-  - Sidebar Items: `gap-0.5` (2px) vertical padding between nav links.
+- **Border Radius (`--radius`)**: `0.5rem` (8px).
+- **Shadows**: Cards and modals use a deep shadow:
+  `shadow-2xl` → `box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);`
+- **Spacing Density**:
+  - Cards Grid: `gap-6` (24px).
+  - Sidebar Items: `gap-0.5` (2px) between nav links.
 
 ---
 
-## 🔤 3. Typography & Runtimes
+## 🔤 3. Typography
 
-| Aesthetic Layer      | Font Family                            | CSS Utility    | Ideal Operational Use Case                            |
-| :------------------- | :------------------------------------- | :------------- | :---------------------------------------------------- |
-| **Primary Titles**   | `"Bebas Neue", sans-serif`             | `font-heading` | Main high-signal card headers, page titles.           |
-| **Prose & Body**     | `"IBM Plex Sans Variable", sans-serif` | `font-sans`    | Explanatory text, paragraphs, tables.                 |
-| **Technical Chrome** | `"IBM Plex Mono", monospace`           | `font-mono`    | Navigation links, settings inputs, SQL queries, code. |
+| Aesthetic Layer      | Font Family                            | CSS Utility    | Use Case                                          |
+| :------------------- | :------------------------------------- | :------------- | :------------------------------------------------ |
+| **Primary Titles**   | `"Bebas Neue", sans-serif`             | `font-heading` | Card headers, page titles.                        |
+| **Prose & Body**     | `"IBM Plex Sans", sans-serif`          | `font-sans`    | Explanatory text, paragraphs, tables.             |
+| **Technical Chrome** | `"IBM Plex Mono", monospace`           | `font-mono`    | Inputs, SQL, code, navigation chrome.             |
 
----
-
-## 📦 4. SVG Icon Mapping Catalog
-
-To ensure visual consistency and completely eliminate platform-inconsistent emojis, the navigation chrome (`Sidebar.astro` and `MobileNav.astro`) maps dynamic section keys to clean, flat, inline SVGs:
-
-### A. Rocket Icon (`getting-started`)
-
-Used to represent system setup and installation paths.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <path
-    d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"
-  />
-  <path
-    d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"
-  />
-  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-</svg>
-```
+Loaded via `next/font/google` in the dashboard layout (`--font-bebas`, `--font-ibm-plex-sans`, `--font-ibm-plex-mono`).
 
 ---
 
-### B. Book Icon (`guides`)
+## 📦 4. Icons
 
-Used to represent operational manuals and setup instructions.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-</svg>
-```
-
----
-
-### C. Lightbulb Icon (`concepts`)
-
-Used to represent structural theories and edge architectures.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <path d="M9 18h6" />
-  <path d="M10 22h4" />
-  <path
-    d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"
-  />
-</svg>
-```
-
----
-
-### D. Book-Open Icon (`reference`)
-
-Used to represent dictionary definitions, configuration matrices, and API details.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-</svg>
-```
-
----
-
-### E. Target Icon (`tutorials`)
-
-Used to represent step-by-step walkthroughs and integration guides.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <circle cx="12" cy="12" r="10" />
-  <circle cx="12" cy="12" r="6" />
-  <circle cx="12" cy="12" r="2" />
-</svg>
-```
-
----
-
-### F. Gear Icon (`devops` & `workers`)
-
-Used to represent background cron engines, system setups, and deployment configs.
-
-```html
-<svg
-  class="size-3.5"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <circle cx="12" cy="12" r="3" />
-  <path
-    d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-  />
-</svg>
-```
-
----
-
-### G. Home House Icon (`home`)
-
-Used to return to the parent portal.
-
-```html
-<svg
-  class="size-4"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
->
-  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-  <polyline points="9 22 9 12 15 12 15 22" />
-</svg>
-```
+Dashboard chrome uses **Lucide** and **Tabler** React icons (stroke, `currentColor`). Do not mix emoji into operator UI. Docs navigation is Mintlify’s icon set — keep section keys aligned with `docs.json`.
 
 ### 🔗 Next Steps
 
-- **[System Topology Overview](/docs/devops/architecture/overview)** — Analyze edge isolates and data layers integrations.
-- **[Isolate Communication Spec](/docs/devops/architecture/communication)** — Check service bindings and standard Bearer Auth middleware.
+- **[System Topology Overview](/docs/devops/architecture/overview)** — Edge isolates and data layers.
+- **[Isolate Communication Spec](/docs/devops/architecture/communication)** — Service Bindings and internal auth.

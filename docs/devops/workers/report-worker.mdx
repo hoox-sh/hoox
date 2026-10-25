@@ -20,14 +20,17 @@ The `report-worker` mounts storage buckets, notification bindings, and is trigge
 {
   "name": "report-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
   "placement": {
     "mode": "smart",
   },
   "triggers": {
-    "crons": ["0 8 * * *", "0 18 * * *"], // 08:00 and 18:00 UTC
+    "crons": ["0 8 * * *", "0 18 * * *"],
+  },
+  "browser": {
+    "binding": "BROWSER",
   },
   "r2_buckets": [
     {
@@ -35,16 +38,20 @@ The `report-worker` mounts storage buckets, notification bindings, and is trigge
       "bucket_name": "trade-reports",
     },
   ],
+  "kv_namespaces": [
+    {
+      "binding": "CONFIG_KV",
+      "id": "<KV_NAMESPACE_ID>",
+    },
+  ],
   "services": [
     { "binding": "D1_SERVICE", "service": "d1-worker" },
     { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
   ],
-  "secrets": [
-    "INTERNAL_KEY_BINDING",
-    // PDF uses the BROWSER binding. CF_API_TOKEN is not required for quickAction("pdf").
-  ],
 }
 ```
+
+`INTERNAL_KEY_BINDING` is set with `wrangler secret put`. PDF uses the `BROWSER` binding (`quickAction("pdf")`).
 
 ---
 
@@ -120,4 +127,4 @@ Calls `TELEGRAM_SERVICE` `/alert` with fail-closed internal auth (`TELEGRAM_ALER
 ### 🔗 Next Steps
 
 - **[telegram-worker Profile](/docs/devops/workers/telegram-worker)** — Review push alert configurations and webhook tunnels.
-- **[D1 Database Operations](/docs/enduser/guides/database-ops)** — Manage Drizzle schemas and execute custom queries.
+- **[D1 Database Operations](/docs/enduser/guides/database-ops)** — Apply schema.sql and query the ledger.

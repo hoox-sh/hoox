@@ -93,7 +93,7 @@ hoox infra kv list
 # B. Create a new KV namespace (e.g. for staging or production)
 hoox infra kv create CONFIG_KV
 
-# C. Apply the default 16-key configuration manifest to your active namespace
+# C. Apply dashboard.jsonc defaults to CONFIG_KV
 hoox config kv apply-manifest
 ```
 
@@ -155,5 +155,5 @@ hoox infra vectorize create my-rag-index --dimensions 768 --metric cosine
 
 ### 🔗 Next Steps
 
-- [**Database Migrations & SQL**](/docs/enduser/guides/database-ops) — Run queries, manage drizzle schemas, and restore backups.
+- [**Database Migrations & SQL**](/docs/enduser/guides/database-ops) — Apply schema.sql, run tracking migrations, query, and restore backups.
 - [**Take-to-Production Deployments**](/docs/enduser/guides/deploy-workers) — Deploy your compiled workers and bind V8 isolates globally.

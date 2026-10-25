@@ -16,8 +16,5 @@
 * [architecture](architecture/) - Nested concepts.
 * [deployment](deployment/) - Nested concepts.
 * [development](development/) - Nested concepts.
-* [plans](plans/) - Nested concepts.
-* [refactoring](refactoring/) - Nested concepts.
 * [security](security/) - Nested concepts.
-* [specs](specs/) - Nested concepts.
 * [workers](workers/) - Nested concepts.

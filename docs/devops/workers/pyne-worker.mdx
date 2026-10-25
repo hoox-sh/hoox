@@ -21,9 +21,9 @@ This isolate vendors **Python** `pynescript.runtime`. It is not [PyneTS](https:/
 | Binding | Type | Purpose |
 | ------- | ---- | ------- |
 | `TRADE_SERVICE` | Service | Forward strategy trade events to `trade-worker` |
-| `OHLCV_DATA` | R2 | Kline / OHLCV storage and script registry |
+| `OHLCV_DATA` | R2 | Kline / OHLCV storage and script registry (`pyne-worker-ohlcv`) |
 
-Cron: `* * * * *` (bar-close scheduler; only re-runs when R2 has a newer bar).
+Cron: `* * * * *` (bar-close scheduler; only re-runs when R2 has a newer bar). Smart Placement is on. `account_id` in wrangler is `"<CLOUDFLARE_ACCOUNT_ID>"` — use yours.
 
 ---
 
@@ -88,7 +88,7 @@ hoox secrets set dashboard PYNE_API_KEY            # optional, match API_KEY
 
 ## Related
 
-- [Workers index](/docs/devops/workers/index)
+- [Workers index](/docs/devops/workers)
 - [trade-worker](/docs/devops/workers/trade-worker) — execution target for strategy events
 - [dashboard](/docs/devops/workers/dashboard) — `PYNE_SERVICE` binding + `PYNE_API_KEY`
 - [PYNE pyne-worker](https://hoox.sh/pyne/docs/pyne-worker) — product evaluate docs

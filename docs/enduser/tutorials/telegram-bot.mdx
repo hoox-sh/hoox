@@ -47,11 +47,11 @@ To ensure that only **you** can command your bot (and to prevent unauthorized us
 Bind your bot token and authorized Chat ID as encrypted Workers Secrets in your workspace:
 
 ```bash
-# Inject the secure Telegram Bot token
-hoox secrets set TELEGRAM_BOT_TOKEN "5829104829:AAFkL92jL-492kLl..."
-
-# Inject your authorized Telegram Chat ID
-hoox secrets set TELEGRAM_CHAT_ID "987654321"
+# Worker name is required. The CLI prompts for the value (not echoed).
+hoox secrets set telegram-worker TG_BOT_TOKEN_BINDING
+hoox secrets set telegram-worker TG_CHAT_ID_BINDING
+# Comma-separated allowlist (inbound commands fail-closed when unset)
+hoox secrets set telegram-worker AUTHORIZED_CHAT_IDS
 ```
 
 ---
@@ -65,8 +65,9 @@ To allow Telegram’s servers to route incoming chat commands straight to your e
 hoox deploy telegram-webhook
 ```
 
-_The CLI calls Telegram’s API to configure the route:_
-`https://hoox.alpha-trading.workers.dev/telegram-webhook`
+The CLI registers:
+
+`https://telegram-worker.<SUBDOMAIN_PREFIX>.workers.dev/webhook`
 
 ---
 
@@ -95,13 +96,13 @@ Beyond static commands, `telegram-worker` is integrated with **Cloudflare® Work
 ---
 
 <Warning>
-  The `telegram-worker` strictly filters all incoming messages. If a message
-  originates from a `Chat ID` that does not match your authorized
-  `TELEGRAM_CHAT_ID` secret, it is silently dropped and logged as a security
-  alert, ensuring your account remains 100% secure.
+  The `telegram-worker` strictly filters incoming messages. Inbound `/webhook`
+  commands fail-closed when `AUTHORIZED_CHAT_IDS` is unset. Outbound alerts
+  must land on that allowlist (or `TG_CHAT_ID_BINDING` when the allowlist is
+  empty). Unlisted chat IDs are dropped.
 </Warning>
 
 ### 🔗 Next Steps
 
-|- **[Alert Troubleshooting](/docs/enduser/tutorials/tradingview-webhook#webhook-troubleshooting-runbook)** — Common TradingView® webhook errors and resolutions.
+- **[Alert Troubleshooting](/docs/enduser/tutorials/tradingview-webhook#webhook-troubleshooting-runbook)** — Common TradingView® webhook errors and resolutions.
 - **[Platform Configuration Guide](/docs/enduser/getting-started/configuration)** — Environment variables and CONFIG_KV keys.

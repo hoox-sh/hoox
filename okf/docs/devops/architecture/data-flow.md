@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/data-flow.mdx"
@@ -23,6 +23,7 @@ Repo path `docs/devops/architecture/data-flow.mdx`.
 # Outline
 
 * 1. Webhook to Trade Execution Flow (High-Speed Path)
+* 1b. Operator wallet proxy (/wallet/)
 * 2. Autonomous AI Risk Monitoring Flow (Cron Cycle)
 * 3. PDF Portfolio Report Rendering Flow
 * 4. Exchange ↔ D1 position reconciliation

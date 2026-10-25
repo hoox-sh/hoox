@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "repair"
+title: "Self-healing and repair"
+description: "Diagnose empty submodules, missing secrets, and broken bindings with hoox repair."
 ---
 
 # 🛠️ Self-Healing & Repair
@@ -23,7 +24,7 @@ hoox repair check
 
 The diagnostics engine runs a strict, sequential analysis of your entire monorepo environment. Each of the 5 steps completes and reports back:
 
-- Submodule Integrity (verify all 9 workers are cloned)
+- Submodule Integrity (verify worker trees are cloned: 10 isolates + dashboard)
 - Dependency Resolution (verify bun workspaces)
 - TypeScript Type Safety (run tsc --noEmit)
 - Cloudflare® Edge Bindings (verify D1, KV, R2, Queues)
@@ -44,7 +45,7 @@ hoox repair secrets
 # C. Reset the CONFIG_KV configuration namespace to default variables
 hoox repair kv
 
-# D. Re-apply Drizzle DQL schemas and run pending D1 database migrations
+# D. Re-apply schema.sql and tracking migrations
 hoox repair db
 
 # E. Rebuild and redeploy a single, degraded worker
@@ -82,9 +83,9 @@ When triggered, the CLI walks you through a structured recovery protocol:
 - **Phase 1** — D1 Database Backup: Exports current ledger to `backups/recovery-pre-rebuild.sql`.
 - **Phase 2** — Infrastructure Tear-Down: Deletes corrupted D1, KV, and Queue instances.
 - **Phase 3** — Fresh Provisioning: Recreates all database tables and config buckets on Cloudflare®.
-- **Phase 4** — Sequenced Redeployment: Re-compiles and deploys all 9 edge workers in correct dependency order.
+- **Phase 4** — Sequenced Redeployment: Re-compiles and deploys enabled workers in dependency order.
 - **Phase 5** — Database Seeding: Restores backup SQL data and re-applies schema migrations.
-- **Phase 6** — KV Sync: Applies the 16-key configuration manifest defaults.
+- **Phase 6** — KV Sync: Applies `dashboard.jsonc` defaults via `hoox config kv apply-manifest`.
 
 <Warning>
   The `hoox repair rebuild` command performs destructive resets on D1 and KV
@@ -100,9 +101,9 @@ When triggered, the CLI walks you through a structured recovery protocol:
 | :-------------------------------------------------------- | :------------------------------------------------------- | :----------------------------------------------------------------------------------------- |
 | `bun install` crashes                                     | Git submodules are empty                                 | `git submodule update --init --recursive` then `hoox repair check`                         |
 | `D1_ERROR: no such table`                                 | SQLite D1 tables not initialized                         | `hoox db apply --remote`                                                                   |
-| `500 Internal Server Error`                               | Missing or rotated exchange API secrets                  | `hoox secrets set trade-worker BYBIT_KEY_BINDING "key"`                                    |
+| `500 Internal Server Error`                               | Missing or rotated exchange API secrets                  | `hoox secrets set trade-worker EXCHANGE_KEY_BINDING`                                       |
 | `500 Internal Server Error` (2)                           | Or webhooks not registered                               | `hoox deploy update-internal-urls`                                                         |
-| Telegram Bot is mute                                      | BotFather token is wrong                                 | `hoox secrets set telegram-worker TELEGRAM_BOT_TOKEN "token"`                              |
+| Telegram Bot is mute                                      | BotFather token is wrong                                 | `hoox secrets set telegram-worker TG_BOT_TOKEN_BINDING`                                    |
 | Telegram Bot is mute (2)                                  | Or webhook is unregistered                               | `hoox deploy telegram-webhook`                                                             |
 | Queue depth growing                                       | Exchange API returning errors                            | Check API key validity; `hoox monitor queue-depth`                                         |
 | Dashboard at 500 errors                                   | Next.js build failed or D1 schema outdated               | `hoox repair db` then `hoox dashboard deploy`                                              |
@@ -128,7 +129,7 @@ Trading not working?
     All OK  (continue)
 
   Are secrets bound? -> hoox secrets list <worker>
-    Any missing? -> hoox secrets set <worker> NAME VALUE
+    Any missing? -> hoox secrets set <worker> NAME
     All present  (continue)
 
   Is queue depth > 0? -> hoox monitor queue-depth
@@ -143,7 +144,7 @@ Trading not working?
 ### Pro Tips
 
 - Scheduled Health Checks: Set up a cron job to run `hoox repair check` daily and email yourself the results.
-- Pre-Deploy Checklist: Always run `hoox repair check` and `hoox test` before deploying to production.
+- Pre-Deploy Checklist: Always run `hoox repair check` and `hoox test all` before deploying to production.
 - Secrets Rotation: Rotate exchange API keys quarterly. Use `hoox secrets set` to update — no redeployment needed.
 
 ---

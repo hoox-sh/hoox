@@ -7,7 +7,7 @@ tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/api/payloads.mdx"
@@ -25,7 +25,7 @@ Repo path `docs/devops/api/payloads.mdx`.
 * 🛡️ 1. Standard Request Envelope
 * 📈 2. Trade Execution Payloads (trade-worker)
   * A. Centralized Exchange Order Payload (/webhook & /process)
-  * B. On-Chain DeFi Swap Payload (/dex)
+  * B. Spot DEX signal (same /webhook envelope)
 * 🗄️ 3. Database SQL Query Payloads (d1-worker)
   * A. Execute Single SQL Statement
 * 💬 4. Telegram Notification Payloads (telegram-worker)

@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "idempotency"
+title: "Idempotency"
+description: "Two-phase Durable Object reserve/commit/release so webhook retries cannot double-dispatch orders."
 ---
 
 # 🔒 Idempotency & Durable Objects
@@ -15,7 +16,7 @@ How Hoox uses Cloudflare Durable Objects for **at-most-once acceptance** at the 
 
 ## ⚠️ The Danger: How Webhook Retries Lead to Double-Ordering
 
-Gateway **two-phase** flow (v0.13+): **reserve** the key as `pending` before queue/service work, **commit** only when the trade truly succeeds (including soft-fail HTTP 2xx with `success: false` → **release**), so failed attempts can retry. Auto fingerprints include a **per-minute time bucket** so intentional same-size trades later are not blocked for the full TTL. Prefer a client `idempotencyKey` / `Idempotency-Key` header when you need cross-minute uniqueness.
+Gateway **two-phase** flow (since 0.13, current in 0.15.x): **reserve** the key as `pending` before queue/service work, **commit** only when the trade truly succeeds (including soft-fail HTTP 2xx with `success: false` → **release**), so failed attempts can retry. Auto fingerprints include a **per-minute time bucket** so intentional same-size trades later are not blocked for the full TTL. Prefer a client `idempotencyKey` / `Idempotency-Key` header when you need cross-minute uniqueness.
 
 Without idempotency, a typical signal failure sequence looks like this:
 

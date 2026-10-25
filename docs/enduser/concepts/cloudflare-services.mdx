@@ -28,7 +28,7 @@ Here is an architectural map of how each service functions in the Hoox monorepo.
 ## 🔑 2. KV Store (Sub-Millisecond Key-Value Configuration)
 
 - **Concept**: A highly available, globally distributed key-value store optimized for high-read/low-write operations.
-- **Hoox Implementation**: Houses the global 16-key runtime manifest, including the **Global Kill Switch** (`trade:kill_switch`), exchange routing paths, rate-limiter profiles, and authorized client IP ranges.
+- **Hoox Implementation**: Houses the runtime manifest, including the **Global Kill Switch** (`trade:kill_switch`), per-venue `exchange:<name>:enabled` flags, `webhook:queue_mode`, and TradingView® IP allowlists.
 - **Why it Matters**:
   - Read operations are cached directly at Cloudflare®'s edge nodes, delivering sub-millisecond lookups.
   - Updates propagate worldwide in under 10 seconds. You can toggle settings in your terminal, and the change affects every worker globally in seconds, without code redeployment.

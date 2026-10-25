@@ -7,7 +7,7 @@ info:
     Ingest trade signals, check system health, and manage DeFi wallet
     operations on the Cloudflare edge. All requests are handled by the
     Hoox gateway worker (`workers/hoox-worker`) running at the network edge.
-  version: "1.0.0"
+  version: "0.15.0"
   contact:
     name: Hoox Support
     email: support@hoox.sh
@@ -55,11 +55,18 @@ paths:
                   example: whk_live_a1b2c3d4e5f6
                 exchange:
                   type: string
-                  description: Target exchange
+                  description: |
+                    Target venue. CEX: `binance`, `bybit`, `mexc`.
+                    Spot DEX: `uniswap-ethereum`, `uniswap-arbitrum`,
+                    `jupiter-solana` (BASE/QUOTE symbols; `test: true` is
+                    rejected with TEST_TRADING_UNSUPPORTED).
                   enum:
                     - binance
                     - bybit
                     - mexc
+                    - uniswap-ethereum
+                    - uniswap-arbitrum
+                    - jupiter-solana
                   example: bybit
                 action:
                   type: string
@@ -98,10 +105,12 @@ paths:
                     When true, route the order to the exchange testnet/sandbox
                     API (Binance Futures testnet, Bybit testnet). MEXC has no
                     public REST sandbox and rejects with TEST_TRADING_UNSUPPORTED.
-                    Prefer BINANCE_TESTNET_* / BYBIT_TESTNET_* secrets; falls back
-                    to live bindings with a warning. D1 status becomes TEST_EXECUTED;
-                    position ids use {exchange}-testnet-{symbol}-{side}.
-                    Live trading is the default when omitted or false.
+                    DEX venues always reject test with TEST_TRADING_UNSUPPORTED.
+                    Prefer EXCHANGE_TESTNET_KEY_BINDING / EXCHANGE_TESTNET_SECRET_BINDING
+                    (per-venue BINANCE_TESTNET_* / BYBIT_TESTNET_* aliases still accepted).
+                    D1 status becomes TEST_EXECUTED; position ids use
+                    {exchange}-testnet-{symbol}-{side}. Live trading is the default
+                    when omitted or false.
                   example: true
                 idempotencyKey:
                   type: string
@@ -233,13 +242,87 @@ paths:
         required: true
         schema:
           type: string
-        description: Wallet operation path (e.g., swap, balance, approve)
+          enum:
+            - status
+            - config
+            - balance
+            - transfer
+            - approve
+            - quote
+            - swap
+            - transactions
+        description: |
+          Allowlisted wallet path forwarded to web3-wallet-worker.
+          `GET /wallet` (no extra path) is also valid.
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        description: >
+          Operator Bearer token (`Authorization: Bearer <OPERATOR_API_KEY>`).
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+        description: Passed through to the wallet isolate so retries share one logical swap.
+    get:
+      summary: Read wallet state
+      description: |
+        Operator-authenticated proxy to web3-wallet-worker. The gateway
+        injects mesh auth (`WALLET_EXECUTE_KEY_BINDING`, falling back to
+        `INTERNAL_KEY_BINDING`). GET is used for `/wallet`, `/status`,
+        `/config`, `/balance`, and `/transactions`.
+      operationId: getWallet
+      tags:
+        - Wallet
+      responses:
+        "200":
+          description: Wallet isolate response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Missing or invalid operator Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Path is not on the gateway wallet allowlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update wallet config
+      description: |
+        Operator-authenticated proxy. PUT is used for `/wallet/config`.
+      operationId: putWallet
+      tags:
+        - Wallet
+      responses:
+        "200":
+          description: Config updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Missing or invalid operator Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Execute wallet operation
       description: |
-        Proxies DeFi wallet operations to the web3-wallet-worker via
-        service binding. Supports EVM chain operations including swaps,
-        balance checks, and token approvals.
+        Operator-authenticated proxy to web3-wallet-worker via service
+        binding. POST is used for `/swap`, `/quote`, `/transfer`, and
+        `/approve`. Swap body is ExactIn (`chain`, `tokenIn`, `tokenOut`,
+        `amountIn`); Uniswap venues send `dexVersion: v3`.
       operationId: executeWalletOperation
       tags:
         - Wallet
@@ -251,34 +334,41 @@ paths:
               type: object
               required:
                 - chain
-                - to
-                - value
-                - data
+                - tokenIn
+                - tokenOut
+                - amountIn
               properties:
                 chain:
                   type: string
-                  description: EVM-compatible chain
+                  description: Target chain
                   enum:
                     - ethereum
                     - arbitrum
-                    - polygon
-                  example: arbitrum
-                to:
+                    - solana
+                  example: ethereum
+                tokenIn:
                   type: string
-                  description: Recipient or contract address
-                  example: "0x6b175474e89094c44da98b954eedeac495271d0f"
-                value:
+                  description: Input token address (EVM) or mint (Solana)
+                  example: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+                tokenOut:
                   type: string
-                  description: Transaction value in wei (as string)
-                  example: "100000000000000000"
-                data:
+                  description: Output token address or mint
+                  example: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                amountIn:
                   type: string
-                  description: Encoded contract call data
-                  example: "0xa9059cbb000000000000000000000000..."
-                gasLimit:
+                  description: Exact-in amount in token units
+                  example: "100"
+                slippageBps:
                   type: integer
-                  description: Optional transaction gas limit
-                  example: 200000
+                  description: Slippage in basis points
+                  example: 50
+                dexVersion:
+                  type: string
+                  description: Uniswap router version (EVM only). Spot path uses v3.
+                  enum:
+                    - v2
+                    - v3
+                  example: v3
       responses:
         "200":
           description: Wallet operation successful
@@ -289,34 +379,29 @@ paths:
         "400":
           description: |
             Invalid request — malformed JSON, missing required fields,
-            or invalid value (e.g. malformed address, non-positive wei
-            value, gas limit out of range).
+            or invalid value (e.g. malformed address, non-positive amount).
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: |
-            Internal authentication missing or invalid. Wallet routes
-            require the `X-Internal-Auth-Key` header (or service
-            binding from another worker).
+            Operator Bearer token missing or invalid. The gateway injects
+            mesh auth before calling web3-wallet-worker; callers do not
+            send `X-Internal-Auth-Key`.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "403":
           description: |
-            Authorization failed — caller's IP not on the allowlist,
-            wallet disabled in `WALLET_CONFIG_KV`, or the target chain
-            is not enabled.
+            Wallet disabled in config, or the target chain is not enabled.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "429":
-          description: |
-            Rate limit exceeded on wallet operations. Default ceiling
-            is enforced by the shared `createRateLimiter` middleware.
+          description: Rate limit exceeded on wallet operations.
           content:
             application/json:
               schema:
@@ -913,10 +998,10 @@ paths:
     get:
       summary: Agent usage statistics
       description: |
-        Proxied by the gateway to the dashboard's
-        `/api/agent/usage` endpoint. Returns aggregated AI provider
-        usage, including token counts, request counts, and cost
-        estimates for the configured window.
+        Dashboard route (`/api/agent/usage`), not a gateway path.
+        Reads `agent:usage` from CONFIG_KV. Empty object until
+        agent-worker records metrics. Use `POST /agent/chat` on
+        agent-worker (via the dashboard) for live model calls.
       operationId: agentUsage
       tags:
         - AI Agent

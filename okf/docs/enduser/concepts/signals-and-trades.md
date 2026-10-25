@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "📊 Signals & Trade Spec"
-description: "This document details the exact specifications, JSON validation schemas, and internal translation logic that occurs when an external trade signal (such as a TradingView® alert or…"
+description: "description: \"Webhook JSON schema, CEX/DEX venue names, test trading, and D1 ledger columns.\"."
 resource: "docs/enduser/concepts/signals-and-trades.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/signals-and-trades.mdx"

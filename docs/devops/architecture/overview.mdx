@@ -8,9 +8,13 @@ title: "System Topology & Overview"
 description: "High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models."
 ---
 
-Hoox is an enterprise-grade, serverless algorithmic trading platform built entirely on **Cloudflare® Edge V8 isolates** and globally distributed resources. By using a modular, service-oriented architecture, Hoox decomposes complex trading processes into **11 compute surfaces**: gateway, trade, agent, dashboard (Next.js), telegram, d1, web3, email, analytics, report, and **pyne** (Python Pine Script™ edge evaluate).
+Hoox is a serverless algorithmic trading platform on **Cloudflare® Workers**. Version **0.15.0** splits the system into **11 compute surfaces**: 10 workers under `workers/*` plus the **dashboard** (Next.js 16 / OpenNext). **pyne-worker** is Python; the rest are TypeScript V8 isolates.
 
-Most workers communicate privately via Service Bindings in microseconds, auto-scale globally near exchange servers, and store transaction logs in localized databases—all while running within Cloudflare® free tiers. **pyne-worker** is a tooling isolate: public evaluate/management routes use `API_KEY` auth (not mesh `INTERNAL_KEY_BINDING`); live strategy forwards to `trade-worker` use mesh internal auth.
+Most workers talk over **Service Bindings** (no public HTTP). Public ingress is the **hoox gateway** (`POST /webhook`, `GET /health`, operator `/v1/*` and `/wallet/*`) and the **dashboard**. **pyne-worker** is a tooling isolate: public evaluate/management routes use `API_KEY` (`X-API-Key`); live strategy forwards to **trade-worker** use mesh internal auth.
+
+Spot execution covers **CEX** (Binance, Bybit, MEXC) and **spot DEX** (`uniswap-ethereum`, `uniswap-arbitrum` via Uniswap V3 SwapRouter02, `jupiter-solana` via Jupiter Swap V2). DEX orders leave **trade-worker** as `WEB3_WALLET_SERVICE` `POST /swap`. Perps are not supported.
+
+**Opt-in tenant isolation** (`TenantEnv`: `TENANT_MODE` + `TENANT_ID`) shipped in 0.14 and is **off by default**. Entitlement scope types exist in `@hoox-sh/hoox-shared`; they are classification helpers only — not live enforcement.
 
 ---
 
@@ -70,13 +74,14 @@ graph TB
     GW -->|Service Binding| TW
     GW -->|Service Binding| TGW
     GW -->|Service Binding| ANW
+    GW -->|Operator /wallet/*| W3W
     GW -->|Durable Object Lock| DO
     GW -->|Queue Failover| Q
 
     TW -->|Service Binding| D1W
     TW -->|Service Binding| TGW
     TW -->|Service Binding| ANW
-    TW -->|DeFi Execution| W3W
+    TW -->|WEB3_WALLET_SERVICE POST /swap| W3W
     TW -.->|Config Read| KV
     TW -.->|Write Trade Logs| R2
 
@@ -84,7 +89,7 @@ graph TB
     TGW -.->|Semantic RAG search| VEC
     TGW -->|Service Binding| ANW
 
-    AW -->|Cron 5m / Position Scale| TW
+    AW -->|Cron 1–1440 min (default */15)| TW
     AW -->|Service Binding| TGW
     AW -->|Service Binding| D1W
 
@@ -102,19 +107,21 @@ graph TB
 
 | Worker Name            |  Runtime Scope   | Cron Trigger |    Public Routing    |      Smart Placement       | Primary Observability |
 | :--------------------- | :--------------: | :----------: | :------------------: | :------------------------: | :-------------------: |
-| **`hoox`**             |  Gateway Router  |      No      | **Yes** (`/webhook`) |    **Yes** (Fast path)     | Time-series Telemetry |
-| **`trade-worker`**     | Order Execution  |      No      |    No (Isolated)     | **Yes** (Exchange Proxied) |    Execution Logs     |
-| **`agent-worker`**     | Risk Management  |  Cron 1–1440 min (default `*/15`)  |    No (Isolated)     | **Yes** (Account Auditing) |      Alert Logs       |
-| **`telegram-worker`**  |  Alerts & Chat   |      No      |    No (Isolated)     |  **Yes** (Telegram APIs)   |     Command Logs      |
-| **`d1-worker`**        |  SQLite Manager  |      No      |    No (Isolated)     |   **Yes** (SQLite Bound)   |     Query Latency     |
-| **`report-worker`**    | Browser Rendering PDF (`BROWSER`) | Cron `08:00` and `18:00` UTC |    No (Isolated)     |  **Yes** (Rendering APIs)  |     Print Status      |
-| **`email-worker`**     | Mailgun / Email Routing / JSON | No inbox poll |    No (Isolated)     |             No             |   Parse Statistics    |
-| **`web3-wallet-worker`** | DeFi Swap Engine |      No      |    No (Isolated)     | **Yes** (RPC proxied) |     Tx Sign Logs      |
-| **`analytics-worker`** |  Observability   |      No      |    No (Isolated)     |             No             |    Metrics Dataset    |
-| **`pyne-worker`**      | Pine edge evaluate | Cron `* * * * *` | **Tooling** (`API_KEY` / `X-API-Key`) | **Yes** (evaluate path) | Evaluate / forward logs |
-| **`dashboard`**        | Next.js ops UI   |      No      | **Yes** (public)     |             No             |    UI / binding calls |
+| **`hoox`**             |  Gateway Router  |      No      | **Yes** (`/webhook`, `/health`, operator `/v1/*` + `/wallet/*`) |    **Yes**     | Time-series Telemetry |
+| **`trade-worker`**     | CEX + spot DEX execution  |      No      |    No (Isolated)     | **Yes** |    Execution Logs     |
+| **`agent-worker`**     | Risk Management  |  Cron 1–1440 min (default `*/15`)  |    No (Isolated)     | **Yes** |      Alert Logs       |
+| **`telegram-worker`**  |  Alerts & Chat   |      No      |    No (Isolated)     |  **Yes**   |     Command Logs      |
+| **`d1-worker`**        |  SQLite Manager  |      No      |    No (Isolated)     |   **Yes**   |     Query Latency     |
+| **`report-worker`**    | Browser Rendering PDF (`BROWSER`) | Cron `08:00` and `18:00` UTC |    No (Isolated)     |  **Yes**  |     Print Status      |
+| **`email-worker`**     | Mailgun / Email Routing / JSON | No inbox poll |    No (Isolated)     |             **Yes**             |   Parse Statistics    |
+| **`web3-wallet-worker`** | On-chain wallet + spot DEX |      No      |    No (Isolated)     | **Yes** |     Tx Sign Logs      |
+| **`analytics-worker`** |  Observability   |      No      |    No (Isolated)     |             **Yes**             |    Metrics Dataset    |
+| **`pyne-worker`**      | Pine edge evaluate | Cron `* * * * *` | **Tooling** (`API_KEY` / `X-API-Key`) | **Yes** | Evaluate / forward logs |
+| **`dashboard`**        | Next.js 16 ops UI (OpenNext)   |      No      | **Yes** (public)     |             No             |    UI / binding calls |
 
-> **Public tooling vs mesh-private workers:** Mesh workers (`trade-worker`, `d1-worker`, `agent-worker`, etc.) expose **no** public HTTP and require `INTERNAL_KEY_BINDING` / `X-Internal-Auth-Key` on service-to-service calls. **`pyne-worker`** is a tooling isolate: its evaluate and management APIs use **`API_KEY`**, not mesh `INTERNAL_KEY` on public routes. When pyne forwards strategy events to `trade-worker`, that hop uses mesh internal auth.
+> **Public vs mesh-private:** Mesh workers (`trade-worker`, `d1-worker`, `agent-worker`, `web3-wallet-worker`, …) expose **no** public HTTP. Service-to-service calls send `X-Internal-Auth-Key`. The **hoox gateway** is public for webhooks and health; operator Bearer (`OPERATOR_API_KEY`) gates `/v1/*` and `/wallet/*`. **`pyne-worker`** public routes use **`API_KEY`**, not mesh `INTERNAL_KEY`. When pyne forwards strategy events to `trade-worker`, that hop uses mesh internal auth.
+
+Smart Placement (`placement.mode: "smart"`) is on every isolate except the dashboard, which stays close to operators rather than backend services.
 
 ---
 
@@ -143,7 +150,7 @@ The `hoox` gateway validates that the payload `apiKey` string exactly matches th
 
 ### Layer 3: Service Binding Encrypted Isolation
 
-Internal workers (`trade-worker`, `d1-worker`, `agent-worker`) expose **zero** public HTTP endpoints. They cannot be targeted or accessed from the public internet. They can only be invoked internally by other V8 isolates using Cloudflare **Service Bindings**.
+Internal workers (`trade-worker`, `d1-worker`, `agent-worker`, `web3-wallet-worker`, …) expose **zero** public HTTP endpoints. Reach them only through Service Bindings. The gateway’s `/wallet/*` proxy is the operator-facing path onto the wallet isolate — it still injects mesh auth on the binding hop.
 
 ---
 
@@ -151,14 +158,14 @@ Internal workers (`trade-worker`, `d1-worker`, `agent-worker`) expose **zero** p
 
 To prevent internal bypass or privilege escalation, all internal microservice boundaries enforce a strict **bearer authorization check**:
 
-- All internal workers (`hoox`, `trade-worker`, `d1-worker`, `agent-worker`, `telegram-worker`) are bound to the same `INTERNAL_KEY_BINDING` secret.
-- Every service-to-service invocation is audited by the shared `requireInternalAuth` middleware from `@hoox-sh/hoox-shared/middleware`, dropping unauthorized calls.
+- Mesh workers bind `INTERNAL_KEY_BINDING`. Scoped aliases (`WALLET_EXECUTE_KEY_BINDING`, `TRADE_EXECUTE_KEY_BINDING`, `D1_READ_KEY_BINDING` / `D1_WRITE_KEY_BINDING`) are preferred when set and fall back to the shared key.
+- Service-to-service calls go through `requireInternalAuth` / `authenticatedServiceFetch` from `@hoox-sh/hoox-shared`. Unauthorized calls are dropped.
 
 ---
 
 ### Layer 5: Durable Object Idempotency Locks
 
-If the network drops after an order fill, TradingView® will resend the webhook. The gateway uses a single-threaded **Durable Object** to lock the request trace ID. If the transaction ID has already been logged, the duplicate is dropped before hitting exchange APIs, preventing double-ordering.
+If the network drops after an order fill, TradingView® will resend the webhook. The gateway uses a single-threaded **Durable Object** (`IdempotencyStore`) in two phases: `reserve` (pending) before dispatch, `commit` on true success, `release` on soft-fail. Duplicates and in-flight keys return **409**. Missing DO binding is fail-closed (**503**).
 
 ---
 
@@ -171,94 +178,24 @@ If the network drops after an order fill, TradingView® will resend the webhook.
 
 ---
 
-## 📊 Codebase Dependency Graph
+## Opt-in tenant isolation
 
-Hoox ships with an automated **function-level dependency graph extractor** that maps every exported symbol, import, call, type reference, and service binding across all 917 source files and 14 workspaces.
+Set `TENANT_MODE` to `true` or `1` **and** a valid `TENANT_ID` (`[A-Za-z0-9_-]{1,64}`) to namespace KV/DO keys (`t/<id>/…`), R2 keys (`t-<id>/…`), and D1 `tenant_id` rows. `TENANT_ID` alone does nothing. Self-host installs leave both unset.
 
-### Generating the Graph
-
-```bash
-# From repository root
-bun run graph
-```
-
-This runs `scripts/extract-graph.ts` (powered by **ts-morph**) and scans 917 source files across all 14 workspaces in **~20–25s**.
-
-During extraction, an **8-phase live progress bar** reports each stage with timing:
-
-```
-  [██░░░░░░░░░░░░░░░░░░] 13%  exports: 1667 nodes             10.6s
-  [██████████░░░░░░░░░░] 50%  type refs: 2536 edges            1.7s
-  [████████████░░░░░░░░] 63%  calls: 445 edges                 9.7s
-  [████████████████████] 100% Done                             22.0s
-
-⏱  Total time: 22.0s
-```
-
-| File                  | Size   | Format                       | Purpose                                                                  |
-| --------------------- | ------ | ---------------------------- | ------------------------------------------------------------------------ |
-| `graph-metadata.json` | ~45 KB | JSON                         | Human-authored semantics (tracked in git)                                |
-| `graph.json`          | ~2.5 MB | JSON (nodes + edges)        | Machine-readable graph — **generated** via `bun run graph`, not committed |
-| `graph.dot`           | ~1.3 MB | Graphviz DOT                | Visual rendering — **generated**, not committed                          |
-
-### Node Types & Color Coding (DOT)
-
-| Shape       | Kind             | Example                     |
-| ----------- | ---------------- | --------------------------- |
-| `box`       | Function / Const | `executeTrade`, `CONFIG_KV` |
-| `note`      | Interface / Type | `TradeRequest`, `Env`       |
-| `component` | Class            | `IdempotencyDO`             |
-| `Mrecord`   | Enum             | `ExitCode`, `OrderStatus`   |
-| Penwidth=2  | Entry Point      | `main`, `export default`    |
-
-Entry points (top-level workspace exports) are highlighted with double borders.
-
-### Edge Color Legend
-
-| Color                    | Edge Kind        | Count |
-| ------------------------ | ---------------- | ----- |
-| 🔵 Blue `#4A90D9`        | Imports          | 2,524 |
-| 🟠 Orange `#FF9800`      | Type references  | 2,536 |
-| 🩷 Pink `#E91E63`        | Cross-file calls | 445   |
-| 🟢 Green `#4CAF50`       | Extends          | 7     |
-| 🌿 Light Green `#8BC34A` | Implements       | 2     |
-| 🟣 Purple `#673AB7`      | Service bindings | 11    |
-| 🌊 Cyan `#00BCD4`        | Workspace deps   | 11    |
-
-### Rendering to SVG
-
-```bash
-# Requires Graphviz installed
-dot -Tsvg graph.dot -o graph.svg
-
-# Or paste graph.dot into edotor.net / viz-js.com
-```
-
-### Key Extraction Rules
-
-- **Export-only nodes**: Only exported symbols appear in the graph (684 unexported symbols filtered out).
-- **Call edge fallback**: Method calls like `router.post` resolve via TypeChecker; when the symbol name (`post`) doesn't match a top-level export, the edge falls back to the target file's first container node.
-- **Self-reference filtering**: Calls within the same file are excluded.
-- **Deduplication**: Duplicate edges are collapsed into a single entry.
-- **Service bindings**: Parsed from each worker's `wrangler.jsonc` configuration.
+Entitlement scope types (`EntitlementScope`, `hasScope()`) in `@hoox-sh/hoox-shared` classify bearers. They do **not** enforce product entitlements on the request path.
 
 ---
 
-### 🔗 Next Steps
+## Bindings graph (local)
 
-- **[Worker Communication Specifications](/docs/devops/architecture/communication)** — Deep dive into service bindings, zero-TCP routing, and V8 engines.
-- **[Data Flow Maps](/docs/devops/architecture/data-flow)** — Step-by-step sequence charts of trade executions and cron risk evaluations.
-- **[Codebase Dependency Graph](/docs/devops/architecture/overview#-codebase-dependency-graph)** — Generate a live architecture map of all exports, calls, and bindings.
+`bun run graph` at the repo root extracts Service Bindings from each worker’s `wrangler.jsonc` into generated `graph.json` / `graph.dot` (not committed). Use it to inspect the mesh locally; do not treat generated node counts as product docs.
 
-**Enterprise / Institutional Scale**
+---
 
-For the full bleeding-edge Enterprise architecture (Workers for Platforms multi-tenancy, Workflows, Logpush audit, AI Gateway, Bot Management, etc.) — the commercial layer on top of the open core — see:
+### Next Steps
 
-- `docs/enterprise/architecture.mdx`
-- `docs/enterprise/multi-tenancy.mdx`
-- `docs/enterprise/observability-audit.mdx`
-- `docs/enterprise/security-compliance.mdx`
+- **[Worker Communication Specifications](/docs/devops/architecture/communication)** — Service Bindings and internal auth.
+- **[Data Flow Maps](/docs/devops/architecture/data-flow)** — Webhook, DEX swap, wallet proxy, and cron sequences.
+- **[Workers](/docs/devops/workers)** — Per-isolate profiles.
 
-See also root `OPEN_CORE.md` and `OPEN_CORE_FEATURE_SPLIT.md`.
-
-These build directly on the current retail architecture while unlocking Cloudflare Enterprise features and 2025-2026 primitives.
+Enterprise overlays (Workers for Platforms, Logpush, dedicated tenancy) live under **[Enterprise](/docs/enterprise/architecture)**.

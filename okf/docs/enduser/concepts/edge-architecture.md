@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "⚡ Edge-First Architecture"
-description: "Why running algorithmic trading bots on V8 isolates and Cloudflare's 330+ global data centers cuts latency by 60% and eliminates slippage."
+description: "description: \"Why V8 isolates and Cloudflare Workers cut order-path latency versus a single VPS.\"."
 resource: "docs/enduser/concepts/edge-architecture.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/edge-architecture.mdx"

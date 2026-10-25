@@ -2,8 +2,8 @@
 
 # Concepts
 
-* [api-endpoints.mdx](api-endpoints.md) - description: "Complete REST API reference for the Hoox gateway, webhooks, health checks, AI chat streams, and edge error models.".
-* [cli-commands.mdx](cli-commands.md) - description: "Comprehensive CLI directory detailing ~30 command groups, 60+ subcommands, global flags, and positional options for the hoox binary.".
-* [configuration.mdx](configuration.md) - description: "Environment variables and CONFIGKV keys for the HOOX mesh.".
-* [❓ Frequently Asked Questions (FAQ)](faq.md) - Answers to the most common questions about setting up, operating, and troubleshooting the Hoox trading platform.
-* [📖 Glossary](glossary.md) - A curated vocabulary of terms used throughout the Hoox documentation. Understanding these terms is essential for effective navigation of the platform.
+* [api-endpoints.mdx](api-endpoints.md) - description: "Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway.".
+* [cli-commands.mdx](cli-commands.md) - description: "Command tree, flags, and examples for the hoox CLI (0.15.0).".
+* [configuration.mdx](configuration.md) - description: "Environment variables, Worker secrets, and CONFIGKV keys for the HOOX mesh.".
+* [❓ Frequently Asked Questions (FAQ)](faq.md) - description: "Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.15.x.".
+* [📖 Glossary](glossary.md) - description: "Operator vocabulary: workers, venues, secrets, Durable Objects, and DEX spots.".

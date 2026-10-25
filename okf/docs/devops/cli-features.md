@@ -7,7 +7,7 @@ tags: [cli-features, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/cli-features.mdx"
@@ -39,7 +39,8 @@ Repo path `docs/devops/cli-features.mdx`.
   * Banner (ui/banner.ts) — Linear Rail
   * Adding a new output
 * 🔑 5. Secrets modes (hoox secrets)
-* 🚪 6. Setup gates (hoox onboard / hoox setup)
+* 👷 6. Worker catalog (hoox workers)
+* 🚪 7. Setup gates (hoox onboard / hoox setup)
   * 🔗 Next Steps
 
 # Mentions

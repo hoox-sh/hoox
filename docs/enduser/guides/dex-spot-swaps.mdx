@@ -8,7 +8,7 @@ title: "DEX spot swaps"
 description: "Route Uniswap V3 (Ethereum, Arbitrum) and Jupiter Swap V2 (Solana) through trade-worker signals. Setup, secrets, pair syntax, and test-flag limits."
 ---
 
-Spot DEX venues use the same webhook vocabulary as CEX (`LONG` / `SHORT` / `CLOSE_*`) but execute as ExactIn swaps in `web3-wallet-worker`. Signing never leaves that isolate. Perps (GMX, Hyperliquid, Jupiter perps) are out of scope for this slice.
+Spot DEX venues use the same webhook vocabulary as CEX (`LONG` / `SHORT` / `CLOSE_*`) but execute as ExactIn swaps in `web3-wallet-worker`. Signing never leaves that isolate. Perpetual DEX venues are **not supported**.
 
 ---
 
@@ -87,6 +87,8 @@ Do **not** set `"test": true` — DEX venues are mainnet-only (`TEST_TRADING_UNS
 4. The wallet worker quotes, enforces USD caps, signs, and returns `{ txHash, id }`.
 
 Credential source is `wallet-binding` — CEX API keys are not used.
+
+The hoox gateway also exposes an operator **`/wallet/*` proxy** (Bearer `OPERATOR_API_KEY`) that forwards allowlisted paths (`/status`, `/config`, `/balance`, `/quote`, `/swap`, `/transfer`, `/approve`, `/transactions`) to `web3-wallet-worker`. Mesh auth is injected by the gateway. See [API endpoints](/docs/enduser/reference/api-endpoints).
 
 ---
 

@@ -12,15 +12,13 @@ description: "Documentation hub for the institutional / Enterprise version of HO
 
 > **This is the commercial / Enterprise extension layer.**
 >
-> HOOX follows an **Open Core** model. The core architecture, most code, and documentation are open source. This section describes the **commercial Enterprise layer** built on top of the open core.
->
-> See:
-- [OPEN_CORE.md](../../OPEN_CORE.md)
-- [OPEN_CORE_FEATURE_SPLIT.md](../../OPEN_CORE_FEATURE_SPLIT.md)
+> HOOX follows an **Open Core** model. The core architecture, most code, and documentation are open source. This section describes the **commercial Enterprise layer** built on top of the open core — Workers for Platforms dispatch, compliance pipelines, and institutional controls.
 
-This section contains **public architecture documentation** for the institutional / paid Enterprise version of HOOX (the commercial extension layer built on the open core). It is designed to run on **Cloudflare Enterprise**.
+This section contains **public architecture documentation** for the institutional / paid Enterprise version of HOOX. It is designed to run on **Cloudflare Enterprise**.
 
 **Note:** No proprietary Enterprise source code is included in this public repository.
+
+The open-source mesh can attribute payloads with an optional tenant scope when you set `TENANT_MODE` / `TENANT_ID` (off by default). Full dispatch isolation, billing, and per-tenant User Workers are Enterprise.
 
 ## Documents
 
@@ -39,6 +37,4 @@ This section contains **public architecture documentation** for the institutiona
 - Higher limits, custom SLAs, AI Gateway at scale
 - Data residency and advanced compliance controls
 
-See the approved architecture plan (internal `plan.md`) for phasing and rationale.
-
-All designs build directly on the existing high-quality retail codebase (Service Bindings, DOs, Smart Placement, shared middleware, etc.).
+All designs build directly on the existing open-core mesh (Service Bindings, Durable Objects, Smart Placement, shared middleware).

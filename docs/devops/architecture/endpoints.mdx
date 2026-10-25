@@ -16,25 +16,35 @@ This page captures the **architectural context** for routing across the Hoox mic
 
 ## 🏗️ Interactive Compute & Routing Flow
 
-All external webhooks flow through the public `hoox` gateway, which authenticates payloads and routes them to private workers inside localized V8 engine isolates:
+Public HTTPS hits the **hoox gateway** (webhooks, health, operator `/v1/*` and `/wallet/*`) or the **dashboard**. Mesh isolates stay private:
 
 ```mermaid
 graph TD
     %% Ingress
     Client[TradingView® / User] -->|1. Public HTTPS Ingress| GW[hoox Gateway]
+    Op[Operator Bearer] -->|GET/POST /wallet/*| GW
+    Dash[Dashboard] -->|Public UI + /api/*| DASH[dashboard isolate]
 
     %% Gateway Service Bindings
-    GW -->|2. Service Binding| TW[trade-worker]
-    GW -->|2. Service Binding| TGW[telegram-worker]
+    GW -->|2. TRADE_SERVICE| TW[trade-worker]
+    GW -->|2. TELEGRAM_SERVICE| TGW[telegram-worker]
+    GW -->|2. WEB3_WALLET_SERVICE| W3[web3-wallet-worker]
+    GW -->|2. ANALYTICS_SERVICE| ANW[analytics-worker]
     GW -->|2. Async Failover Queue| Q[trade-execution Queue]
 
     %% Internal Workers Services
-    TW -->|3. Service Binding| D1W[d1-worker]
-    TW -->|3. Service Binding| W3[web3-wallet-worker]
+    TW -->|3. D1_SERVICE| D1W[d1-worker]
+    TW -->|3. WEB3_WALLET_SERVICE POST /swap| W3
     TGW -.->|RAG Queries| VEC[(Vectorize Index)]
     Q -->|4. Async Consumer| TW
     D1W -.->|SQLite read/write| DB[(D1 Database)]
+    DASH -->|Service Bindings| D1W
+    DASH -->|Service Bindings| AW[agent-worker]
+    DASH -->|Service Bindings| W3
+    DASH -->|Service Bindings| PY[pyne-worker]
 ```
+
+Operator `/wallet/*` is an explicit allowlist proxy (not a catch-all). Paths: `/`, `/status`, `/config`, `/balance`, `/transfer`, `/approve`, `/quote`, `/swap`, `/transactions`. Auth is Bearer `OPERATOR_API_KEY`; the gateway injects mesh `X-Internal-Auth-Key`.
 
 ---
 
@@ -46,7 +56,9 @@ Every internal HTTP request between V8 isolates **must** transmit the standard b
 X-Internal-Auth-Key: <INTERNAL_KEY_BINDING>
 ```
 
-This shared secret is provisioned per-worker as an encrypted `wrangler secret` and validated by the `requireInternalAuth` middleware from `@hoox-sh/hoox-shared/middleware`. Public webhook and dashboard endpoints use payload-embedded API keys or session cookies instead — see the canonical [`/docs/devops/api/endpoints`](/docs/devops/api/endpoints) for the full auth matrix.
+This shared secret is provisioned per-worker as an encrypted `wrangler secret` and validated by `requireInternalAuth` / `authenticatedServiceFetch`. Scoped keys (`WALLET_EXECUTE_KEY_BINDING`, `TRADE_EXECUTE_KEY_BINDING`, D1 read/write keys) are preferred when set.
+
+Public surfaces use different auth: webhook body `apiKey`, operator Bearer on `/v1/*` and `/wallet/*`, dashboard session cookies, pyne `X-API-Key`. See [`/docs/devops/api/endpoints`](/docs/devops/api/endpoints) for the full matrix.
 
 ---
 

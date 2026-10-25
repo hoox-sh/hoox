@@ -8,7 +8,7 @@ title: "Workers"
 description: "Per-isolate profiles for every HOOX Cloudflare Worker — gateway, execution, data, agents, and UI."
 ---
 
-Each page is an **isolate profile**: bindings, routes, secrets, and behavior for one worker in the mesh.
+Each page is an **isolate profile**: bindings, routes, secrets, and behavior for one of the **11 compute surfaces** (10 workers under `workers/*` + dashboard). Version **0.15.0**.
 
 Worker sources live as **git submodules** under `workers/` in [hoox-sh/hoox](https://github.com/hoox-sh/hoox). Each repository carries a GitHub description, `package.json` description, and a README with a shared **Mesh interconnect** section that links every sibling isolate.
 
@@ -16,8 +16,8 @@ Worker sources live as **git submodules** under `workers/` in [hoox-sh/hoox](htt
 
 | Worker | Role | Source |
 | ------ | ---- | ------ |
-| [hoox (Gateway)](/docs/devops/workers/hoox) | Public webhook ingress, WAF/auth, two-phase DO idempotency + rate-limit DO, notify chatId allowlist, queue/service dispatch | [hoox-worker](https://github.com/hoox-sh/hoox-worker) |
-| [trade-worker](/docs/devops/workers/trade-worker) | CEX REST (Binance / Bybit / MEXC) + DEX spots via `WEB3_WALLET_SERVICE`, queue, named D1 RPCs, test trading | [trade-worker](https://github.com/hoox-sh/trade-worker) |
+| [hoox (Gateway)](/docs/devops/workers/hoox) | Public webhook ingress, WAF/auth, two-phase DO idempotency + rate-limit DO, notify chatId allowlist, operator `/wallet/*` proxy, queue/service dispatch | [hoox-worker](https://github.com/hoox-sh/hoox-worker) |
+| [trade-worker](/docs/devops/workers/trade-worker) | CEX REST (Binance / Bybit / MEXC) + spot DEX via `WEB3_WALLET_SERVICE`, queue, named D1 RPCs, test trading | [trade-worker](https://github.com/hoox-sh/trade-worker) |
 | [web3-wallet-worker](/docs/devops/workers/web3-wallet-worker) | EVM + Solana signing; Uniswap V3 and Jupiter Swap V2 `/swap` | [web3-wallet-worker](https://github.com/hoox-sh/web3-wallet-worker) |
 
 ## Data & intelligence

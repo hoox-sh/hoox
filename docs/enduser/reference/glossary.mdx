@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "glossary"
+title: "Glossary"
+description: "Operator vocabulary: workers, venues, secrets, Durable Objects, and DEX spots."
 ---
 
 # 📖 Glossary
@@ -20,7 +21,7 @@ A curated vocabulary of terms used throughout the Hoox documentation. Understand
 | **Webhook**            | An automated HTTP POST callback triggered by an external system (e.g., TradingView®) when a specific event occurs, such as a technical indicator crossover.          |
 | **Signal**             | A structured JSON payload sent to the Hoox Gateway instructing it to execute a trade. Signals originate from TradingView® alerts, email parsing, or Telegram commands. |
 | **Pine Script™**       | TradingView®'s domain-specific language for indicators and strategies. Hoox docs use `//@version=6`. Edge evaluate also runs via **pyne-worker** / `hoox pyne`.       |
-| **Leverage**           |
+| **Leverage**           | Multiplier on position notional. Signal field `leverage` (default 1 = spot). Ignored on DEX spots. |
 | **LONG**               | A trade direction indicating the purchase (buy) of an asset with the expectation that its price will rise.                                                            |
 | **SHORT**              | A trade direction indicating the sale (sell) of an asset with the expectation that its price will fall.                                                               |
 | **CLOSE**              | An action to flatten (exit) an existing open position, returning the account to a neutral state.                                                                      |
@@ -67,7 +68,9 @@ A curated vocabulary of terms used throughout the Hoox documentation. Understand
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Idempotency**                          | The property ensuring that a given operation (e.g., a trade signal) produces the same result whether executed once or multiple times — preventing duplicate trades. |
 | **HMAC-SHA256**                          | A cryptographic signing algorithm used to authenticate order payloads sent to exchange APIs, ensuring message integrity and origin verification.                    |
-| **Secret Binding**                       | An encrypted credential injected directly into a V8 isolate at runtime. Secrets are never stored in code, config files, or logs.                                    |
+| **Secret Binding**                       | An encrypted credential injected directly into a V8 isolate at runtime. Secrets are never stored in code, config files, or logs. Canonical CEX pair: `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING`. |
+| **WEBHOOK_API_KEY_BINDING**              | Gateway secret compared to the webhook JSON `apiKey`. Not a `CONFIG_KV` key.                                                                                        |
+| **Wallet proxy**                         | Gateway `/wallet/*` operator routes (Bearer `OPERATOR_API_KEY`) that forward allowlisted paths to `web3-wallet-worker`.                                             |
 | **WAF (Web Application Firewall)**       | A network-layer security service that filters, monitors, and blocks HTTP traffic based on customizable rules (e.g., IP allow-listing).                              |
 | **CORS (Cross-Origin Resource Sharing)** | A browser security mechanism. Hoox disables CORS on the gateway to prevent unauthorized cross-domain requests.                                                      |
 | **IP Allow-listing**                     | Restricting access to the webhook endpoint to a predefined list of trusted IP addresses (e.g., TradingView®'s known ranges).                                        |
@@ -84,19 +87,22 @@ A curated vocabulary of terms used throughout the Hoox documentation. Understand
 | **Wrangler**                      | Cloudflare®'s official CLI for Workers. Hoox embeds it; prefer `hoox` / `hx` for operator workflows.                           |
 | **Linear Rail banner**            | Default CLI banner style (`◆ H · O · O · X`) with tagline/version; compact TTY animation.                                      |
 | **Docker Compose**                | A container orchestration tool used by Hoox for running isolated local development environments with all services.             |
-| **TUI (Terminal User Interface)** | A full-screen, keyboard-driven terminal dashboard (`./hoox-tui`) for monitoring and controlling the Hoox platform.             |
+| **TUI (Terminal User Interface)** | A full-screen, keyboard-driven terminal dashboard (`hoox tui` / `@hoox-sh/hoox-tui` 0.3.x) for monitoring and controlling the Hoox platform. |
+| **MCP server**                    | Stdio MCP process (`bun run mcp`, `packages/mcp`) that exposes one tool per `hoox` command with a confirm gate. See [MCP](/docs/devops/mcp). |
 | **OpenTUI**                       | A React-based framework for building terminal user interfaces, used to construct Hoox's TUI.                                   |
 | **OpenNext**                      | An adapter enabling Next.js applications to run on Cloudflare Workers. Hoox uses it for the dashboard Command Center.          |
-| **Drizzle**                       | A lightweight TypeScript ORM used with D1 for database schema management and migrations.                                       |
+| **schema.sql**                    | Canonical D1 DDL at `workers/trade-worker/schema.sql`. Apply with `hoox db apply`; tracking columns with `hoox db migrate`.   |
 | **CI/CD**                         | Continuous Integration / Continuous Deployment. Hoox's pipeline runs linting, type checks, unit tests, and build verification. |
 
 ## Exchange-Specific
 
 | Term        | Definition                                                                                                  |
 | ----------- | ----------------------------------------------------------------------------------------------------------- |
-| **MEXC**    | A global cryptocurrency exchange supporting spot and futures trading. One of three supported exchanges.     |
-| **Bybit**   | A cryptocurrency derivatives exchange known for its high-performance API. One of three supported exchanges. |
-| **Binance** | The world's largest cryptocurrency exchange by volume. One of three supported exchanges.                    |
+| **MEXC**    | CEX venue. No public REST testnet — `"test": true` is rejected. |
+| **Bybit**   | CEX venue. Testnet host `api-testnet.bybit.com`. |
+| **Binance** | CEX venue. Futures testnet host `testnet.binancefuture.com`. |
+| **Uniswap V3** | DEX spot on `uniswap-ethereum` / `uniswap-arbitrum` via `SwapRouter02`. |
+| **Jupiter Swap V2** | DEX spot on `jupiter-solana`. Requires `JUPITER_API_KEY`. |
 
 ---
 

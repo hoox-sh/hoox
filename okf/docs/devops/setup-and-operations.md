@@ -7,7 +7,7 @@ tags: [devops, doc, docs, setup-and-operations]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/setup-and-operations.mdx"
@@ -57,11 +57,11 @@ Repo path `docs/devops/setup-and-operations.mdx`.
   * 5.8 Phase 8: Worker Deployment
   * 5.9 Phase 9: Dashboard Deployment
   * 5.10 Phase 10: Verification
+  * 5.11 Self-hosted (no Cloudflare)
 * 6. Infrastructure Provisioning
   * 6.1 D1 Database
   * 6.2 KV Namespaces
   * 6.3 R2 Buckets
-  * 6.4 Queue
 
 # Mentions
 

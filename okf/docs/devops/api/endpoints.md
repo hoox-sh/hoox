@@ -7,7 +7,7 @@ tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/api/endpoints.mdx"
@@ -26,6 +26,8 @@ Repo path `docs/devops/api/endpoints.mdx`.
 * 🚀 Ingress Webhook Endpoints (workers/hoox-worker)
   * A. Ingest Signal Webhook
   * B. Proactive Health Diagnostics
+* Operator management plane (/v1/)
+* Wallet operator proxy (/wallet/)
 * 🗄️ Database Service Endpoints (workers/d1-worker)
   * A. Execute Single SQL Statement
   * B. Execute Transactional Batch Statements

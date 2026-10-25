@@ -28,7 +28,14 @@ hoox logs worker trade-worker
 hoox logs worker hoox
 
 # C. Alternatively, invoke Wrangler directly for custom configurations
-npx wrangler tail hoox --config workers/hoox-worker/wrangler.jsonc
+wrangler tail hoox --config workers/hoox-worker/wrangler.jsonc
+```
+
+`hoox workers logs <name>` is an alias for `hoox logs worker <name>`. For Cloudflare Workers Observability traces:
+
+```bash
+hoox trace events
+hoox trace live
 ```
 
 ---
@@ -42,7 +49,7 @@ Because a single TradingView® alert flows through multiple workers (Gateway →
 1. **Generation**: The `hoox` gateway generates a unique, cryptographically secure **UUIDv4** immediately upon receiving a webhook payload. This is set as the `requestId` in the transaction context.
 2. **Propagation**: Every internal service binding call transmits this UUID as the `X-Request-Id` HTTP header.
 3. **Structured Ingestion**: When logging error telemetry or writing trade fills to R2 and D1 databases, workers attach the `requestId` as a dedicated index column.
-4. **Unified Auditing**: You can audit an entire transaction's lifecycle across all 9 workers by running a single database query filtering by the trace ID:
+4. **Unified Auditing**: You can audit an entire transaction's lifecycle across the mesh by running a single database query filtering by the trace ID:
 
 ```sql
 SELECT created_at, worker, message, severity
@@ -88,7 +95,7 @@ ORDER BY created_at ASC
 - **Diagnostics**: Worker database transactions fail with table missing errors.
 - **Primary Root Cause**: Relational SQLite schemas were never initialized on your production D1 instance.
 - **Resolution**:
-  1. Initialize database tables and run pending drizzle migrations:
+  1. Initialize database tables and run tracking migrations:
      ```bash
      hoox db apply --remote
      hoox db migrate --remote

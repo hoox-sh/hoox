@@ -31,9 +31,12 @@ Cloudflare Service Bindings allow one edge worker to call another **without ever
     { "binding": "TRADE_SERVICE", "service": "trade-worker" },
     { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
     { "binding": "WEB3_WALLET_SERVICE", "service": "web3-wallet-worker" },
+    { "binding": "ANALYTICS_SERVICE", "service": "analytics-worker" },
   ],
 }
 ```
+
+`trade-worker` also binds `WEB3_WALLET_SERVICE` for spot DEX `POST /swap`. The gateway’s operator `/wallet/*` proxy uses the same binding with `WALLET_EXECUTE_KEY_BINDING` (falls back to `INTERNAL_KEY_BINDING`).
 
 ---
 
@@ -121,11 +124,12 @@ export async function handleRequest(
 ```
 
 <Note>
-  Every single internal worker (`hoox`, `trade-worker`, `d1-worker`,
-  `agent-worker`, `telegram-worker`, `email-worker`, `analytics-worker`,
-  `report-worker`, `web3-wallet-worker`, `dashboard`) binds the exact same
-  secret name: `INTERNAL_KEY_BINDING`. This eliminates variable footprint drift
-  and simplifies secret deployments across your workspace.
+  Mesh workers bind `INTERNAL_KEY_BINDING`. Prefer scoped secrets when you
+  set them: `WALLET_EXECUTE_KEY_BINDING` (wallet `/swap` and the gateway
+  `/wallet` proxy), `TRADE_EXECUTE_KEY_BINDING`, `D1_READ_KEY_BINDING` /
+  `D1_WRITE_KEY_BINDING`. Each falls back to the shared key.
+  **pyne-worker** public routes use `API_KEY` (`X-API-Key`); only the
+  strategy → trade-worker hop sends `X-Internal-Auth-Key`.
 </Note>
 
 ---

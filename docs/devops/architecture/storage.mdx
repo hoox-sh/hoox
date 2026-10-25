@@ -18,11 +18,11 @@ Hoox segregates data into four distinct edge storage tiers based on consistency,
 
 ```mermaid
 graph TD
-    Pipeline["📥 Incoming Request Pipeline"] -->|Route| DO["💎 Durable Objects<br/>Strong Consistency<br/>(Idempotency Locks)"]
-    Pipeline -->|Route| KV["⚡ CONFIG_KV<br/>Eventual Consistency<br/>(sub-ms reads, 10s write)"]
-    Pipeline -->|Route| D1["🗄️ D1 SQLite<br/>Relational ACID<br/>(5ms SQL queries)"]
+    Pipeline["Incoming Request Pipeline"] -->|Route| DO["Durable Objects<br/>Strong Consistency<br/>(Idempotency Locks)"]
+    Pipeline -->|Route| KV["CONFIG_KV<br/>Eventual Consistency<br/>(sub-ms reads, 10s write)"]
+    Pipeline -->|Route| D1["D1 SQLite<br/>Relational ACID<br/>(5ms SQL queries)"]
 
-    DO -->|Persist / Log| R2["📦 R2 Object Storage<br/>Zero-Egress Bucket<br/>(Heavy JSON Fills / PDFs)"]
+    DO -->|Persist / Log| R2["R2 Object Storage<br/>Zero-Egress Bucket<br/>(Heavy JSON Fills / PDFs)"]
     KV -->|Persist / Log| R2
     D1 -->|Persist / Log| R2
 
@@ -42,75 +42,74 @@ graph TD
 
 ---
 
-## 🗄️ 2. D1 Relational Engine & Drizzle Schema Specs
+## 2. D1 relational engine and schema.sql
 
-D1 runs a serverless SQLite engine embedded in the Cloudflare V8 worker isolate thread. This eliminates TCP handshake overhead when executing SQL queries.
+D1 runs a serverless SQLite engine in the Cloudflare Worker isolate. That removes a TCP handshake when executing SQL.
 
-### Drizzle ORM Schema Standards
+Canonical DDL lives at `workers/trade-worker/schema.sql` (`CREATE TABLE IF NOT EXISTS`). Apply it with `hoox db apply`; add tracking columns with `hoox db migrate` (`scripts/migrate-tracking.sh`). Full column list: [Database operations](/docs/enduser/guides/database-ops).
 
-Hoox developers use Drizzle ORM to define strict type safety for D1 SQLite tables. Below is the active specification for our `trades` and `positions` schemas:
+```sql
+CREATE TABLE IF NOT EXISTS trades (
+  id TEXT PRIMARY KEY,
+  signal_id TEXT,
+  timestamp INTEGER NOT NULL,
+  exchange TEXT NOT NULL,   -- binance|bybit|mexc|uniswap-ethereum|uniswap-arbitrum|jupiter-solana
+  symbol TEXT NOT NULL,
+  action TEXT NOT NULL,     -- LONG | SHORT | CLOSE_LONG | CLOSE_SHORT
+  quantity REAL,
+  price REAL,
+  leverage INTEGER,
+  status TEXT NOT NULL,     -- EXECUTED | TEST_EXECUTED | FAILED | PENDING
+  error_message TEXT,
+  raw_response TEXT,
+  tenant_id TEXT NOT NULL DEFAULT '',
+  created_at INTEGER DEFAULT (unixepoch())
+);
 
-```typescript
-import { sqliteTable, text, real, integer } from "drizzle-orm/sqlite-core";
-
-// 1. Transactional Trades Ledger Schema
-export const trades = sqliteTable("trades", {
-  id: text("id").primaryKey(), // UUIDv4
-  requestId: text("request_id").notNull(), // Distributed Trace ID
-  exchange: text("exchange").notNull(), // "bybit" | "binance" | "mexc"
-  symbol: text("symbol").notNull(), // Uppercase symbol: "BTCUSDT"
-  action: text("action").notNull(), // "LONG" | "SHORT" | "CLOSE"
-  side: text("side").notNull(), // "BUY" | "SELL"
-  quantity: real("quantity").notNull(), // Executed contract quantity
-  price: real("price").notNull(), // Execution fill price
-  fee: real("fee").notNull(), // Exchange transaction fee paid in quote
-  orderId: text("order_id").notNull(), // Exchange-provided order identifier
-  status: text("status").notNull(), // "Filled" | "Failed"
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-});
-
-// 2. Real-Time Open Position Matrix Schema
-export const positions = sqliteTable("positions", {
-  symbol: text("symbol").primaryKey(),
-  exchange: text("exchange").notNull(),
-  side: text("side").notNull(), // "LONG" | "SHORT"
-  size: real("size").notNull(), // Current contract size
-  entryPrice: real("entry_price").notNull(), // Volume-weighted average entry price
-  leverage: integer("leverage").default(1),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
-});
+CREATE TABLE IF NOT EXISTS positions (
+  id TEXT PRIMARY KEY,
+  exchange TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  side TEXT NOT NULL,       -- LONG or SHORT
+  entry_price REAL,
+  size REAL,
+  leverage INTEGER,
+  status TEXT NOT NULL,     -- OPEN or CLOSED
+  tenant_id TEXT NOT NULL DEFAULT '',
+  updated_at INTEGER DEFAULT (unixepoch())
+);
 ```
 
 ---
 
-## 📦 3. R2 Log Offloading: SQLite Conservation Strategy
+## 3. R2 log offloading
 
 SQLite engines are single-writer databases. If write concurrency is too high, transaction queues can lock the thread. To conserve D1 write limits and maintain high performance during high-frequency events:
 
-1. **D1 Relational Logs**: Only high-value financial transactions (the structured fields in the `trades` table above) are written to D1.
-2. **R2 Verbose Blobs**: Full, verbose JSON payload exchanges, network headers, and WebSocket stream records are serialized and saved to **R2 Storage** using date-based key paths:
+1. **D1 relational logs**: Only high-value financial transactions (the structured fields in the `trades` table above) are written to D1. **d1-worker** owns the `trade-data-db` binding; **trade-worker** reaches it over `D1_SERVICE`. **web3-wallet-worker** keeps a separate `TRANSACTIONS_DB` (`web3-wallet-transactions`) for on-chain tx records.
+2. **R2 verbose blobs**: Full JSON payload exchanges, network headers, and stream records are serialized and saved to **R2 Storage** using date-based key paths:
    `logs/bybit/BTCUSDT/2026-05-19/order-18049284739.json`
 
-This offloading strategy reduces D1 SQLite write volumes by **up to 75%**, keeping your database compact, fast, and fully within free-tier limits.
+This offloading strategy reduces D1 SQLite write volumes, keeping the database compact and within free-tier limits.
 
 ---
 
-## 🔑 4. KV Eventual Consistency & Cache Performance
+## 4. KV eventual consistency
 
 Cloudflare KV is a highly distributed key-value store optimized for high-read/low-write operations:
 
-- **Eventual Consistency**: When you toggle a setting in KV (e.g. `trade:kill_switch = true`), the change is instantly cached at your local gateway node. However, it takes up to **10 seconds** to propagate to Cloudflare’s other 330+ locations globally.
-- **Operational Rule**: KV is perfect for global configurations, allowlists, and emergency kill switches. It is **never** used to track highly dynamic real-time states like position sizes, account drawdowns, or margin balances. High-frequency states must always be routed through D1 or Durable Objects.
+- **Eventual consistency**: When you toggle a setting in KV (e.g. `trade:kill_switch = true`), the change is instantly cached at your local gateway node. However, it takes up to **10 seconds** to propagate to Cloudflare’s other 330+ locations globally.
+- **Operational rule**: KV is perfect for global configurations, allowlists, and emergency kill switches. It is **never** used to track highly dynamic real-time states like position sizes, account drawdowns, or margin balances. High-frequency states must always be routed through D1 or Durable Objects.
+- **Tenant keys**: When `TENANT_MODE` is on, helpers prefix KV/DO names `t/<id>/…` and R2 keys `t-<id>/…`. Off by default (identity).
 
 ---
 
 <Warning>
-  Never attempt to run raw migration files directly on your production D1
-  database without first running a backup. Ensure your database status is fully
-  tracked and synchronized using Drizzle migrations: `hoox db migrate --remote`.
+  Back up production D1 before applying schema changes (`hoox db export --remote`).
+  Then run `hoox db apply --remote` and `hoox db migrate --remote`.
 </Warning>
 
-### 🔗 Next Steps
+### Next steps
 
 - **[Internal Endpoints Mapping](/docs/devops/architecture/endpoints)** — Map out exposed ports, URLs, and service bindings.
 - **[Wrangler Setup & Tooling](/docs/devops/development/local-dev)** — Configure Wrangler to bind local D1 and KV instances for dev testing.

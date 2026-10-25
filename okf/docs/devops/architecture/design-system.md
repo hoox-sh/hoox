@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "design-system.mdx"
-description: "description: \"Production design system and visual token specifications, covering OKLCH color palettes, typography, and visual SVG icon maps.\"."
+description: "description: \"Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI.\"."
 resource: "docs/devops/architecture/design-system.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/design-system.mdx"
@@ -23,15 +23,8 @@ Repo path `docs/devops/architecture/design-system.mdx`.
 # Outline
 
 * 🎨 1. OKLCH Color Palette
-  * Dark Mode (Primary Visual Standard)
+  * Dark Mode (Primary)
 * 📐 2. Layout, Borders & Density
-* 🔤 3. Typography & Runtimes
-* 📦 4. SVG Icon Mapping Catalog
-  * A. Rocket Icon (getting-started)
-  * B. Book Icon (guides)
-  * C. Lightbulb Icon (concepts)
-  * D. Book-Open Icon (reference)
-  * E. Target Icon (tutorials)
-  * F. Gear Icon (devops & workers)
-  * G. Home House Icon (home)
+* 🔤 3. Typography
+* 📦 4. Icons
   * 🔗 Next Steps

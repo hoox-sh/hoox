@@ -4,7 +4,8 @@
 -->
 
 ---
-title: "database-ops"
+title: "Database operations"
+description: "Apply the D1 schema, run tracking migrations, query the ledger, and export backups with hoox db."
 ---
 
 # 🗄️ Database Operations
@@ -25,67 +26,55 @@ The database schema defines five fundamental tables designed for trading operati
 | **`trade_signals`** | Historical record of every raw incoming webhook alert before execution processing.                   | ~10,000/mo                 |
 | **`system_logs`**   | Crucial debug and error messages offloaded from compute nodes.                                       | ~5,000/mo                  |
 
-### Schema Details
+Canonical DDL is `workers/trade-worker/schema.sql` (`CREATE TABLE IF NOT EXISTS` — re-applying does not wipe rows). Column names below match that file:
 
 ```sql
--- Core trades ledger
-CREATE TABLE trades (
-  id TEXT PRIMARY KEY,
-  request_id TEXT NOT NULL,
-  exchange TEXT NOT NULL,           -- 'bybit', 'binance', 'mexc'
+CREATE TABLE IF NOT EXISTS trade_signals (
+  signal_id TEXT PRIMARY KEY,
+  timestamp INTEGER NOT NULL,
   symbol TEXT NOT NULL,
-  action TEXT NOT NULL,             -- 'LONG', 'SHORT', 'CLOSE'
-  side TEXT NOT NULL,               -- 'BUY' or 'SELL'
-  quantity REAL NOT NULL,
-  price REAL NOT NULL,
-  leverage INTEGER DEFAULT 1,
-  fee REAL NOT NULL DEFAULT 0,
-  order_id TEXT NOT NULL,
-  status TEXT NOT NULL,             -- 'Filled', 'Rejected', 'Failed', 'Partial'
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  signal_type TEXT NOT NULL,
+  source TEXT,
+  raw_data TEXT,
+  tenant_id TEXT NOT NULL DEFAULT '',
+  processed_at INTEGER DEFAULT (unixepoch())
 );
 
--- Active positions tracking
-CREATE TABLE positions (
+CREATE TABLE IF NOT EXISTS trades (
   id TEXT PRIMARY KEY,
-  symbol TEXT NOT NULL UNIQUE,
-  side TEXT NOT NULL,
-  quantity REAL NOT NULL,
-  entry_price REAL NOT NULL,
-  mark_price REAL DEFAULT 0,
-  leverage INTEGER DEFAULT 1,
-  unrealized_pnl REAL DEFAULT 0,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  signal_id TEXT,
+  timestamp INTEGER NOT NULL,
+  exchange TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  action TEXT NOT NULL,             -- LONG / SHORT / CLOSE_LONG / CLOSE_SHORT
+  quantity REAL,
+  price REAL,
+  leverage INTEGER,
+  status TEXT NOT NULL,             -- EXECUTED / TEST_EXECUTED / FAILED / PENDING
+  error_message TEXT,
+  raw_response TEXT,
+  tenant_id TEXT NOT NULL DEFAULT '',
+  created_at INTEGER DEFAULT (unixepoch())
 );
 
--- Account balance snapshots
-CREATE TABLE balances (
+CREATE TABLE IF NOT EXISTS positions (
   id TEXT PRIMARY KEY,
-  total_balance REAL NOT NULL,
-  available_balance REAL NOT NULL,
-  unrealized_pnl REAL DEFAULT 0,
-  snapshot_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Incoming signal audit trail
-CREATE TABLE trade_signals (
-  id TEXT PRIMARY KEY,
-  raw_payload TEXT NOT NULL,
-  parsed_symbol TEXT,
-  parsed_action TEXT,
-  received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- System diagnostic logs
-CREATE TABLE system_logs (
-  id TEXT PRIMARY KEY,
-  level TEXT NOT NULL,              -- 'info', 'warn', 'error'
-  source TEXT NOT NULL,             -- Worker name
-  message TEXT NOT NULL,
-  metadata TEXT,                    -- JSON blob of additional context
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  exchange TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  side TEXT NOT NULL,               -- LONG or SHORT
+  entry_price REAL,
+  mark_price REAL,
+  liquidation_price REAL,
+  leverage INTEGER,
+  size REAL,
+  unrealized_pnl REAL,
+  status TEXT NOT NULL,             -- OPEN or CLOSED
+  tenant_id TEXT NOT NULL DEFAULT '',
+  updated_at INTEGER DEFAULT (unixepoch())
 );
 ```
+
+`tenant_id` is present for **opt-in tenant isolation** (off by default). Existing single-tenant rows stay at `''`.
 
 ---
 
@@ -100,23 +89,9 @@ hoox db apply
 hoox db apply --remote
 ```
 
-### Migration Files Location
-
-Migrations are stored in `workers/d1-worker/src/drizzle/` and are automatically versioned:
-
-```text
-workers/d1-worker/src/drizzle/
-├── 0001_initial_schema.sql
-├── 0002_add_leverage_column.sql
-├── 0003_balances_snapshot_table.sql
-└── meta/
-    └── snapshot.json
-```
-
 <Warning>
-  Running `hoox db apply` compiles migrations and seeds the database locally.
-  For production deployment, you **must** append the `--remote` flag to execute
-  operations directly on your active Cloudflare® D1 instance.
+  Running `hoox db apply` executes `workers/trade-worker/schema.sql` against the
+  **local** D1. For production, append `--remote`.
 </Warning>
 
 ---
@@ -126,36 +101,28 @@ workers/d1-worker/src/drizzle/
 When new features are added that require changes to the database structure, you must run migrations:
 
 ```bash
-# List all applied and pending database migrations in production
-hoox db migrate status --remote
+# Apply tracking migrations (local)
+hoox db migrate
 
-# Apply all pending schema migrations sequentially to production D1
+# Apply tracking migrations on production D1
 hoox db migrate --remote
-
-# Rollback the most recent migration (use with caution)
-hoox db migrate rollback --remote
 ```
 
-The migration engine tracks history inside a special `d1_migrations` table, ensuring that migrations are never executed twice or applied in the wrong sequence.
+There is no `migrate status` or `migrate rollback` subcommand. Export first (`hoox db export --remote`) if you need a restore point.
 
 ### Migration Best Practices
 
 <ol>
   <li>
-    <strong>Always write reversible migrations</strong> — include both{" "}
-    <code>UP</code> and <code>DOWN</code> scripts.
-  </li>
-  <li>
-    <strong>Never modify existing migrations</strong> — create new ones for
-    schema changes.
-  </li>
-  <li>
     <strong>Test locally first</strong> — run <code>hoox db apply</code> without{" "}
     <code>--remote</code> to verify.
   </li>
   <li>
-    <strong>Backup before migrating</strong> — export your production database
-    first.
+    <strong>Backup before migrating</strong> — <code>hoox db export --remote</code>.
+  </li>
+  <li>
+    <strong>Prefer additive DDL</strong> — the shipped schema uses{" "}
+    <code>CREATE TABLE IF NOT EXISTS</code> so re-apply is safe.
   </li>
 </ol>
 
@@ -175,32 +142,24 @@ hoox db query "SELECT COUNT(*) FROM trades" --remote
 # C. Inspect the 5 most recent trade fills with formatting
 hoox db query "SELECT created_at, symbol, action, price, quantity FROM trades ORDER BY created_at DESC LIMIT 5" --remote
 
-# D. Check currently open positions on Bybit
-hoox db query "SELECT symbol, side, size, entry_price FROM positions WHERE size > 0" --remote
+# D. Check currently open positions
+hoox db query "SELECT symbol, side, size, entry_price FROM positions WHERE status = 'OPEN'" --remote
 
-# E. Calculate daily P&L
-hoox db query "SELECT DATE(created_at) as day, SUM(CASE WHEN side='BUY' THEN -price*quantity ELSE price*quantity END) as daily_pnl FROM trades WHERE status='Filled' GROUP BY day ORDER BY day DESC LIMIT 7" --remote
-
-# F. Export trades as CSV
-hoox db query "SELECT * FROM trades ORDER BY created_at DESC" --remote --format csv > trades_export.csv
+# E. Recent fills
+hoox db query "SELECT timestamp, exchange, symbol, action, price, quantity, status FROM trades ORDER BY timestamp DESC LIMIT 7" --remote
 ```
 
 ### Useful Query Templates
 
 ```sql
--- Win rate calculation
-SELECT
-  COUNT(CASE WHEN realized_pnl > 0 THEN 1 END) * 100.0 / COUNT(*) AS win_rate_pct
-FROM trades WHERE status = 'Filled';
-
--- Average trade size by exchange
+-- Average notional by exchange (live fills)
 SELECT exchange, AVG(quantity * price) as avg_trade_size
-FROM trades WHERE status = 'Filled'
+FROM trades WHERE status = 'EXECUTED'
 GROUP BY exchange;
 
--- Hourly trading distribution (for optimal timing)
-SELECT strftime('%H', created_at) as hour, COUNT(*) as trade_count
-FROM trades WHERE status = 'Filled'
+-- Hourly trading distribution
+SELECT strftime('%H', datetime(timestamp, 'unixepoch')) as hour, COUNT(*) as trade_count
+FROM trades WHERE status = 'EXECUTED'
 GROUP BY hour ORDER BY hour;
 ```
 
@@ -267,8 +226,9 @@ hoox db reset --remote --confirm
 If you want to clear data but preserve schema structure:
 
 ```bash
-# Truncate all data tables while keeping schema intact
-hoox db query "DELETE FROM trades; DELETE FROM positions; DELETE FROM balances; DELETE FROM system_logs;" --remote
+# Truncate data tables while keeping schema intact (requires --allow-destructive)
+hoox db query "DELETE FROM trades" --remote --allow-destructive
+hoox db query "DELETE FROM positions" --remote --allow-destructive
 ```
 
 ---

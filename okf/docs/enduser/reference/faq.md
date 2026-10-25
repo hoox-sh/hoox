@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "❓ Frequently Asked Questions (FAQ)"
-description: "Answers to the most common questions about setting up, operating, and troubleshooting the Hoox trading platform."
+description: "description: \"Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.15.x.\"."
 resource: "docs/enduser/reference/faq.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/faq.mdx"
@@ -28,6 +28,7 @@ Repo path `docs/enduser/reference/faq.mdx`.
   * Q: How do I install and bootstrap?
   * Q: Can I use Hoox for free?
   * Q: Do I need to know Solidity or blockchain development?
+  * Q: Can I drive Hoox from an editor / agent?
 * 🔑 Credentials & Secrets
   * Q: Where do I get my Cloudflare® API token?
   * Q: How do I create exchange API keys?
@@ -52,6 +53,7 @@ Repo path `docs/enduser/reference/faq.mdx`.
 * 📦 Infrastructure
   * Q: What data is stored in D1 vs KV vs R2?
   * Q: How does Hoox handle exchange downtime?
+  * Q: Is multi-tenant isolation on by default?
   * Q: Can I use a custom domain?
 * 📋 Comparisons
   * Q: Why edge workers instead of a VPS?

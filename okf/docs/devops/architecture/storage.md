@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/storage.mdx"
@@ -23,8 +23,11 @@ Repo path `docs/devops/architecture/storage.mdx`.
 # Outline
 
 * 1. The Multi-Tier Storage Architecture
-* 🗄️ 2. D1 Relational Engine & Drizzle Schema Specs
-  * Drizzle ORM Schema Standards
-* 📦 3. R2 Log Offloading: SQLite Conservation Strategy
-* 🔑 4. KV Eventual Consistency & Cache Performance
-  * 🔗 Next Steps
+* 2. D1 relational engine and schema.sql
+* 3. R2 log offloading
+* 4. KV eventual consistency
+  * Next steps
+
+# Mentions
+
+* [scripts](/code/scripts.md)

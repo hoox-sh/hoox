@@ -20,28 +20,32 @@ The `analytics-worker` binds directly to Cloudflare’s **Analytics Engine** dat
 {
   "name": "analytics-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-04-17",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
+  "placement": { "mode": "smart" },
   "analytics_engine_datasets": [
     {
       "binding": "ANALYTICS_ENGINE",
       "dataset": "hoox-analytics",
     },
   ],
-  "placement": { "mode": "smart" },
-  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "kv_namespaces": [
+    {
+      "binding": "CONFIG_KV",
+      "id": "<KV_NAMESPACE_ID>",
+    },
+  ],
 }
 ```
 
-> No `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` are in `secrets` — these are set as `vars` in `wrangler.jsonc` and used for the Cloudflare SQL API query path.
+`INTERNAL_KEY_BINDING` is set with `wrangler secret put`. This isolate is **write-only** to Analytics Engine (`writeDataPoint`). The REST SQL query path is not used.
 
 ---
 
 ## 🔑 2. Environmental Variables & Encrypted Secrets
 
-- **`CLOUDFLARE_API_TOKEN`** (var): A secure token with `Account.Analytics` read permissions, allowing the worker to query stored datasets via the Cloudflare SQL API.
-- **`CLOUDFLARE_ACCOUNT_ID`** (var): Your Cloudflare Account ID used in SQL API requests.
+- **`INTERNAL_KEY_BINDING`**: Mesh auth for every `/track/*` route.
 
 ---
 

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🔒 Idempotency & Durable Objects"
-description: "How Hoox uses Cloudflare Durable Objects for at-most-once acceptance at the gateway (two-phase reserve/commit/release) so webhook retries cannot double-dispatch orders during…"
+description: "description: \"Two-phase Durable Object reserve/commit/release so webhook retries cannot double-dispatch orders.\"."
 resource: "docs/enduser/concepts/idempotency.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/idempotency.mdx"

@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/ai-risk-manager.mdx"
@@ -28,5 +28,5 @@ Repo path `docs/enduser/concepts/ai-risk-manager.mdx`.
   * C. Max Daily Drawdown & Global Kill Switch
 * 🤖 2. Multi-Provider AI Gateway & Reasoning
   * A. The Resilient Provider Fallback Chain
-  * B. Custom Telemetry & Chat Endpoints
+  * B. Agent isolate endpoints
   * 🔗 Next Steps

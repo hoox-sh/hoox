@@ -117,13 +117,15 @@ To ensure that **only** TradingView® official servers can fire signals to your 
 2. Click **Create Rule**.
 3. **Rule Name**: `Restrict /webhook to TradingView® IPs`.
 4. **Field**: `URI Path` | **Operator**: `equals` | **Value**: `/webhook`.
-5. **And**: `IP Source Address` | **Operator**: `is not in` | **Value**: (Paste TradingView® official IP ranges here, which are automatically synced by running the `hoox waf configure --TradingView-only` command).
+5. **And**: `IP Source Address` | **Operator**: `is not in` | **Value**: paste TradingView® official IP ranges (keep the list current from TradingView® docs).
 6. **Action**: **Block** (or **Challenge**).
 7. Save. All unauthorized traffic hitting `/webhook` is dropped instantly at the DNS edge, preventing any V8 compute load.
 
 ```bash
-# Automated WAF setup via CLI
-hoox waf configure --TradingView-only
+# CLI helpers for the same zone
+hoox waf status
+hoox waf rules add ip-allowlist <TRADINGVIEW_CIDR>
+hoox waf rules list
 ```
 
 ---

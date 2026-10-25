@@ -20,9 +20,12 @@ The `web3-wallet-worker` does not expose a public URL, communicating internally 
 {
   "name": "web3-wallet-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-19",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
-  "account_id": "debc6545e63bea36be059cbc82d80ec8",
+  "account_id": "<CLOUDFLARE_ACCOUNT_ID>",
+  "placement": {
+    "mode": "smart",
+  },
   "vars": {
     "RPC_URL_ETHEREUM": "https://eth.llamarpc.com",
     "RPC_URL_ARBITRUM": "https://arbitrum.llamarpc.com",
@@ -31,19 +34,28 @@ The `web3-wallet-worker` does not expose a public URL, communicating internally 
   "kv_namespaces": [
     {
       "binding": "CONFIG_KV",
-      "id": "c5917667a21745e390ff969f32b1847d",
+      "id": "<KV_NAMESPACE_ID>",
+    },
+    {
+      "binding": "WALLET_CONFIG_KV",
+      "id": "<KV_NAMESPACE_ID>",
     },
   ],
-  "secrets": [
-    "INTERNAL_KEY_BINDING",
-    "WALLET_EXECUTE_KEY_BINDING",
-    "WALLET_MNEMONIC_SECRET",
-    "WALLET_PK_SECRET",
-    "SOLANA_PRIVATE_KEY",
-    "JUPITER_API_KEY",
+  "d1_databases": [
+    {
+      "binding": "TRANSACTIONS_DB",
+      "database_id": "<D1_DATABASE_ID>",
+      "database_name": "web3-wallet-transactions",
+    },
+  ],
+  "services": [
+    { "binding": "TELEGRAM_SERVICE", "service": "telegram-worker" },
+    { "binding": "ANALYTICS_SERVICE", "service": "analytics-worker" },
   ],
 }
 ```
+
+Secrets (`INTERNAL_KEY_BINDING`, `WALLET_EXECUTE_KEY_BINDING`, `WALLET_MNEMONIC_SECRET`, `WALLET_PK_SECRET`, `SOLANA_PRIVATE_KEY`, `JUPITER_API_KEY`) are set with `wrangler secret put`. The isolate has **no public URL**. Operators use the gateway [`/wallet/*` proxy](/docs/devops/workers/hoox); **trade-worker** calls `POST /swap` over `WEB3_WALLET_SERVICE`.
 
 ---
 
@@ -136,7 +148,7 @@ Operator guide: [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
 
 ### B. Query Token Balance
 
-- **Endpoint**: `GET /balance?chain=polygon&address=0x…&token=0x…`
+- **Endpoint**: `GET /balance?chain=ethereum&address=0x…&token=0x…`
 - **Headers**: `X-Internal-Auth-Key: <INTERNAL_KEY_BINDING>`
 - **Success Response (200 OK)**:
   ```json

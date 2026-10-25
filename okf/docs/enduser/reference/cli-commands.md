@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cli-commands.mdx"
-description: "description: \"Comprehensive CLI directory detailing ~30 command groups, 60+ subcommands, global flags, and positional options for the hoox binary.\"."
+description: "description: \"Command tree, flags, and examples for the hoox CLI (0.15.0).\"."
 resource: "docs/enduser/reference/cli-commands.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/cli-commands.mdx"
@@ -31,13 +31,12 @@ Repo path `docs/enduser/reference/cli-commands.mdx`.
   * C. Edge Provisioning & Deployment
   * D. Health Checks & Monitoring
   * E. Secrets & Keys Management
-  * F. Database Administration
-  * G. Performance Measurement
-  * H. Self-Healing & Diagnostics
-* Historical: v0.9.0 Output Polish
-  * New output primitives
-  * Visual changes (visible in every command)
-* Historical: v0.8.0 Refactor
-  * New commands (introduced in v0.8.0; still current)
-  * Removed commands (use the replacement)
+  * F. Workers catalog
+  * G. Database Administration
+  * H. PYNE (pyne-worker)
+  * I. TUI
+  * J. Update (git, not npm)
+  * K. Performance Measurement
+  * L. Self-Healing & Diagnostics
+* Older releases
   * 🔗 Next Steps

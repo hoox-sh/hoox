@@ -12,10 +12,12 @@ description: "Stub — the canonical Cloudflare Workers bindings registry lives 
 
 In Cloudflare's serverless architecture, **bindings** represent the declarative bridges linking your isolate compute logic to other internal microservices and storage platforms. This page intentionally keeps only the high-level architectural framing; the canonical registry — every Service Binding, KV, R2, D1, Workers AI, Vectorize, Queue, Durable Object, and Browser Rendering entry — lives in **[`docs/devops/bindings`](/docs/devops/bindings)** and is the single source of truth.
 
+Copy `account_id`, KV namespace IDs, and D1 database IDs from **your** Wrangler account — never paste live IDs from another install. Use `"<CLOUDFLARE_ACCOUNT_ID>"` and `"<KV_NAMESPACE_ID>"` in examples.
+
 > **Tip:** Adding new bindings to your workers? Always update your `wrangler.jsonc` manifest at the workspace root, and then execute `hoox deploy update-internal-urls` to sync bindings and URLs globally!
 
 ### 🔗 Next Steps
 
 - **[Canonical Bindings Reference](/docs/devops/bindings)** — Complete, up-to-date bindings table (service bindings, KV, R2, D1, AI, Vectorize, queues, DOs).
-- **[Storage & SQLite DDL](/docs/devops/architecture/storage)** — Drizzle schemas, R2 bucket configurations, and database rules.
+- **[Storage & SQLite DDL](/docs/devops/architecture/storage)** — `schema.sql`, R2 bucket configurations, and database rules.
 - **[Production Deployments](/docs/devops/deployment/production)** — How Wrangler compiles and maps these bindings to the live edge.

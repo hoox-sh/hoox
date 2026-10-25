@@ -5,42 +5,47 @@
 
 ---
 title: "API Endpoint Specification"
-description: "Complete REST API reference for the Hoox gateway, webhooks, health checks, AI chat streams, and edge error models."
+description: "Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway."
 ---
 
-This document details the public REST API endpoints exposed by the Hoox gateway (`workers/hoox-worker`). These endpoints are used to ingest automated trade signals, register Telegram bots, query AI metrics, and check serverless V8 isolate health status.
+This document details the HTTP routes on the **hoox gateway** (`workers/hoox-worker`). TradingView® and other signal sources hit `/webhook`. Operator tools (TUI, dashboard, CLI health) use Bearer `OPERATOR_API_KEY` on `/v1/*` and `/wallet/*`.
+
+`agent-worker` chat/vision/usage routes are **not** public gateway paths — they stay on that isolate (dashboard / TUI reach them via Service Bindings).
 
 ---
 
-## 🔒 Request Headers & Security Policy
-
-Every public HTTP request submitted to the Hoox gateway must include the following headers:
+## 🔒 Request headers
 
 ```http
 Content-Type: application/json
 Accept: application/json
 ```
 
-### CORS & Origin Policies
+Operator routes also require:
 
-For security, **Cross-Origin Resource Sharing (CORS)** is disabled by default on the `/webhook` route—it only accepts direct server-to-server POST requests (e.g. from TradingView® or custom server scripts).
+```http
+Authorization: Bearer <OPERATOR_API_KEY>
+```
 
-To interact with the dashboard, the gateway verifies active authorization cookies and tokens inside the V8 engine context.
+Optional on webhook and wallet writes: `Idempotency-Key` (max 256 chars). Prefer this over the auto fingerprint when you need cross-minute uniqueness.
+
+**CORS** is disabled on `/webhook` — server-to-server POST only.
 
 ---
 
-## 🎯 1. Ingest Trade Signal Webhook
+## 🎯 1. Ingest trade signal webhook
 
-Receives, validates, and routes trade orders to exchange APIs.
+Receives, validates, and routes trade orders.
 
-- **Endpoint**: `/webhook`
+- **Endpoint**: `/webhook` (also `POST /`)
 - **Method**: `POST`
+- **Auth**: JSON `apiKey` must match `WEBHOOK_API_KEY_BINDING` on the hoox gateway
 
-### Request Payload (JSON Schema)
+### Request payload
 
 ```json
 {
-  "apiKey": "alpha_secure_key_18305",
+  "apiKey": "your-hoox-webhook-passkey",
   "exchange": "bybit",
   "action": "LONG",
   "symbol": "BTCUSDT",
@@ -51,19 +56,30 @@ Receives, validates, and routes trade orders to exchange APIs.
 }
 ```
 
-Optional field **`test`** (`boolean`): when `true`, the trade-worker routes the order to the exchange testnet (Binance Futures / Bybit). MEXC does not support API test trading and returns `TEST_TRADING_UNSUPPORTED`.
+DEX example (`BASE/QUOTE` required; `"test": true` is rejected):
 
-| | Live | Test (`"test": true`) |
-| - | ---- | --------------------- |
-| Host | Production REST / optional WS DO | Testnet REST only |
-| Secrets | `BINANCE_*` / `BYBIT_*` / `MEXC_*` | Prefer `*_TESTNET_*`, else live fallback |
+```json
+{
+  "apiKey": "your-hoox-webhook-passkey",
+  "exchange": "uniswap-ethereum",
+  "action": "LONG",
+  "symbol": "ETH/USDC",
+  "quantity": 100
+}
+```
+
+| Field | Live | Test (`"test": true`) |
+| ----- | ---- | --------------------- |
+| Host | Production REST | Testnet REST (Binance / Bybit only) |
+| Secrets | `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING` | Prefer `EXCHANGE_TESTNET_*`, else live fallback |
 | D1 | `EXECUTED` · normal position id | `TEST_EXECUTED` · `*-testnet-*` id |
+| DEX | ExactIn swap via `web3-wallet-worker` | `400 TEST_TRADING_UNSUPPORTED` |
 
-Full setup: [Test Trading](/docs/enduser/guides/test-trading).
+`exchange`: `binance`, `bybit`, `mexc`, `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`. Full field table: [Signals & trades](/docs/enduser/concepts/signals-and-trades). Testnet: [Test Trading](/docs/enduser/guides/test-trading). DEX: [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
 
-### Response Models
+### Response models
 
-#### A. Success Path (Order Filled Instantly - 200 OK)
+#### A. Success (200 OK)
 
 ```json
 {
@@ -82,9 +98,9 @@ Full setup: [Test Trading](/docs/enduser/guides/test-trading).
 }
 ```
 
-#### B. Queue Failover Path (Exchange Offline / Rate-limited - 202 Accepted)
+#### B. Queue failover (202 Accepted)
 
-If the exchange is down, the signal is enqueued for guaranteed asynchronous delivery.
+If the exchange is down and `webhook:queue_mode` is `queue_failover` or `queue_everywhere`, the signal is enqueued.
 
 ```json
 {
@@ -97,81 +113,75 @@ If the exchange is down, the signal is enqueued for guaranteed asynchronous deli
 
 ---
 
-## 🟢 2. System Health Check
+## 🟢 2. System health check
 
-Probes the gateway isolate, validating connections to D1 databases and CONFIG_KV caches.
+Liveness probe. No auth. Reports binding **presence**, not a KV round-trip.
 
 - **Endpoint**: `/health`
 - **Method**: `GET`
 
-### Success Response (200 OK)
-
-```json
-{
-  "status": "ok",
-  "timestamp": 1779261050000,
-  "bindings": {
-    "d1": "connected",
-    "kv": "connected",
-    "queue": "active"
-  }
-}
-```
-
----
-
-## 🤖 3. Conversational AI Chat & Telemetry
-
-Integrates with the `agent-worker` Multi-Provider AI Gateway.
-
-### A. Conversational Chat Stream
-
-- **Endpoint**: `/agent/chat`
-- **Method**: `POST`
-- **Headers**: `Accept: text/event-stream` (Supports Server-Sent Events)
-
-#### Request Payload
-
-```json
-{
-  "prompt": "Evaluate my trade performance over the last 24 hours.",
-  "stream": true,
-  "provider": "anthropic"
-}
-```
-
----
-
-### B. AI Gateway Telemetry
-
-- **Endpoint**: `/agent/usage`
-- **Method**: `GET`
-
-#### Response Payload (200 OK)
-
 ```json
 {
   "success": true,
+  "status": "ok",
   "timestamp": 1779261050000,
-  "usage": {
-    "openai": { "inputTokens": 45180, "outputTokens": 8920, "costUSD": 0.183 },
-    "anthropic": {
-      "inputTokens": 18240,
-      "outputTokens": 4010,
-      "costUSD": 0.081
-    },
-    "workersAi": { "neuronsUsed": 842000, "costUSD": 0.0 }
+  "service": "hoox",
+  "bindings": {
+    "kv": "configured",
+    "sessions": "configured",
+    "queue": "configured",
+    "trade": "configured",
+    "telegram": "configured",
+    "wallet": "configured",
+    "idempotency": "configured",
+    "rateLimiter": "configured"
   }
 }
 ```
 
+CLI: `hoox check health`.
+
 ---
 
-## 🚨 4. Standard Platform Error Models
+## 🛡️ 3. Operator plane (`/v1/*`)
 
-When an API check fails, the gateway uses the shared `@hoox-sh/hoox-shared` package to return a standardized JSON error format:
+Bearer `OPERATOR_API_KEY`. Fail-closed if the secret is missing.
 
-### A. 400 Bad Request (Payload Validation Failure)
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `GET` | `/v1/health` | Operator liveness (`plane: "operator"`) |
+| `GET` | `/v1/workers` | Minimal gateway self-view |
+| `GET` | `/v1/trades/stream` | SSE trade stream (TUI) |
+| `GET` | `/v1/logs/stream` | SSE log stream (TUI) |
+| `GET` | `/workers` | Legacy alias of `/v1/workers` |
+
+---
+
+## 💱 4. Wallet proxy (`/wallet/*`)
+
+Forwards allowlisted paths to `web3-wallet-worker` with operator Bearer auth. The gateway injects mesh `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` / `INTERNAL_KEY_BINDING`). `Idempotency-Key` is passed through. Unknown paths are not forwarded.
+
+| Method | Gateway path | Upstream |
+| ------ | ------------ | -------- |
+| GET/POST/PUT | `/wallet` | `/` |
+| GET/POST/PUT | `/wallet/status` | `/status` |
+| GET/POST/PUT | `/wallet/config` | `/config` |
+| GET/POST/PUT | `/wallet/balance` | `/balance` |
+| GET/POST/PUT | `/wallet/quote` | `/quote` |
+| GET/POST/PUT | `/wallet/swap` | `/swap` |
+| GET/POST/PUT | `/wallet/transfer` | `/transfer` |
+| GET/POST/PUT | `/wallet/approve` | `/approve` |
+| GET/POST/PUT | `/wallet/transactions` | `/transactions` |
+
+Signal-driven DEX swaps still go `POST /webhook` → trade-worker → `WEB3_WALLET_SERVICE` `/swap`. The `/wallet` proxy is the operator surface.
+
+---
+
+## 🚨 5. Standard platform errors
+
+### A. 400 Bad Request
+
+Invalid JSON, missing fields, unsupported `test: true` on MEXC/DEX (`TEST_TRADING_UNSUPPORTED`), or DEX symbol not `BASE/QUOTE`.
 
 ```json
 {
@@ -183,58 +193,56 @@ When an API check fails, the gateway uses the shared `@hoox-sh/hoox-shared` pack
       { "field": "quantity", "issue": "Must be greater than zero." },
       {
         "field": "exchange",
-        "issue": "Invalid exchange router. Options: binance, bybit, mexc."
+        "issue": "Invalid exchange. Options: binance, bybit, mexc, uniswap-ethereum, uniswap-arbitrum, jupiter-solana."
       }
     ]
   }
 }
 ```
 
-### B. 401 Unauthorized (Invalid API Key / IP Address)
+### B. 403 Forbidden (invalid `apiKey` or IP)
 
 ```json
 {
   "success": false,
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Authentication failed. Mismatched apiKey or unauthorized origin IP."
-  }
+  "error": "Forbidden"
 }
 ```
 
-### C. 409 Conflict (Duplicate Request Intercepted)
+IP allowlist rejects return `{ "success": false, "error": "Access denied" }` with `403`.
+
+### C. 409 Conflict (duplicate idempotency key)
 
 ```json
 {
   "success": false,
-  "error": {
-    "code": "DUPLICATE_REQUEST",
-    "message": "Order rejected. Durable Object locked: trace ID already processed in the last 24 hours."
-  }
+  "requestId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+  "error": "Duplicate trade request. This trade was already processed."
 }
 ```
 
-### D. 503 Service Unavailable (Kill Switch Engaged)
+Auto fingerprints include a per-minute time bucket. Prefer a client `idempotencyKey`.
+
+### D. 503 Service Unavailable (kill switch or missing DO)
 
 ```json
 {
   "success": false,
-  "error": {
-    "code": "KILL_SWITCH_ACTIVE",
-    "message": "Trading halted globally. The emergency Global Kill Switch is currently turned ON in CONFIG_KV."
-  }
+  "error": "Trading paused: global kill switch is enabled",
+  "code": "KILL_SWITCH"
 }
 ```
+
+Missing `IDEMPOTENCY_STORE` binding is fail-closed (`503`).
 
 ---
 
 <Tip>
-  Every error code is designed to map directly to a readable prompt in the
-  Telegram bot and Next.js dashboard UI, allowing you to instantly diagnose
-  execution problems.
+  Probe the mesh with `hoox check health`. Tail the gateway with
+  `hoox logs worker hoox`.
 </Tip>
 
 ### 🔗 Next Steps
 
-- [**Request Payload Schemas**](/docs/enduser/reference/payloads) — Analyze the complete JSON request schemas and TypeScript interfaces.
-- [**CLI Commands Reference**](/docs/enduser/reference/cli-commands) — Review all CLI commands, options, and JSON flags.
+- [**Signals & trades**](/docs/enduser/concepts/signals-and-trades) — webhook JSON schema and side mapping.
+- [**CLI Commands Reference**](/docs/enduser/reference/cli-commands) — CLI commands, options, and JSON flags.

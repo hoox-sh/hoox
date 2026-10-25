@@ -22,8 +22,9 @@ X-Internal-Auth-Key: <INTERNAL_KEY_BINDING>
 
 Public webhook and dashboard endpoints use cookie authorization or custom API keys:
 
-- **Webhook Ingestion**: Authenticated using the `apiKey` property inside the JSON payload.
-- **Telegram webhook**: Authenticated via the secure token path: `/telegram/<TELEGRAM_WEBHOOK_SECRET>`.
+- **Webhook ingestion**: Authenticated using the `apiKey` property inside the JSON payload.
+- **Telegram webhook**: Authenticated via the Telegram secret token header plus inbound chat allowlist.
+- **Operator plane** (`/v1/*`, `/wallet/*`): `Authorization: Bearer <OPERATOR_API_KEY>`. The client env is `HOOX_API_TOKEN`. The gateway injects mesh `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` preferred) when it proxies to `web3-wallet-worker`.
 
 ---
 
@@ -76,15 +77,83 @@ Receives TradingView® alerts or automated cURL signals.
 - **Success Response (200 OK)**:
   ```json
   {
+    "success": true,
     "status": "ok",
     "timestamp": 1779261050000,
+    "service": "hoox",
     "bindings": {
-      "d1": "connected",
-      "kv": "connected",
-      "queue": "active"
+      "kv": "configured",
+      "sessions": "configured",
+      "queue": "configured",
+      "trade": "configured",
+      "telegram": "configured",
+      "wallet": "configured",
+      "idempotency": "configured",
+      "rateLimiter": "configured"
     }
   }
   ```
+
+`GET /health` is unauthenticated. Values are `configured` or `missing` — the probe does not round-trip KV.
+
+---
+
+## Operator management plane (`/v1/*`)
+
+Bearer `OPERATOR_API_KEY` via `requireOperatorAuth`. Prefer a dedicated management hostname (see [Zero Trust](/docs/devops/deployment/zero-trust)).
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `GET` | `/v1/health` | Operator auth + plane probe (`{ plane: "operator", … }`) |
+| `GET` | `/v1/workers` | Minimal worker list |
+| `GET` | `/v1/trades/stream` | SSE trades |
+| `GET` | `/v1/logs/stream` | SSE logs |
+
+Do **not** put operator Bearer on TradingView® `/webhook`.
+
+---
+
+## Wallet operator proxy (`/wallet/*`)
+
+The hoox gateway proxies allowlisted wallet paths to `web3-wallet-worker` (`WEB3_WALLET_SERVICE`). Callers authenticate with the **operator Bearer**; the gateway injects mesh auth. `Idempotency-Key` passes through. JSON bodies may carry an optional `tenantId` when tenant mode is on.
+
+Allowlisted upstream paths (GET, POST, and PUT on each gateway path):
+
+| Gateway path | Upstream | Typical use |
+| ------------ | -------- | ----------- |
+| `/wallet` | `/` | Wallet init / address |
+| `/wallet/status` | `/status` | Address, enabled flag, chains |
+| `/wallet/config` | `/config` | Read or update wallet config |
+| `/wallet/balance` | `/balance` | Native or token balance |
+| `/wallet/transfer` | `/transfer` | Token transfer |
+| `/wallet/approve` | `/approve` | ERC-20 approve |
+| `/wallet/quote` | `/quote` | DEX quote |
+| `/wallet/swap` | `/swap` | DEX swap (Uniswap V3 / Jupiter) |
+| `/wallet/transactions` | `/transactions` | Recent wallet txs |
+
+Any other `/wallet/...` path is not forwarded.
+
+```http
+GET /wallet/status
+Authorization: Bearer <OPERATOR_API_KEY>
+```
+
+```http
+POST /wallet/swap
+Authorization: Bearer <OPERATOR_API_KEY>
+Idempotency-Key: <uuid>
+Content-Type: application/json
+
+{
+  "chain": "arbitrum",
+  "tokenIn": "USDC",
+  "tokenOut": "ETH",
+  "amountIn": "100",
+  "dexVersion": "v3"
+}
+```
+
+Trade signals still go through `POST /webhook` with `exchange` set to `uniswap-ethereum`, `uniswap-arbitrum`, or `jupiter-solana`. See [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
 
 ---
 

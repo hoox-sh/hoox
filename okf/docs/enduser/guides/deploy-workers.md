@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🚀 Deploying to Production"
-description: "Deploying your algorithmic trading ecosystem to Cloudflare®'s production edge requires careful orchestration. Because workers communicate internally using fast-path Service…"
+description: "description: \"Deploy the worker mesh and dashboard with hoox deploy all --auto, then bind Telegram and KV.\"."
 resource: "docs/enduser/guides/deploy-workers.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-10-25T15:19:17Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/deploy-workers.mdx"

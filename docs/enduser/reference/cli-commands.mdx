@@ -5,10 +5,10 @@
 
 ---
 title: "CLI Commands Reference"
-description: "Comprehensive CLI directory detailing ~30 command groups, 60+ subcommands, global flags, and positional options for the hoox binary."
+description: "Command tree, flags, and examples for the hoox CLI (0.15.0)."
 ---
 
-The `@hoox-sh/hoox-cli` tool (**0.13.x**) manages the entire monorepo development, provisioning, deployment, monitoring, and self-healing pipelines. This reference provides the complete command tree, positional arguments, optional flags, and concrete examples for all command groups. The binary is also available as **`hx`**.
+The `@hoox-sh/hoox-cli` tool (**0.15.0**) manages workspace bootstrap, Cloudflare provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
 
 <Frame caption="hoox deploy --help">
   <img src="/docs/images/cli/help-deploy.png" alt="Terminal showing hoox deploy help" />
@@ -20,9 +20,11 @@ The `@hoox-sh/hoox-cli` tool (**0.13.x**) manages the entire monorepo developmen
 
 Per-group stills: [Interface gallery](/docs/enduser/guides/screenshots#cli).
 
-Install: `bun add -g @hoox-sh/hoox-cli`. Recommended bootstrap: `hoox onboard`. Prefer CLI commands over raw Wrangler for day-to-day ops. Agents can run the same commands through the [Hoox MCP server](/docs/devops/mcp).
+Install: `bun add -g @hoox-sh/hoox-cli`. Recommended bootstrap: `hoox onboard`. Prefer CLI commands over raw Wrangler for day-to-day ops. Agents can run the same commands through the [Hoox MCP server](/docs/devops/mcp) (`bun run mcp` from a checkout — the MCP package is private and is not published to npm).
 
-**Current defaults (0.13.x):** ships with mesh security hardening (`@hoox-sh/hoox-shared@1.4.0` + worker submodules) — two-phase gateway idempotency, `RateLimiterStore`, chatId allowlists, named D1 list RPCs, mesh-wide `safeWaitUntil`. CLI surface still includes monorepo auto-detect + remember (run `hx` from any cwd), Linear Rail banner (`◆ H · O · O · X`), quieter `check setup` secrets UX, setup gates, secret sync modes (`--system` / `--required`), `hoox pyne` for **pyne-worker**, operator security plane (`doctor --security`, `tunnel check`). Global UX: `--no-color` / `NO_COLOR` / `TERM=dumb`, completion footers, “did you mean …”, sectioned help. Historical release notes: [v0.9.0](#historical-v090-output-polish) · [v0.8.0](#historical-v080-refactor).
+**0.15.0 surface:** monorepo auto-detect + remember (run `hx` from any cwd), Linear Rail banner (`◆ H · O · O · X`), secret sync modes (`--system` / `--required`), `hoox workers catalog` / `enable` / `disable`, `hoox pyne` for **pyne-worker**, operator security plane (`doctor --security`, `tunnel check`). Global UX: `--json` task-result arrays, `--quiet` (no stdout), `--no-color` / `NO_COLOR` / `TERM=dumb`, completion footers, “did you mean …”, sectioned help.
+
+Older CLI releases (0.8–0.13) are not current. See [`packages/cli/CHANGELOG.md`](https://github.com/hoox-sh/hoox/blob/main/packages/cli/CHANGELOG.md) for history.
 
 ---
 
@@ -68,65 +70,67 @@ These options are registered globally and can be appended to any command:
 
 | Flag         | Description                                                          | Example                         |
 | :----------- | :------------------------------------------------------------------- | :------------------------------ |
-| `--json`     | Outputs machine-parseable JSON format (ideal for script pipelines).  | `hoox check health --json`      |
-| `--quiet`    | Suppresses headers, banners, and interactive prompts.                | `hoox deploy kv-config --quiet` |
+| `--json`     | Machine-parseable JSON. Task-runner commands (`deploy all`, `check setup`, `check health`, …) write a **task-result array** (`title`, `ok`, `ms`, optional `value` / `error` / `details`). | `hoox deploy all --json`        |
+| `--quiet`    | Prints nothing (no headers, tables, or task summary).                | `hoox deploy all --quiet`       |
 | `--no-color` | Disable ANSI color output (also: `NO_COLOR=1` env var, `TERM=dumb`). | `hoox --no-color check health`  |
 | `--help`     | Prints complete parameter and option listings.                       | `hoox infra d1 --help`          |
-| `--version`  | Outputs active CLI package build version.                            | `hoox --version`                |
+| `--version`  | Outputs active CLI package build version (`0.15.0`).                 | `hoox --version`                |
 | `-y, --yes`  | Skip confirmation prompts (where supported).                         | `hoox repair rebuild --yes`     |
 
 ---
 
 ## 🗂️ Command Groups Directory
 
-~30 top-level command groups (including `doctor`, `tunnel`, `pyne`, and the rest below).
+Top-level groups: `init`, `onboard`, `setup`, `clone`, `dev`, `deploy`, `infra`, `config`, `secrets`, `keys`, `check`, `doctor`, `tunnel`, `db`, `monitor`, `workers`, `repair`, `schema`, `update`, `logs`, `test`, `waf`, `dashboard`, `tui`, `agent`, `pyne`, `trace`, `perf`, `disclaimer`, `completion`.
 
 ```text
 hoox                                 Startup: resolve monorepo + chdir. No args: auto-onboard if no wrangler.jsonc; else menu/TUI
 ├── onboard                          One-shot full bootstrap (init + setup) [recommended]
+│                                    aliases: bootstrap, quickstart
 ├── init                             Interactive setup wizard (config only)
+│                                    --self-hosted prints VPS/Docker path and exits (does not write wrangler.jsonc)
 ├── setup                            Auto-bootstrap infrastructure (keys, D1, secrets, dashboard)
 ├── clone [name]                     Clone worker repositories as submodules
 ├── dev                              Local development execution engine
-│   ├── start                        Start all workers (native or Docker)
+│   ├── start [--runtime native|docker]
 │   ├── worker <name>                Start a single worker
 │   └── dashboard                    Start Next.js dashboard dev server
 ├── deploy                           Edge deployment pipelines
-│   ├── all                          Roll out all workers + dashboard in sequence
+│   ├── all                          Workers + dashboard [--env, --rebuild, --auto, --dry-run]
 │   ├── workers                      Deploy all workers only (skip dashboard)
 │   ├── worker <name>                Deploy a single edge worker
-│   ├── dashboard                    Deploy Next.js dashboard via OpenNext
+│   ├── dashboard                    Deploy Next.js dashboard via OpenNext [--rebuild]
 │   ├── telegram-webhook             Register Telegram bot webhook API
 │   ├── update-internal-urls         Bind inter-worker Service Binding URLs
 │   ├── kv-config                    Synchronize KV manifest variables
 │   ├── history <worker>             Show deployment history
-│   └── rollback <worker>            Rollback to a previous version
-├── infra                            Cloudflare resource provisioning IaC
-│   ├── provision                    Auto-provision all required services
+│   └── rollback <worker> [version]  Rollback to a previous version
+├── infra                            Cloudflare resource provisioning
+│   ├── provision [--dry-run]        Auto-provision all required services
 │   ├── d1 [list/create/delete]      Manage D1 databases
 │   ├── kv [list/create/delete]      Manage KV namespaces
 │   ├── r2 [list/create/delete]      Manage R2 object storage buckets
 │   ├── queues [list/create/delete]  Manage Cloudflare Queues
-│   ├── vectorize [create/delete]    Manage vector search indexes
-│   └── analytics [list]             Manage Analytics Engine datasets
+│   ├── vectorize [list/create/delete]  Manage vector search indexes
+│   └── analytics [list/create]      Manage Analytics Engine datasets
 ├── config                           Manage wrangler.jsonc configuration
 │   ├── show                         View current configuration
 │   ├── set <key> <value>            Update a config value
-│   ├── env [init/show/validate/generate-dev-vars]  Manage .env.local build variables
+│   ├── env [init/show/validate/generate-dev-vars]
 │   ├── kv [set/get/list/delete/apply-manifest/manifest]  CONFIG_KV runtime keys
 │   ├── transport [show|set]         Operator transport (public|access|mtls|tunnel)
 │   ├── secrets [list/set/delete/sync]  Cloudflare Worker secrets (legacy location)
 │   └── keys [generate/list]         Internal auth keys (legacy location)
 ├── secrets                          Manage Cloudflare Worker secrets [top-level]
 │   ├── list [worker]                List secrets for a worker
-│   ├── set <worker> <name>          Set a secret
+│   ├── set <worker> <name>          Set a secret (worker required; prompts for value)
 │   ├── delete <worker> <name>       Delete a secret
 │   └── sync [worker] [--system|--required]  Sync .dev.vars → CF (mesh-only with --system)
 ├── keys                             Manage internal auth keys [top-level]
 │   ├── generate                     Generate new keys
 │   └── list                         List existing keys
 ├── check                            Toolchain and route diagnostic suite
-│   ├── prerequisites                Validate local machine tool installs
+│   ├── prerequisites [--tool]       Validate local machine tool installs
 │   ├── setup                        Full system validation (config, infra, secrets, db)
 │   ├── health [--fix]               Probe worker /health endpoints
 │   ├── fix [--dry-run]              Auto-repair common issues
@@ -144,36 +148,46 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 ├── monitor                          Observability and emergency controls
 │   ├── trades [N]                   Aggregate recent filled transactions
 │   ├── logs [worker]                Tail and inspect time-series logs
+│   ├── kill-switch [show/on/off]    Emergency global trading halt
 │   ├── queue-depth                  Audit message counts in queues
 │   ├── backup                       Backup SQL ledger to backups/
-│   ├── kill-switch [show/on/off]    Emergency global trading halt
-│   └── analytics                    Query analytics data from D1
+│   └── analytics [summary/errors]   Query analytics data from D1
 ├── workers                          Per-worker operations
-│   ├── list                         List all workers with status/path/secrets count
+│   ├── list                         List all workers with status/path/catalog membership
+│   ├── catalog                      Canonical worker catalog and default enabled flags
+│   ├── enable <name...>             Enable workers in wrangler.jsonc (seeds from catalog)
+│   ├── disable <name...>            Disable workers in wrangler.jsonc
 │   ├── dev <name>                   Start a worker for local development
 │   └── logs <name>                  Tail logs for a specific worker
 ├── repair                           System diagnostics & self-healing
-│   ├── check                        Run 5-step checklist
+│   ├── check                        Run diagnostics [--install-deps, --no-typecheck]
 │   ├── worker <name>                Rebuild a degraded worker
-│   ├── infra                        Verify and repair missing edge bindings
-│   ├── secrets                      Re-sync hardware secrets
+│   ├── infra [--provision]          Verify and repair missing edge bindings
+│   ├── secrets                      Re-sync hardware secrets (`secrets sync --system`)
 │   ├── kv                           Restore KV manifest defaults
-│   ├── db                           Re-apply Drizzle migrations
+│   ├── db                           Re-apply schema.sql and tracking migrations
 │   └── rebuild                      Full destructive interactive rebuild
 ├── logs                             Real-time Cloudflare Worker log tailing
-│   ├── worker <name>                Tail logs for a specific worker
+│   ├── worker <name>                Tail logs for a specific worker [--no-follow]
 │   └── all                          Tail logs from all enabled workers
 ├── schema                           Validate/generate worker manifests
 │   ├── validate [worker]            Validate worker(s) against canonical manifest
 │   ├── list                         List workers with binding counts
 │   └── generate <worker>            Generate wrangler.jsonc + .dev.vars from manifest
-├── update                           Self-update the CLI or wrangler
+├── update [worker|wrangler]         git pull the repo, a worker submodule, or wrangler
 ├── test                             Run verification pipeline (CI)
-├── waf                              Auto-configure Cloudflare WAF firewall rules
+│   ├── all                          lint → typecheck → unit → integration
+│   ├── unit / integration / worker  Scoped test runs
+│   └── live                         Live Cloudflare service tests (no mocks)
+├── waf                              Cloudflare WAF
+│   ├── status                       Show WAF status
+│   ├── rules [list/add/remove]      Manage firewall rules
+│   └── mode [enable/disable]        Enable or disable WAF
 ├── dashboard                        Unified dashboard operations
 │   ├── dev                          Start the dashboard dev server
 │   └── deploy [--rebuild]           Build and deploy the dashboard
 ├── tui                              Launch the OpenTUI terminal dashboard
+│                                    --fps, --no-mouse, --remote, --api-url, --token, --debug, --allow-insecure
 ├── agent                            AI agent operations and health checks
 │   └── health [--probe]             Provider config check; optional live probes
 ├── pyne                             PYNE edge evaluate (pyne-worker / Pine Script™)
@@ -210,13 +224,18 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 ```bash
 # Recommended: one-shot full bootstrap (collects credentials, provisions, deploys)
 hoox onboard
+# aliases: hoox bootstrap, hoox quickstart
 
 # Non-interactive one-shot
 hoox onboard --token cfut_xxx --account xxx --preset full
 
 # Step-by-step (more control)
 hoox init        # Write wrangler.jsonc, collect integration secrets
-hoox setup       # Mesh keys (incl. WALLET_EXECUTE), Solana seed if missing, D1 schema, secrets, dashboard
+hoox setup       # Mesh keys, D1 schema, secrets, dashboard
+
+# Self-hosted (no Cloudflare): print VPS / Docker path and exit
+# Does not write wrangler.jsonc
+hoox init --self-hosted
 
 # Verify the system
 hoox check setup
@@ -244,11 +263,19 @@ hoox dashboard dev
 ### C. Edge Provisioning & Deployment
 
 ```bash
-# Provision all databases, buckets, and queues on your Cloudflare® account
+# Provision all databases, buckets, and queues on your Cloudflare account
 hoox infra provision
+hoox infra provision --dry-run
 
-# Deploy the entire microservices stack in sequence, automatically updating URLs
+# Deploy the entire microservices stack in sequence
 hoox deploy all --auto
+
+# JSON: task-result array on stdout. Quiet: no stdout.
+hoox deploy all --json
+hoox deploy all --quiet
+
+# Preview without executing
+hoox deploy all --dry-run
 
 # Deploy a single worker
 hoox deploy worker trade-worker
@@ -268,25 +295,31 @@ hoox check health
 # Try to auto-fix any issues found
 hoox check health --fix
 
+# Auto-repair common local issues (preview first)
+hoox check fix --dry-run
+hoox check fix
+
 # Audit active trade history table
 hoox monitor trades 25
 
-# Emergency Halt: halt all trade signals globally in under 10 seconds
+# Emergency Halt: halt all trade signals globally
+hoox monitor kill-switch show
 hoox monitor kill-switch on
+hoox monitor kill-switch off
+
+hoox monitor queue-depth
+hoox monitor analytics summary
+hoox monitor analytics errors --hours 24
 ```
 
 ### E. Secrets & Keys Management
 
-```bash
-# Set a Cloudflare® Worker secret (live exchange keys)
-hoox secrets set trade-worker BINANCE_KEY_BINDING "your_key_here"
-hoox secrets set trade-worker BINANCE_SECRET_BINDING "your_secret_here"
+Canonical trade-worker exchange secrets are **`EXCHANGE_KEY_BINDING`** and **`EXCHANGE_SECRET_BINDING`**. `hoox secrets set` requires the worker name and prompts for the value (hidden stdin). There is no third positional argument.
 
-# Optional: dedicated testnet keys for "test": true webhooks
-hoox secrets set trade-worker BINANCE_TESTNET_KEY_BINDING "your_testnet_key"
-hoox secrets set trade-worker BINANCE_TESTNET_SECRET_BINDING "your_testnet_secret"
-hoox secrets set trade-worker BYBIT_TESTNET_KEY_BINDING "your_testnet_key"
-hoox secrets set trade-worker BYBIT_TESTNET_SECRET_BINDING "your_testnet_secret"
+```bash
+# Set a Cloudflare Worker secret (live exchange keys)
+hoox secrets set trade-worker EXCHANGE_KEY_BINDING
+hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
 
 # List secrets for a worker
 hoox secrets list trade-worker
@@ -306,14 +339,71 @@ hoox keys generate
 hoox keys list
 ```
 
-### F. Database Administration
+### F. Workers catalog
+
+The shared worker catalog is the source of known isolates and default enabled flags. `enable` / `disable` write `workers.<name>.enabled` in the root `wrangler.jsonc`. Missing catalog workers are seeded on enable.
+
+```bash
+hoox workers list
+hoox workers catalog
+hoox workers enable trade-worker agent-worker
+hoox workers disable web3-wallet-worker email-worker
+hoox workers catalog --json
+```
+
+### G. Database Administration
 
 ```bash
 # Query the total sum of fees paid today across Bybit
 hoox db query "SELECT SUM(fee) FROM trades WHERE created_at >= date('now')" --remote
 ```
 
-### G. Performance Measurement
+### H. PYNE (pyne-worker)
+
+```bash
+hoox pyne health
+hoox pyne run ./strategy.pine --mode auto
+hoox pyne scripts list
+hoox pyne scripts get <id>
+hoox pyne scripts deploy ./strategy.pine --id my-strategy
+hoox pyne scripts delete <id>
+hoox pyne cron jobs
+hoox pyne cron run
+hoox pyne feed refresh
+hoox pyne ingest -- --symbol BTCUSDT --timeframe 1d
+hoox pyne sync-vendor && hoox pyne deploy
+```
+
+Auth: `--api-key`, `PYNE_API_KEY` / `API_KEY`, or `workers/pyne-worker/.dev.vars`.
+URL: `--url`, `PYNE_WORKER_URL`, or `https://pyne-worker.<subdomain_prefix>.workers.dev`.
+
+### I. TUI
+
+```bash
+hoox tui
+hoox tui --fps 30 --no-mouse
+hoox tui --remote --token "$HOOX_API_TOKEN"
+hoox tui --api-url https://mgmt.example.com --token "$HOOX_API_TOKEN"
+hoox tui --debug
+# Escape hatch (not recommended):
+hoox tui --remote --allow-insecure
+```
+
+Remote mode requires Bearer (`--token` / `HOOX_API_TOKEN`), Cloudflare Access service-token env, or `--allow-insecure`.
+
+### J. Update (git, not npm)
+
+`hoox update` pulls git. It does **not** self-update the CLI from npm.
+
+```bash
+hoox update              # git pull of the main repo
+hoox update d1-worker    # update that worker's submodule from its remote
+hoox update wrangler     # update wrangler to the latest version
+```
+
+To install a newer CLI: `bun add -g @hoox-sh/hoox-cli`.
+
+### K. Performance Measurement
 
 ```bash
 # Send 50 synthetic probes and report p50/p95/p99 per-hop latency
@@ -326,77 +416,44 @@ hoox perf fastpath tail --duration 60
 hoox perf fastpath report --from 1h
 ```
 
-### H. Self-Healing & Diagnostics
+### L. Self-Healing & Diagnostics
 
 ```bash
 # Run a full workspace system audit
 hoox repair check
+hoox repair check --install-deps --no-typecheck
 
 # Verify worker health (the single source of truth)
 hoox check health
+
+hoox doctor
+hoox doctor --security
+hoox tunnel check
 ```
 
 ---
 
-## Historical: v0.9.0 Output Polish
+## Older releases
 
-> **Historical notes** from the v0.9.0 release (retained for upgrade context). Current CLI is **0.13.x** — Linear Rail is the default banner style; monorepo remember and quieter secrets checks landed later; mesh security hardening ships with 0.13.
+Commands such as `hoox onboard`, top-level `hoox secrets` / `hoox keys`, `hoox perf fastpath`, and `hoox dashboard` landed in 0.8.x. Shared formatters (`--no-color`, “did you mean”, completion footers) landed in 0.9.x. Linear Rail, monorepo remember, and quieter secrets checks landed later. **Current CLI is 0.15.0** — do not treat 0.9 as current.
 
-The v0.9.0 release polished the output framework. **No new commands and no breaking changes** — every command picks up the improvements automatically through the shared formatters. The new primitives are also available to plugin authors via the package's public exports.
+Replacements still in force:
 
-### New output primitives
+- `hoox monitor status` → `hoox check health`
+- `hoox workers status` → `hoox check health`
+- `hoox dashboard update-urls` → `hoox deploy update-internal-urls`
 
-- **`--no-color` global flag** — suppresses all ANSI color output. Also honored: `NO_COLOR=1` env var (https://no-color.org standard) and `TERM=dumb`.
-- **`formatCompletion(message, { durationMs, suggestion })`** — prints a `✓ Done in 1.2s` footer after every successful command, with an optional `→ next: hoox …` suggestion. Wired into the global `program.hook("postAction", ...)`.
-- **"Did you mean" suggestions** — typos like `hoox deplpy` produce `did you mean 'hoox deploy' ?`. Levenshtein distance ≤ 2 against all registered command names.
-- **Custom help formatter** — `hoox --help` and per-command `--help` use a sectioned layout (Usage / Options / Examples / See also) with refined colors.
-- **`formatNumber(n)`** — compact notation (`1.2K`, `1.5M`, `2.5B`) used by `formatTable` number auto-alignment and by `hoox perf fastpath` / `hoox monitor trades` / `hoox trace metrics`.
-- **`formatBytes(n, { binary? })`** — SI (`KB`, `MB`) or binary (`KiB`, `MiB`) units.
-
-### Visual changes (visible in every command)
-
-- **Theme palette** — refined to a modern-minimal aesthetic: zinc/slate text, single indigo-400 accent, de-saturated status colors (emerald/rose/amber/sky). The visual change ripples through every command; information content is unchanged.
-- **Badge style** — `formatBadge()` no longer uses high-contrast background chips; it now renders colored glyph + colored text (Vercel / Linear style).
-- **Spinner** — uses braille dots (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`) instead of plain ASCII (`-\|/`).
-- **`formatTable` options** — supports `zebra`, `alignNumbers`, `colorizeStatus`, `compact` (all default to on, except `compact` which defaults to off). Backward compatible.
-- **`formatError`** — card layout with `[code]` badge and `suggestions` support. JSON output now includes a new `suggestions` field.
-- **Banner default** — later superseded by **Linear Rail** (`◆ H · O · O · X`) as the default compact banner in 0.11.x; version is read dynamically from `package.json`.
-
-See [`packages/cli/CHANGELOG.md`](https://github.com/hoox-sh/hoox/blob/main/packages/cli/CHANGELOG.md) for the full release notes.
-
----
-
-## Historical: v0.8.0 Refactor
-
-> **Historical notes** from the v0.8.0 release. Commands listed here remain current; this section documents when they were introduced.
-
-The v0.8.0 release consolidated and cleaned up the CLI surface. **Pre-1.0 breaking changes were made without deprecation warnings** since this is still active development.
-
-### New commands (introduced in v0.8.0; still current)
-
-- **`hoox onboard`** (aliases: `bootstrap`, `quickstart`) — One-shot full bootstrap that chains `init` + `setup`. The recommended entry point for new users. When you run `hoox` with no arguments and no `wrangler.jsonc` exists, the CLI now auto-launches this.
-- **`hoox secrets`** (top-level) — Promoted from `hoox config secrets` for discoverability.
-- **`hoox keys`** (top-level) — Promoted from `hoox config keys` for discoverability.
-- **`hoox perf fastpath`** — Probe-based latency measurement (active synthetic probes with p50/p95/p99 per-hop breakdown).
-- **`hoox dashboard dev` / `hoox dashboard deploy`** — Unified dashboard operations that were previously split across `hoox dev dashboard` and `hoox deploy dashboard`.
-
-### Removed commands (use the replacement)
-
-- `hoox monitor status` → use `hoox check health` (single source of truth for health checks)
-- `hoox workers status` → use `hoox check health`
-- `hoox dashboard update-urls` → use `hoox deploy update-internal-urls`
-- `hoox config secrets` → use `hoox secrets` (top-level now)
-- `hoox config keys` → use `hoox keys` (top-level now)
+Full notes: [`packages/cli/CHANGELOG.md`](https://github.com/hoox-sh/hoox/blob/main/packages/cli/CHANGELOG.md).
 
 ---
 
 <Tip>
-  Every single subcommand is fully documented locally! Append `--help` to any
-  command (e.g. `hoox config env --help`) to view advanced positional arguments
-  and specific flag options instantly.
+  Every subcommand is documented locally. Append `--help` to any command
+  (e.g. `hoox config env --help`) to view positional arguments and flags.
 </Tip>
 
 ### 🔗 Next Steps
 
 - [**Configuration Dictionary**](/docs/enduser/getting-started/configuration) — Environment variables and CONFIG_KV keys.
 - [**API Endpoint Reference**](/docs/enduser/reference/api-endpoints) — Analyze REST routes, schemas, and gateway error structures.
+- [**Hoox MCP server**](/docs/devops/mcp) — Drive the same command tree from an MCP client.

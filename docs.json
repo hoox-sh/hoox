@@ -293,8 +293,7 @@
                 "pages": [
                   "docs/devops/cli-features",
                   "docs/devops/mcp",
-                  "docs/devops/tui",
-                  "docs/devops/refactoring/workers-pattern-consolidation"
+                  "docs/devops/tui"
                 ]
               }
             ]
