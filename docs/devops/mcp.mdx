@@ -1,0 +1,78 @@
+<!--
+  Copyright (c) 2026 HOOX · jango-blockchained (hoox-sh)
+  SPDX-License-Identifier: CC-BY-4.0
+-->
+
+---
+
+title: "Hoox MCP server"
+description: "Drive every hoox CLI command from an MCP client, with a confirm gate, redaction, snapshot, and next-step advice."
+
+---
+
+`@hoox-sh/hoox-mcp` is a stdio MCP server in `packages/mcp`. It turns the live Commander tree into one tool per runnable command, then adds five operator tools around that surface.
+
+```bash
+bun run mcp
+```
+
+Client config from a Hoox checkout:
+
+```json
+{
+  "mcpServers": {
+    "hoox": {
+      "command": "bun",
+      "args": ["packages/mcp/bin/hoox-mcp.js"]
+    }
+  }
+}
+```
+
+`opencode.jsonc` in this repo already registers that command. The process writes JSON-RPC on stdout and logs on stderr. It requires Bun `>= 1.2`.
+
+## Command tools
+
+A command such as `hoox deploy all` is the tool `hoox_deploy_all`. `hoox monitor kill-switch show` is `hoox_monitor_kill_switch_show`. The server builds an argv array and runs `packages/cli/bin/hoox.js`. It does not pass the command through a shell.
+
+Every call adds `--json` and `--no-color`. `--quiet` is not sent, because it drops the JSON document. A confirmed mutation also adds `--yes`. `db reset` adds `--confirm` at the same time; callers still pass the HMAC as `confirm`.
+
+Use `hoox_catalog` to list paths, risk, and tool names. Use `hoox_describe` for arguments and flags. The same catalog is the resource `hoox://commands`.
+
+## Five operator features
+
+| Tool                             | What it does                                                                                                                        |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `hoox_catalog` / `hoox_describe` | Live Commander catalog. New CLI commands appear without a second list.                                                              |
+| `hoox_plan`                      | Builds argv. Mutations return a confirm token and do not run.                                                                       |
+| redacting runner                 | Every command result strips ANSI, redacts secrets, parses JSON, and includes exit code, duration, and the CLI next-step hint.       |
+| `hoox_snapshot`                  | Read-only bundle: doctor, schema validate, schema list, repair check. `remote: true` adds health, workers, kill switch, and tunnel. |
+| `hoox_advise`                    | Next-step suggestion plus worker names and whether `.dev.vars` exists. File contents are not read.                                  |
+
+## Confirm gate
+
+Read-only commands run immediately. Mutating commands return `confirm_token` and stop. Send the same arguments again with `confirm` set to that token. The token is an HMAC of the argv, the checkout path, and a hash of any stdin payload (Pine script or secret). The secret and the script are not stored in the token. It expires after 10 minutes.
+
+`--dry-run` is treated as a read. `--fix`, `--fix-runtime`, `--install-deps`, `--provision`, and `--allow-destructive` turn a read into a mutation.
+
+`secrets set` and `config secrets set` require `secret_value`. That string is written to the CLI's stdin and is not placed on argv. Newlines are rejected. The CLI keeps one trimmed line, and the confirm token hashes those exact stdin bytes. Tool results redact labeled secrets, common token shapes, and JSON string values or `.env` lines whose names look like secrets or are marked secret in the env catalog. `config kv get` JSON redacts the `value` field.
+
+Set `HOOX_MCP_ALLOW_MUTATIONS=1` only for a trusted local process that should skip the token.
+
+## Refused commands
+
+These need a terminal or they do not exit:
+
+- `hoox tui`
+- `hoox dev start`, `hoox dev worker`, `hoox dev dashboard`
+- `hoox dashboard dev`
+- `hoox workers dev`
+- `hoox workers logs` (use `hoox_logs_worker`, which passes `--no-follow`)
+- `hoox init` and `hoox onboard`, unless both `--token` and `--account` are set
+- `hoox config env init` (it prompts for every variable)
+- `hoox deploy dashboard`, unless `--rebuild` is set
+- `hoox deploy rollback`, unless the version argument is set
+
+`trace live` defaults to `--duration 20` when you omit duration. `logs worker` and `logs all` pass `--no-follow` unless `follow` is true, and a follow call is killed after 20 seconds.
+
+Prompts `triage` and `deploy-checklist` describe a read-only pass and a dry-run deploy. `hoox://policy` is the same rule text.

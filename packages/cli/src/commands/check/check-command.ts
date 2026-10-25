@@ -744,6 +744,9 @@ async function handleHealth(
     const taskResults = await runRichTasks<HealthCheckResult>(tasks, {
       title: `Health-checking ${enabledWorkers.length} worker(s)`,
       format: opts,
+      // JSON mode writes the result array when onSummary is absent.
+      // This command prints the health rows itself.
+      ...(opts.json ? { onSummary: () => {} } : {}),
     });
     for (const r of taskResults) {
       if (r.value) results.push(r.value);

@@ -13,10 +13,33 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-25
+
+Minor: a stdio MCP server over the hoox CLI, and JSON output for deploy task lists.
+
+### Added
+
+- **Hoox MCP server** (`packages/mcp`, private, not published). One MCP tool per runnable `hoox` command, generated from the live Commander tree, plus `hoox_catalog`, `hoox_describe`, `hoox_plan`, `hoox_snapshot`, and `hoox_advise`. Mutating calls return a confirm token and do not run until that token is presented. Secrets go to stdin and are redacted in results. `bun run mcp` starts it. Grok loads `.grok/config.toml`. The OpenCode template is `opencode.jsonc.example` (`opencode.jsonc` stays local).
+- Operator page: `docs/devops/mcp`.
+
+### Changed
+
+- `hoox deploy all --json`, and other `runRichTasks` callers that do not print their own summary, write the task-result array. `--quiet` still prints nothing.
+
 ### Fixed
 
 - **npm no longer refuses to run in this repo (`EOVERRIDE`).** The root `package.json` declared `@cloudflare/workers-types` as a devDependency at `^5.20261001.1` while `overrides` pinned it to `^5.20260708.1`. npm rejects an override that contradicts a direct dependency, which left `npm pack` and `npm install` both dead. Removed the override; the single-version guarantee it existed to provide is already enforced by all 14 `package.json` files specifying the identical range. The `@radix-ui/react-slot` override is untouched — it is a transitive pin with no direct dependency to conflict with.
 - **Removed `brand/email-signatures`.** Unreferenced HTML email signature blocks. Nothing in source, docs, tests, or build referenced the path, so they were dead weight in the published npm tarball. The rest of `brand/` (fonts, png, svg, generators) is untouched.
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.15.0  |
+| `@hoox-sh/hoox-tui`    | 0.3.2   |
+| `@hoox-sh/hoox-shared` | 1.5.0   |
+
+> **Risk note.** The MCP server can run mutating hoox commands after a confirm token. `HOOX_MCP_ALLOW_MUTATIONS` stays off unless a trusted local process sets it.
 
 ## [0.14.0] - 2026-10-13
 

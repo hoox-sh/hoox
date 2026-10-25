@@ -1057,6 +1057,54 @@ describe("registerDeployCommand", () => {
       expect(deployMock).toHaveBeenCalled();
     });
 
+    it("prints task results for deploy all --json", async () => {
+      listEnabledWorkersMock = mock(() => ["d1-worker"]);
+      (
+        ConfigService.prototype as unknown as Record<string, unknown>
+      ).listEnabledWorkers = listEnabledWorkersMock;
+      getWorkerMock = mock(() => ({
+        enabled: true,
+        path: "workers/d1-worker",
+      }));
+      (
+        ConfigService.prototype as unknown as Record<string, unknown>
+      ).getWorker = getWorkerMock;
+
+      (Bun as unknown as Record<string, unknown>).spawn = mock(() => ({
+        stdout: new Blob([
+          "Total Upload: 1 KiB\nhttps://dashboard.hoox.workers.dev\n",
+        ]),
+        stderr: new Blob([""]),
+        exited: Promise.resolve(0),
+        killed: false,
+        kill: mock(() => {}),
+      }));
+
+      let stdout = "";
+      const origWrite = process.stdout.write.bind(process.stdout);
+      process.stdout.write = ((chunk: string | Uint8Array) => {
+        stdout += typeof chunk === "string" ? chunk : chunk.toString();
+        return true;
+      }) as typeof process.stdout.write;
+
+      try {
+        process.exitCode = 0;
+        const program = await createProgram();
+        program.option("--json");
+        await program.parseAsync(["deploy", "all", "--auto", "--json"], {
+          from: "user",
+        });
+        const start = stdout.indexOf('[{"title"');
+        expect(start).toBeGreaterThanOrEqual(0);
+        const parsed = JSON.parse(stdout.slice(start)) as Array<{
+          title?: string;
+        }>;
+        expect(parsed.some((row) => row.title === "d1-worker")).toBe(true);
+      } finally {
+        process.stdout.write = origWrite;
+      }
+    });
+
     it("still deploys dashboard when no workers are enabled", async () => {
       listEnabledWorkersMock = mock(() => []);
       (

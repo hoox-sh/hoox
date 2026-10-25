@@ -1,6 +1,6 @@
 {
   "name": "hoox",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -39,6 +39,7 @@
     "manage": "hoox",
     "hoox": "hoox",
     "hx": "hoox",
+    "mcp": "bun packages/mcp/bin/hoox-mcp.js",
     "lint": "eslint packages/ packages/test-utils/ workers/*/src workers/*/test workers/dashboard/src --no-error-on-unmatched-pattern",
     "lint:fix": "eslint packages/ packages/test-utils/ workers/agent-worker/src workers/agent-worker/test workers/analytics-worker/src workers/analytics-worker/test workers/d1-worker/src workers/d1-worker/test workers/email-worker/src workers/email-worker/test workers/hoox-worker/src workers/hoox-worker/test workers/report-worker/src workers/report-worker/test workers/telegram-worker/src workers/telegram-worker/test workers/trade-worker/src workers/trade-worker/test workers/web3-wallet-worker/src workers/web3-wallet-worker/test workers/dashboard/src --fix --no-error-on-unmatched-pattern",
     "format": "prettier --write .",

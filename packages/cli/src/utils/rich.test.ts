@@ -216,10 +216,9 @@ describe("runRichTasks", () => {
     });
   });
 
-  it("emits zero summary output when --json is set (silent mode)", async () => {
-    // Spy on process.stdout.write to ensure nothing reaches stdout
-    // (clack's log functions go through a different path; what matters
-    // is that our wrapper doesn't emit the title or summary table).
+  it("writes the result array in --json mode and skips the summary table", async () => {
+    // Spy on process.stdout.write. Clack logs use a different path; what
+    // matters is that the wrapper writes JSON and not the title or table.
     const original = process.stdout.write.bind(process.stdout);
     const writeMock = mock((chunk: string | Buffer) => {
       return original(typeof chunk === "string" ? chunk : chunk.toString());
@@ -241,12 +240,38 @@ describe("runRichTasks", () => {
       expect(results[0]?.ok).toBe(true);
       expect(results[1]?.ok).toBe(true);
 
-      // The summary table and the title shouldn't have been written.
       const allCalls = writeMock.mock.calls
         .map((c) => (typeof c[0] === "string" ? c[0] : String(c[0])))
         .join("");
       expect(allCalls).not.toContain("Should-not-appear-in-output");
       expect(allCalls).not.toContain("┌");
+      const parsed = JSON.parse(allCalls) as Array<{
+        title: string;
+        value: number;
+      }>;
+      expect(parsed).toHaveLength(2);
+      expect(parsed[0]?.title).toBe("a");
+      expect(parsed[1]?.value).toBe(2);
+    } finally {
+      process.stdout.write = original;
+    }
+  });
+
+  it("does not write JSON when onSummary owns stdout", async () => {
+    const original = process.stdout.write.bind(process.stdout);
+    const writeMock = mock((chunk: string | Buffer) => {
+      return original(typeof chunk === "string" ? chunk : chunk.toString());
+    });
+    process.stdout.write = writeMock as unknown as typeof process.stdout.write;
+    try {
+      await runRichTasks([{ title: "a", run: async () => 1 }], {
+        format: { json: true },
+        onSummary: () => {},
+      });
+      const allCalls = writeMock.mock.calls
+        .map((c) => (typeof c[0] === "string" ? c[0] : String(c[0])))
+        .join("");
+      expect(allCalls).toBe("");
     } finally {
       process.stdout.write = original;
     }

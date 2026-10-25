@@ -1,0 +1,5 @@
+[mcp_servers.hoox]
+command = "bun"
+args = ["packages/mcp/bin/hoox-mcp.js"]
+enabled = true
+startup_timeout_sec = 60

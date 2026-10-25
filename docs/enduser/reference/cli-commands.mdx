@@ -20,7 +20,7 @@ The `@hoox-sh/hoox-cli` tool (**0.13.x**) manages the entire monorepo developmen
 
 Per-group stills: [Interface gallery](/docs/enduser/guides/screenshots#cli).
 
-Install: `bun add -g @hoox-sh/hoox-cli`. Recommended bootstrap: `hoox onboard`. Prefer CLI commands over raw Wrangler for day-to-day ops.
+Install: `bun add -g @hoox-sh/hoox-cli`. Recommended bootstrap: `hoox onboard`. Prefer CLI commands over raw Wrangler for day-to-day ops. Agents can run the same commands through the [Hoox MCP server](/docs/devops/mcp).
 
 **Current defaults (0.13.x):** ships with mesh security hardening (`@hoox-sh/hoox-shared@1.4.0` + worker submodules) — two-phase gateway idempotency, `RateLimiterStore`, chatId allowlists, named D1 list RPCs, mesh-wide `safeWaitUntil`. CLI surface still includes monorepo auto-detect + remember (run `hx` from any cwd), Linear Rail banner (`◆ H · O · O · X`), quieter `check setup` secrets UX, setup gates, secret sync modes (`--system` / `--required`), `hoox pyne` for **pyne-worker**, operator security plane (`doctor --security`, `tunnel check`). Global UX: `--no-color` / `NO_COLOR` / `TERM=dumb`, completion footers, “did you mean …”, sectioned help. Historical release notes: [v0.9.0](#historical-v090-output-polish) · [v0.8.0](#historical-v080-refactor).
 

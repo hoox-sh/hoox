@@ -5,6 +5,12 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.15.0] — 2026-10-25
+
+### Fixed
+
+- **`deploy all --json` prints the task-result array** instead of an empty success. `--quiet` still prints nothing. Other `runRichTasks` callers that do not supply their own summary get the same JSON document.
+
 ## [0.13.1] — 2026-09-05
 
 ### Fixed

@@ -76,6 +76,8 @@ lerna-debug.log*
 Thumbs.db
 
 config.toml
+# Project MCP server list. Contains no secrets.
+!.grok/config.toml
 TASKPLAN.md
 E2E_TEST_PLAN.md
 test_output.txt

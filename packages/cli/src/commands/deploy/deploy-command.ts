@@ -277,14 +277,18 @@ async function deployAll(
 }
 
 /**
- * Render the default post-deploy summary table: Worker / Status / URL / Size /
- * Duration. Suppressed in --json / --quiet modes by the caller.
+ * Render the post-deploy summary. JSON mode writes the task results so
+ * `--json` is not an empty success. Quiet mode stays silent.
  */
 function renderDeploySummary(
   results: RichTaskResult<DeployResult>[],
   format: FormatOptions
 ): void {
-  if (format.json || format.quiet) return;
+  if (format.json) {
+    process.stdout.write(`${JSON.stringify(results)}\n`);
+    return;
+  }
+  if (format.quiet) return;
   const rows = results.map((r) => {
     const d = r.value;
     return {

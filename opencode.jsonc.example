@@ -54,5 +54,10 @@
       "url": "https://mcp.mintlify.com",
       "enabled": true,
     },
+    "hoox": {
+      "type": "local",
+      "command": ["bun", "packages/mcp/bin/hoox-mcp.js"],
+      "enabled": true,
+    },
   },
 }

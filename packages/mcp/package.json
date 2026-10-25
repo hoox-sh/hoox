@@ -1,0 +1,41 @@
+{
+  "name": "@hoox-sh/hoox-mcp",
+  "version": "0.15.0",
+  "description": "MCP server for the Hoox CLI. One tool per command, plus confirm gates, redaction, snapshot, and advise.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "hoox-mcp": "bin/hoox-mcp.js"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun src/main.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "build": "bun build ./src/main.ts --outdir ./dist --target bun"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "commander": "^15.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "bun-types": "^1.4.2",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "bun": ">=1.2"
+  },
+  "license": "Apache-2.0",
+  "author": "jango-blockchained (hoox-sh)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoox-sh/hoox.git",
+    "directory": "packages/mcp"
+  }
+}

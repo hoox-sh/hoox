@@ -33,6 +33,7 @@ Bun workspaces: `packages/*`, `workers/*`, `pages/*`.
 | `packages/cli` | CLI tool (`hoox` commands) | `bin/hoox.js` |
 | `packages/shared` | Shared middleware, types, errors, analytics, D1 schemas | `src/index.ts` (exports: `./middleware`, `./d1`, `./schemas`, `./wizard`, `./stores/*`) |
 | `packages/tui` | OpenTUI terminal dashboard | `src/main.tsx` |
+| `packages/mcp` | MCP server over the `hoox` CLI (`hoox-mcp`) | `src/main.ts` |
 | `workers/hoox-worker` | Public gateway — webhooks, WAF, DO idempotency, dispatch ([repo](https://github.com/hoox-sh/hoox-worker)) | `src/index.ts` |
 | `workers/trade-worker` | Multi-exchange execution (Binance/Bybit/MEXC) ([repo](https://github.com/hoox-sh/trade-worker)) | `src/index.ts` |
 | `workers/agent-worker` | AI risk manager (configurable cron 1–1440 min, kill switch) ([repo](https://github.com/hoox-sh/agent-worker)) | `src/index.ts` |
@@ -70,6 +71,7 @@ bun run build             # build:packages + typecheck
 bun run format            # Prettier
 bun run graph             # regenerate graph.json (~25s, scripts/extract-graph.ts)
 hoox tui                  # launch TUI dashboard
+bun run mcp               # MCP stdio server for every hoox command
 hoox workers deploy       # deploy all workers
 hoox pages deploy         # deploy dashboard (Cloudflare Workers via OpenNext)
 hoox secrets update-cf    # push secrets to Cloudflare

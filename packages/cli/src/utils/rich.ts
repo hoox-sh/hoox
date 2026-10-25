@@ -10,9 +10,11 @@
  * Two execution paths:
  *   - Rich mode  (TTY, no --json/--quiet): uses @clack/prompts `tasks()` for
  *     the animated checklist, then a `formatTable` summary.
- *   - Plain mode (CI, piped, --json, --quiet): one `log.step` per task with
+ *   - Plain mode (CI, piped, --quiet): one `log.step` per task with
  *     timing appended on completion; same final summary table (unless
- *     --json/--quiet, which suppress table output too).
+ *     --quiet, which suppresses the table).
+ *   - JSON mode: no per-task decoration. The result array is written as
+ *     JSON unless the caller supplies `onSummary` (that hook owns stdout).
  *
  * Either way, callers receive a uniform result array and may render their
  * own summary via the `onSummary` hook (or use the built-in default).
@@ -71,9 +73,8 @@ export async function runRichTasks<T = unknown>(
 
   if (tasks.length === 0) return results;
 
-  // Suppress all per-task output when --json is set. We still execute the
-  // tasks (so callers get a complete result array) and still honour
-  // `process.exitCode`, but no decoration reaches stdout.
+  // Per-task lines are noise in JSON mode. The result array is written
+  // below when the caller did not supply onSummary.
   const silent = options.format?.json === true;
 
   if (rich && !silent) {
@@ -202,10 +203,12 @@ export async function runRichTasks<T = unknown>(
     process.exitCode = 1;
   }
 
-  // Summary hook or default table.
+  // Summary hook, JSON document, or default table.
   if (options.onSummary) {
     options.onSummary(results);
-  } else if (!options.format?.json && !options.format?.quiet) {
+  } else if (options.format?.json) {
+    process.stdout.write(`${JSON.stringify(results)}\n`);
+  } else if (!options.format?.quiet) {
     renderDefaultSummary(results);
   }
 
