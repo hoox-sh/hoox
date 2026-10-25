@@ -13,6 +13,10 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+### Fixed
+
+- Pin `@cloudflare/workers-types` to `5.20261001.1`. A fresh install was resolving `5.20261025.1`, and that copy of `ExecutionContext` no longer matched the one `packages/shared` typechecks against.
+
 ## [0.15.0] - 2026-10-25
 
 Minor: a stdio MCP server over the hoox CLI, and JSON output for deploy task lists.

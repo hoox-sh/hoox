@@ -114,6 +114,7 @@
     "url": "https://github.com/hoox-sh/hoox/issues"
   },
   "overrides": {
+    "@cloudflare/workers-types": "5.20261001.1",
     "@radix-ui/react-slot": "^1.2.4"
   },
   "homepage": "https://hoox.sh"
