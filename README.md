@@ -15,6 +15,9 @@ On the direct path, median webhook-to-exchange acknowledgment was **22 ms** (N =
 
 ![HOOX — Distributed by design](brand/png/tagline-distributed-by-design-github-1280x640-br-split-dark.png)
 
+[![HOOX](https://img.shields.io/badge/HOOX-mesh-f38020?style=flat-square)](https://github.com/hoox-sh/hoox)
+[![PYNE](https://img.shields.io/badge/PYNE-engine-3776ab?style=flat-square)](https://github.com/hoox-sh/pyne)
+[![AXIS](https://img.shields.io/badge/AXIS-chart-5a0fc8?style=flat-square)](https://github.com/hoox-sh/axis)
 [![CI](https://img.shields.io/github/actions/workflow/status/hoox-sh/hoox/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/hoox-sh/hoox/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/hoox-sh/hoox/graph/badge.svg)](https://codecov.io/gh/hoox-sh/hoox)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9%2B-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
