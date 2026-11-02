@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { WorkerManifest } from "./types.js";
+import type { WorkerManifest, WorkerTier } from "./types.js";
 
 /**
  * Compute reverse service binding mapping.
@@ -22,6 +22,9 @@ function deriveCalledBy(
         calledBy[svc.service] = callers;
       }
       callers.add(workerName);
+    }
+    for (const incoming of manifest.callers ?? []) {
+      calledBy[workerName]!.add(incoming.worker);
     }
   }
   const result: Record<string, string[]> = {};
@@ -411,6 +414,9 @@ const manifests: Record<string, WorkerManifest> = {
     name: "pyne-worker",
     path: "workers/pyne-worker",
     defaultEnabled: true,
+    tier: "optional",
+    description: "Pine Script™ edge evaluate isolate (Python Worker)",
+    repo: "pyne-worker",
     vars: {
       API_KEY: {
         type: "secret",
@@ -419,6 +425,7 @@ const manifests: Record<string, WorkerManifest> = {
       ALERT_WEBHOOK_URL: {
         type: "secret",
         description: "Default HTTPS webhook for alert()/alertcondition()",
+        optional: true,
       },
       TRADE_WORKER_NAME: {
         type: "plaintext",
@@ -445,6 +452,122 @@ const manifests: Record<string, WorkerManifest> = {
     // Python isolate — auth is X-API-Key, not mesh INTERNAL_KEY middleware
     middleware: [],
     cron: ["* * * * *"],
+    callers: [
+      {
+        worker: "dashboard",
+        binding: "PYNE_SERVICE",
+        description: "PYNE edge evaluate",
+      },
+    ],
+  },
+
+  "pyne-agent-worker": {
+    name: "pyne-agent-worker",
+    path: "workers/pyne-agent-worker",
+    defaultEnabled: false,
+    tier: "optional",
+    description:
+      "NL → PYNE scripts (Workers AI™; optional validate via pyne-worker)",
+    repo: "pyne-agent-worker",
+    vars: {
+      API_KEY: {
+        type: "secret",
+        description: "HTTP auth (X-API-Key / Authorization: Bearer)",
+      },
+      AXIS_MCP_KEY: {
+        type: "secret",
+        description: "AXIS MCP Bearer (falls back to API_KEY)",
+        optional: true,
+      },
+      PYNE_WORKER_API_KEY: {
+        type: "secret",
+        description:
+          "HTTP pyne-worker validate loop (when not using service binding)",
+        optional: true,
+      },
+      PYNE_PRO_API_KEY: {
+        type: "secret",
+        description: "pyn_… Bearer for pynescript.online",
+        optional: true,
+      },
+      HX_ALLOW_SELFHOST: {
+        type: "secret",
+        description: "Fail-open self-host token (set equal to API_KEY)",
+        optional: true,
+      },
+      PYNE_WORKER_URL: {
+        type: "plaintext",
+        description: "HTTP evaluate host when PYNE_SERVICE is unset",
+      },
+      AXIS_MCP_URL: {
+        type: "plaintext",
+        description: "AXIS MCP endpoint",
+        default: "https://worker.axis.hoox.sh/mcp",
+      },
+    },
+    services: [
+      {
+        binding: "PYNE_SERVICE",
+        service: "pyne-worker",
+        description: "Optional /run validate + AST ops",
+        optional: true,
+      },
+    ],
+    callers: [
+      {
+        worker: "dashboard",
+        binding: "PYNE_AGENT_SERVICE",
+        description: "NL → PYNE agent chat",
+      },
+    ],
+    infrastructure: {
+      ai: true,
+      kv: [
+        {
+          binding: "TENANT_KEYS",
+          description: "Live tenant verify cache",
+        },
+      ],
+      vectorize: [{ binding: "VECTORIZE", index: "pyne-agent-kb" }],
+      r2: [
+        {
+          binding: "KB",
+          bucket: "pyne-agent-kb",
+          description: "Knowledge documents",
+        },
+      ],
+      d1: [
+        {
+          binding: "DB",
+          database: "pyne-agent-sessions",
+          description: "Chat session history",
+        },
+      ],
+      durableObjects: [
+        { name: "PyneAgent", className: "PyneAgent" },
+        { name: "PyneMcp", className: "PyneMcp" },
+      ],
+    },
+    middleware: [],
+  },
+
+  /**
+   * Catalog stub — PyneTS currently ships as `@hoox-sh/pynets` (library).
+   * A Worker isolate is planned; formerly known as pine-worker.
+   */
+  "pynets-worker": {
+    name: "pynets-worker",
+    path: "workers/pynets-worker",
+    defaultEnabled: false,
+    tier: "planned",
+    description:
+      "PyneTS Worker isolate (formerly pine-worker). Not shippable yet — use @hoox-sh/pynets.",
+    repo: "pynets-worker",
+    aliases: ["pine-worker"],
+    vars: {},
+    services: [],
+    infrastructure: {},
+    middleware: [],
   },
 
   dashboard: {
@@ -464,6 +587,7 @@ const manifests: Record<string, WorkerManifest> = {
       PYNE_API_KEY: {
         type: "secret",
         description: "Dashboard → pyne-worker X-API-Key (match API_KEY)",
+        optional: true,
       },
     },
     services: [
@@ -481,6 +605,13 @@ const manifests: Record<string, WorkerManifest> = {
         binding: "PYNE_SERVICE",
         service: "pyne-worker",
         description: "PYNE edge evaluate",
+        optional: true,
+      },
+      {
+        binding: "PYNE_AGENT_SERVICE",
+        service: "pyne-agent-worker",
+        description: "NL → PYNE agent chat",
+        optional: true,
       },
     ],
     infrastructure: {
@@ -508,19 +639,91 @@ export interface WorkerCatalogEntry {
   name: string;
   path: string;
   defaultEnabled: boolean;
+  tier: WorkerTier;
+  description?: string;
+  repo?: string;
+  aliases?: string[];
+  /** False for `planned` workers that are not shippable yet. */
+  available: boolean;
+}
+
+function catalogTier(m: WorkerManifest): WorkerTier {
+  return m.tier ?? "core";
 }
 
 /** Full catalog of known workers with default enable flags (sorted by name). */
 export const WORKER_CATALOG: WorkerCatalogEntry[] = WORKER_NAMES.map((name) => {
   const m = manifests[name]!;
+  const tier = catalogTier(m);
   return {
     name: m.name,
     path: m.path,
     defaultEnabled: m.defaultEnabled,
+    tier,
+    description: m.description,
+    repo: m.repo ?? m.name,
+    aliases: m.aliases,
+    available: tier !== "planned",
   };
 });
 
 /** Lookup defaultEnabled for a known worker; undefined if not in catalog. */
 export function getWorkerDefaultEnabled(name: string): boolean | undefined {
-  return manifests[name]?.defaultEnabled;
+  const canonical = resolveCatalogWorkerName(name);
+  return canonical ? manifests[canonical]?.defaultEnabled : undefined;
+}
+
+/** Effective tier (`core` when omitted). Undefined if the name is unknown. */
+export function getWorkerTier(name: string): WorkerTier | undefined {
+  const canonical = resolveCatalogWorkerName(name);
+  if (!canonical) return undefined;
+  return catalogTier(manifests[canonical]!);
+}
+
+/**
+ * Resolve a catalog name or alias (`pine-worker` → `pynets-worker`).
+ * Returns undefined when the input is not in the catalog.
+ */
+export function resolveCatalogWorkerName(input: string): string | undefined {
+  const trimmed = input.trim();
+  if (!trimmed) return undefined;
+  if (manifests[trimmed]) return trimmed;
+  for (const [name, m] of Object.entries(manifests)) {
+    if (m.aliases?.includes(trimmed)) return name;
+  }
+  return undefined;
+}
+
+/** True when the worker is catalogued but not shippable yet. */
+export function isPlannedWorker(name: string): boolean {
+  return getWorkerTier(name) === "planned";
+}
+
+/** Secret names declared on a manifest (`type: "secret"`). */
+export function secretNamesFromManifest(manifest: WorkerManifest): string[] {
+  return Object.entries(manifest.vars)
+    .filter(([, def]) => def.type === "secret")
+    .map(([n]) => n);
+}
+
+/** Required (non-optional) secret names declared on a manifest. */
+export function requiredSecretNamesFromManifest(
+  manifest: WorkerManifest
+): string[] {
+  return Object.entries(manifest.vars)
+    .filter(([, def]) => def.type === "secret" && !def.optional)
+    .map(([n]) => n);
+}
+
+/** Operator-facing explanation for a planned catalog stub. */
+export function plannedWorkerMessage(name: string): string {
+  const canonical = resolveCatalogWorkerName(name) ?? name;
+  const m = manifests[canonical];
+  const former = m?.aliases?.length
+    ? ` (formerly ${m.aliases.join(", ")})`
+    : "";
+  return (
+    m?.description ??
+    `Worker "${canonical}"${former} is catalogued but not shippable yet.`
+  );
 }

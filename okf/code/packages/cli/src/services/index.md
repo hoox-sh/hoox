@@ -15,5 +15,6 @@
 * [packages/cli/src/services/schema](schema.md) - packages/cli/src/services/schema contains index.ts, schema-service.ts.
 * [packages/cli/src/services/secrets](secrets.md) - SecretsService types — secret management for Cloudflare Workers.
 * [packages/cli/src/services/setup](setup.md) - SetupService — reusable core logic for hoox setup.
+* [packages/cli/src/services/stack](stack.md) - Enable optional catalog workers and wire them into the HOOX stack.
 * [packages/cli/src/services/update](update.md) - UpdateService — manages wrangler version updates.
 * [packages/cli/src/services/workspace](workspace.md) - Workspace context — detect monorepo root, remember it, chdir for commands.

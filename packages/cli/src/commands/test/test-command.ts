@@ -28,6 +28,7 @@ import {
 import { startTimer } from "../../utils/timer.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
+import { loadWorkerOrWire } from "../../services/stack/index.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -334,18 +335,16 @@ export function registerTestCommand(program: Command): void {
 
           const configService = new ConfigService();
           await configService.load();
-          const workerConfig = configService.getWorker(name);
+          let workerConfig = configService.getWorker(name);
 
           if (!workerConfig) {
-            formatError(
-              new CLIError(
-                `Worker "${name}" not found in wrangler.jsonc`,
-                ExitCode.INVALID_USAGE
-              ),
-              fmt
-            );
-            process.exitCode = ExitCode.INVALID_USAGE;
-            return;
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            const loaded = await loadWorkerOrWire(configService, name, {
+              format: fmt,
+              yes,
+            });
+            name = loaded.name;
+            workerConfig = loaded.worker;
           }
 
           const workerDir = `${process.cwd()}/${workerConfig.path}`;

@@ -363,7 +363,7 @@ describe("registerCloneCommand", () => {
       const program = buildProgram();
       const output = await captureStdout(program, ["clone", "nonexistent"]);
 
-      expect(output).toContain("not found");
+      expect(output).toMatch(/Unknown worker|not found/i);
     });
 
     it("exits early when worker is already cloned", async () => {

@@ -5,6 +5,17 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.17.0] — 2026-11-02
+
+### Added
+
+- **Optional satellite catalog** (`pyne-worker`, `pyne-agent-worker`) plus planned `pynets-worker` (formerly `pine-worker`). `hoox workers catalog` shows tier / availability.
+- **`hx secrets set pyne-agent-worker API_KEY`** (and clone/deploy/dev/test/repair) prompt to enable and wire the satellite when it is missing from `wrangler.jsonc`, instead of `Worker not found in config`. `--yes` skips the prompt.
+
+### Changed
+
+- Enabling an optional satellite seeds required secrets, wires caller service bindings (dashboard `PYNE_AGENT_SERVICE`), and clones the submodule when the tree is empty.
+
 ## [0.16.0] — 2026-10-25
 
 ### Fixed

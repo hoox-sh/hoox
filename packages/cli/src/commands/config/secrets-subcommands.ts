@@ -32,6 +32,25 @@ import {
   formatSecretFailureDetails,
 } from "../../utils/wrangler-output.js";
 import { serializeEnvLine } from "../../utils/env-file.js";
+import { ensureWorkerInStack } from "../../services/stack/index.js";
+import {
+  WORKER_MANIFESTS,
+  resolveCatalogWorkerName,
+  secretNamesFromManifest,
+  plannedWorkerMessage,
+  isPlannedWorker,
+} from "@hoox-sh/hoox-shared";
+
+function rejectPlannedWorker(name: string): void {
+  if (!isPlannedWorker(name)) return;
+  throw new CLIError(
+    plannedWorkerMessage(name),
+    ExitCode.INVALID_USAGE,
+    undefined,
+    true,
+    "Use pyne-worker or pyne-agent-worker."
+  );
+}
 
 /** Render a structured secret-sync result; set exitCode on failure. */
 export function reportSecretSync(
@@ -243,19 +262,46 @@ EXAMPLES:
           const svc = await SecretsService.create();
 
           if (worker) {
-            const secrets = svc.listSecrets(worker);
+            const canonical = resolveCatalogWorkerName(worker) ?? worker;
+            rejectPlannedWorker(canonical);
+            let secrets = svc.listSecrets(canonical);
+            if (secrets.length === 0 && !svc.getWorkerPath(canonical)) {
+              const manifest = WORKER_MANIFESTS[canonical];
+              if (manifest) {
+                secrets = secretNamesFromManifest(manifest);
+                process.stdout.write(
+                  `${theme.dim(
+                    `"${canonical}" is not in wrangler.jsonc yet (optional satellite). Catalog secrets:`
+                  )}\n`
+                );
+                if (opts.json) {
+                  formatJson(
+                    { worker: canonical, secrets, inConfig: false },
+                    opts
+                  );
+                  return;
+                }
+                for (const s of secrets) {
+                  process.stdout.write(`  ${theme.label("•")} ${s}\n`);
+                }
+                process.stdout.write(
+                  `${theme.dim(`  Enable with: hoox workers enable ${canonical}`)}\n`
+                );
+                return;
+              }
+            }
             if (secrets.length === 0) {
               process.stdout.write(
-                `${theme.dim(`No secrets declared for worker "${worker}".`)}\n`
+                `${theme.dim(`No secrets declared for worker "${canonical}".`)}\n`
               );
               return;
             }
 
             if (opts.json) {
-              formatJson({ worker, secrets }, opts);
+              formatJson({ worker: canonical, secrets }, opts);
             } else {
               process.stdout.write(
-                `${theme.heading(`\nSecrets for ${worker}`)}\n`
+                `${theme.heading(`\nSecrets for ${canonical}`)}\n`
               );
               for (const s of secrets) {
                 process.stdout.write(`  ${theme.label("•")} ${s}\n`);
@@ -304,6 +350,10 @@ ARGUMENTS:
 The command will prompt for the secret value (hidden input).
 It writes to the worker's .dev.vars file and syncs to Cloudflare.
 
+Optional satellites (pyne-worker, pyne-agent-worker) that are missing
+from wrangler.jsonc are offered to enable and wire into the stack.
+Pass --yes to skip that confirmation.
+
 EXAMPLES:
   hoox secrets set trade-worker EXCHANGE_KEY_BINDING
   hoox config secrets set trade-worker EXCHANGE_KEY_BINDING`
@@ -312,13 +362,26 @@ EXAMPLES:
       withErrorHandling(
         async (workerName: string, secretName: string, _, cmd: Command) => {
           const opts = getFormatOptions(cmd);
-          const svc = await SecretsService.create();
-          const declared = svc.listSecrets(workerName);
+          let svc = await SecretsService.create();
+          const canonical = resolveCatalogWorkerName(workerName) ?? workerName;
+          rejectPlannedWorker(canonical);
 
-          if (!declared.includes(secretName) && declared.length > 0) {
+          if (!svc.getWorkerPath(canonical) && !svc.getWorkerPath(workerName)) {
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            await ensureWorkerInStack(canonical, { format: opts, yes });
+            svc = await SecretsService.create();
+          }
+
+          const declared = svc.listSecrets(canonical);
+          const manifestSecrets = WORKER_MANIFESTS[canonical]
+            ? secretNamesFromManifest(WORKER_MANIFESTS[canonical]!)
+            : [];
+          const allowed = declared.length > 0 ? declared : manifestSecrets;
+
+          if (allowed.length > 0 && !allowed.includes(secretName)) {
             throw new CLIError(
-              `Secret "${secretName}" is not declared for worker "${workerName}". ` +
-                `Declared secrets: ${declared.join(", ")}`,
+              `Secret "${secretName}" is not declared for worker "${canonical}". ` +
+                `Declared secrets: ${allowed.join(", ")}`,
               ExitCode.INVALID_USAGE
             );
           }
@@ -332,7 +395,9 @@ EXAMPLES:
           }
 
           const workerPath =
-            svc.getWorkerPath(workerName) ?? `workers/${workerName}`;
+            svc.getWorkerPath(canonical) ??
+            WORKER_MANIFESTS[canonical]?.path ??
+            `workers/${canonical}`;
           const devVarsPath = `${workerPath}/.dev.vars`;
           await updateDevVars(devVarsPath, secretName, value);
 
@@ -343,7 +408,7 @@ EXAMPLES:
 
           const syncSpin = createCliSpinner(opts);
           syncSpin.start("Syncing to Cloudflare...");
-          const result = await svc.syncToCloudflare(workerName);
+          const result = await svc.syncToCloudflare(canonical);
           if (!result.ok) {
             syncSpin.stop(`Sync failed: ${result.error ?? "unknown error"}`);
             formatError(
@@ -352,7 +417,7 @@ EXAMPLES:
                 ExitCode.ERROR,
                 undefined,
                 true,
-                "Check wrangler.jsonc exists and the worker path is correct."
+                `Enable the worker with \`hoox workers enable ${canonical} --yes\`, then re-run.`
               ),
               opts
             );
@@ -406,18 +471,29 @@ EXAMPLES:
       withErrorHandling(
         async (workerName: string, secretName: string, _, cmd: Command) => {
           const opts = getFormatOptions(cmd);
-          const svc = await SecretsService.create();
-          const declared = svc.listSecrets(workerName);
+          let svc = await SecretsService.create();
+          const canonical = resolveCatalogWorkerName(workerName) ?? workerName;
+          rejectPlannedWorker(canonical);
+
+          if (!svc.getWorkerPath(canonical) && !svc.getWorkerPath(workerName)) {
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            await ensureWorkerInStack(canonical, { format: opts, yes });
+            svc = await SecretsService.create();
+          }
+
+          const declared = svc.listSecrets(canonical);
 
           if (!declared.includes(secretName)) {
             throw new CLIError(
-              `Secret "${secretName}" is not declared for worker "${workerName}".`,
+              `Secret "${secretName}" is not declared for worker "${canonical}".`,
               ExitCode.INVALID_USAGE
             );
           }
 
           const workerPath =
-            svc.getWorkerPath(workerName) ?? `workers/${workerName}`;
+            svc.getWorkerPath(canonical) ??
+            WORKER_MANIFESTS[canonical]?.path ??
+            `workers/${canonical}`;
           const { configPath, deployName } =
             await resolveWorkerWranglerConfig(workerPath);
           const deploy = deployName ?? workerName;
@@ -520,12 +596,23 @@ EXAMPLES:
           const systemOnly = Boolean(flagOpts.system || flagOpts.required);
           const syncOpts = { systemOnly };
           const scopeLabel = systemOnly ? "system secret(s)" : "secret(s)";
-          const svc = await SecretsService.create();
+          let svc = await SecretsService.create();
 
           if (workerName) {
+            const canonical =
+              resolveCatalogWorkerName(workerName) ?? workerName;
+            rejectPlannedWorker(canonical);
+            if (
+              !svc.getWorkerPath(canonical) &&
+              !svc.getWorkerPath(workerName)
+            ) {
+              const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+              await ensureWorkerInStack(canonical, { format: opts, yes });
+              svc = await SecretsService.create();
+            }
             const syncSpin = createCliSpinner(opts);
-            syncSpin.start(`Syncing ${scopeLabel} for "${workerName}"...`);
-            const result = await svc.syncToCloudflare(workerName, syncOpts);
+            syncSpin.start(`Syncing ${scopeLabel} for "${canonical}"...`);
+            const result = await svc.syncToCloudflare(canonical, syncOpts);
             if (!result.ok) {
               syncSpin.stop(`Sync failed: ${result.error ?? "unknown error"}`);
               formatError(
@@ -534,7 +621,7 @@ EXAMPLES:
                   ExitCode.ERROR,
                   undefined,
                   true,
-                  "Ensure wrangler.jsonc exists at the monorepo root."
+                  `Enable the worker with \`hoox workers enable ${canonical} --yes\`, then re-run.`
                 ),
                 opts
               );
@@ -544,8 +631,8 @@ EXAMPLES:
             const n = result.value!.synced.length;
             syncSpin.stop(
               result.value!.ok
-                ? `Synced ${n} ${scopeLabel} for "${workerName}"`
-                : `Partial sync for "${workerName}" (${n} ok)`
+                ? `Synced ${n} ${scopeLabel} for "${canonical}"`
+                : `Partial sync for "${canonical}" (${n} ok)`
             );
             reportSecretSync(result.value!, opts, scopeLabel);
           } else {

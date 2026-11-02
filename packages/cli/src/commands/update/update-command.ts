@@ -18,6 +18,7 @@ import {
   isGitRepo,
   isSubmodule,
 } from "../../utils/git.js";
+import { loadWorkerOrWire } from "../../services/stack/index.js";
 
 export function registerUpdateCommand(program: Command): void {
   program
@@ -68,13 +69,16 @@ EXAMPLES:
           if (target) {
             const configService = new ConfigService();
             await configService.load();
-            const worker = configService.getWorker(target);
+            let worker = configService.getWorker(target);
 
             if (!worker) {
-              throw new CLIError(
-                `Unknown worker "${target}" — not found in wrangler.jsonc`,
-                ExitCode.INVALID_USAGE
-              );
+              const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+              const loaded = await loadWorkerOrWire(configService, target, {
+                format: fmt,
+                yes,
+              });
+              target = loaded.name;
+              worker = loaded.worker;
             }
 
             const submodulePath = worker.path;

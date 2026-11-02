@@ -163,9 +163,9 @@ Guides: [Installation](https://docs.hoox.sh/docs/enduser/getting-started/install
 
 | Package                 | Version | Registry |
 | ----------------------- | ------- | -------- |
-| `@hoox-sh/hoox-cli`     | 0.16.0  | npm      |
+| `@hoox-sh/hoox-cli`     | 0.17.0  | npm      |
 | `@hoox-sh/hoox-tui`     | 0.4.0   | npm      |
-| `@hoox-sh/hoox-shared`  | 1.6.0   | npm      |
+| `@hoox-sh/hoox-shared`  | 1.7.0   | npm      |
 | workspace root (`hoox`) | 0.16.0  | private  |
 
 GitHub Releases use the matching [`CHANGELOG.md`](CHANGELOG.md) section.

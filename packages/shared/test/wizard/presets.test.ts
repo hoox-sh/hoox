@@ -70,16 +70,18 @@ describe("INTEGRATIONS", () => {
     expect(keys).toContain("anthropic");
     expect(keys).toContain("google-ai");
     expect(keys).toContain("pyne");
+    expect(keys).toContain("pyne-agent");
   });
 });
 
 describe("BASE_WORKERS", () => {
-  it("includes d1-worker, hoox, agent-worker, analytics-worker, pyne-worker", () => {
+  it("includes d1-worker, hoox, agent-worker, analytics-worker, PYNE satellites", () => {
     expect(Object.keys(BASE_WORKERS)).toContain("d1-worker");
     expect(Object.keys(BASE_WORKERS)).toContain("hoox");
     expect(Object.keys(BASE_WORKERS)).toContain("agent-worker");
     expect(Object.keys(BASE_WORKERS)).toContain("analytics-worker");
     expect(Object.keys(BASE_WORKERS)).toContain("pyne-worker");
+    expect(Object.keys(BASE_WORKERS)).toContain("pyne-agent-worker");
   });
 });
 

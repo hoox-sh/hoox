@@ -313,6 +313,20 @@ export class EnvService {
         hint: "Public base URL for pyne-worker (hoox pyne / dashboard)",
       },
       {
+        name: "AXIS_MCP_KEY",
+        required: false,
+        secret: true,
+        section: "PYNE",
+        hint: "pyne-agent-worker AXIS MCP Bearer (falls back to API_KEY)",
+      },
+      {
+        name: "PYNE_WORKER_API_KEY",
+        required: false,
+        secret: true,
+        section: "PYNE",
+        hint: "pyne-agent-worker HTTP key for pyne-worker validate loop",
+      },
+      {
         name: "DASHBOARD_USER",
         required: true,
         secret: false,
@@ -478,6 +492,11 @@ export class EnvService {
         "REPORT_TELEGRAM_CHAT_ID",
       ],
       "workers/pyne-worker": ["API_KEY", "ALERT_WEBHOOK_URL"],
+      "workers/pyne-agent-worker": [
+        "API_KEY",
+        "AXIS_MCP_KEY",
+        "PYNE_WORKER_API_KEY",
+      ],
       "workers/dashboard": [
         "DASHBOARD_USER",
         "DASHBOARD_PASS",

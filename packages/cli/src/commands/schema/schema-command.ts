@@ -81,6 +81,7 @@ export function registerSchemaCommand(program: Command): void {
             : "\u2014";
           rows.push({
             worker: name,
+            tier: m.tier ?? "core",
             secrets: String(secretCount),
             services: String(svcCount),
             infra: String(infraCount),
@@ -109,6 +110,16 @@ export function registerSchemaCommand(program: Command): void {
             `Known workers: ${svc.getWorkerNames().join(", ") || "(none)"}. Run: hoox schema list`
           );
         }
+        if ((manifest.tier ?? "core") === "planned") {
+          throw new CLIError(
+            manifest.description ??
+              `Worker "${worker}" is catalogued but not shippable yet.`,
+            ExitCode.INVALID_USAGE,
+            undefined,
+            true,
+            "Use pyne-worker or pyne-agent-worker."
+          );
+        }
 
         const wranglerContent = generateWranglerJsonc(manifest);
         const devVarsContent = generateDevVars(manifest);
@@ -121,7 +132,7 @@ export function registerSchemaCommand(program: Command): void {
           return;
         }
 
-        const workersDir = resolve(process.cwd(), "workers", worker);
+        const workersDir = resolve(process.cwd(), manifest.path);
         const wranglerPath = resolve(workersDir, "wrangler.jsonc");
         const devVarsPath = resolve(workersDir, ".dev.vars");
 

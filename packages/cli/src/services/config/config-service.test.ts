@@ -298,6 +298,38 @@ describe("ConfigService", () => {
     ).rejects.toThrow(/Unknown worker/);
   });
 
+  it("setWorkersEnabled seeds required secrets for optional satellites", async () => {
+    const content = JSON.stringify({
+      global: { cloudflare_account_id: "acct" },
+      workers: {
+        "trade-worker": { enabled: true, path: "workers/trade-worker" },
+      },
+    });
+    await writeConfig(tmpDir, content);
+    const path = join(tmpDir, "wrangler.jsonc");
+    const service = new ConfigService(path);
+    await service.load();
+
+    const result = await service.setWorkersEnabled(["pyne-agent-worker"], true);
+    expect(result[0]?.seeded).toBe(true);
+    expect(service.getWorker("pyne-agent-worker")?.enabled).toBe(true);
+    expect(service.getWorker("pyne-agent-worker")?.secrets).toContain(
+      "API_KEY"
+    );
+  });
+
+  it("setWorkersEnabled rejects planned pynets-worker (formerly pine-worker)", async () => {
+    await writeConfig(tmpDir, validConfigJson());
+    const service = new ConfigService(join(tmpDir, "wrangler.jsonc"));
+    await service.load();
+    await expect(
+      service.setWorkersEnabled(["pynets-worker"], true)
+    ).rejects.toThrow(/not shippable|pynets|pine-worker/i);
+    await expect(
+      service.setWorkersEnabled(["pine-worker"], true)
+    ).rejects.toThrow(/not shippable|pynets|pine-worker/i);
+  });
+
   it("listEnabledWorkers() returns empty array when all disabled", async () => {
     const content = JSON.stringify({
       global: { cloudflare_account_id: "abc123" },

@@ -10,7 +10,7 @@ describe("EnvService", () => {
   describe("getDefinitions", () => {
     it("returns all known env var definitions", () => {
       const defs = EnvService.getDefinitions();
-      expect(defs.length).toBe(41);
+      expect(defs.length).toBe(43);
       expect(defs.some((d) => d.name === "CLOUDFLARE_API_TOKEN")).toBe(true);
       expect(defs.some((d) => d.name === "API_KEY")).toBe(true);
       expect(defs.some((d) => d.name === "PYNE_API_KEY")).toBe(true);

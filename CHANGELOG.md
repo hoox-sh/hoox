@@ -13,6 +13,23 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-02
+
+CLI schema upgrade for optional PYNE satellites. `hx secrets set pyne-agent-worker API_KEY` asks to enable and wire the worker instead of `Worker not found in config`.
+
+### Added
+
+- Worker catalog **tiers**: `core`, `optional` (`pyne-worker`, `pyne-agent-worker`), `planned` (`pynets-worker`, formerly `pine-worker`).
+- Enable/secrets/clone/deploy/dev/test/repair prompt to seed `wrangler.jsonc`, clone the submodule, and wire caller bindings (`dashboard.PYNE_AGENT_SERVICE`). `--yes` skips the prompt.
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.17.0  |
+| `@hoox-sh/hoox-tui`    | 0.4.0   |
+| `@hoox-sh/hoox-shared` | 1.7.0   |
+
 ## [0.16.0] - 2026-10-25
 
 Minor: package audit of `shared`, `cli`, and `tui` — correctness, fail-closed setup, JSON-safe CLI output, and TUI Settings that actually drive the shell.
@@ -155,6 +172,7 @@ pass at entitlement scopes.
 Previous release. See the [GitHub release history](https://github.com/hoox-sh/hoox/releases)
 for the 0.13.x line.
 
+[0.17.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.17.0
 [0.16.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.16.0
 [0.15.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.15.0
 [0.14.0]: https://github.com/hoox-sh/hoox/releases/tag/v0.14.0

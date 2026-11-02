@@ -21,8 +21,12 @@
  */
 import { Command } from "commander";
 import { createCliSpinner } from "../../utils/format-mode.js";
-import { ConfigService } from "../../services/config/index.js";
-import { getHooxHome } from "@hoox-sh/hoox-shared";
+import type { ConfigService } from "../../services/config/index.js";
+import { getHooxHome, resolveCatalogWorkerName } from "@hoox-sh/hoox-shared";
+import {
+  createWorkspaceConfigService,
+  ensureWorkerInStack,
+} from "../../services/stack/index.js";
 import { icons } from "../../utils/theme.js";
 import {
   formatSuccess,
@@ -263,7 +267,7 @@ EXAMPLES:
         ) => {
           const fmt = getFormatOptions(cmd);
 
-          const configService = new ConfigService();
+          const configService = createWorkspaceConfigService();
           await configService.load();
 
           const workers = configService.listWorkers();
@@ -419,18 +423,27 @@ EXAMPLES:
           // Mode 3: <name>  —  clone a single worker
           // -------------------------------------------------------------------
           if (name) {
-            const workerConfig = configService.getWorker(name);
-
+            let workerConfig = configService.getWorker(name);
             if (!workerConfig) {
-              formatError(
-                new CLIError(
-                  `Worker "${name}" not found in wrangler.jsonc`,
-                  ExitCode.ERROR
-                ),
-                fmt
-              );
-              process.exitCode = ExitCode.ERROR;
-              return;
+              const canonical = resolveCatalogWorkerName(name) ?? name;
+              const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+              await ensureWorkerInStack(canonical, {
+                format: fmt,
+                yes,
+                config: configService,
+              });
+              await configService.load();
+              workerConfig = configService.getWorker(canonical);
+              if (!workerConfig) {
+                throw new CLIError(
+                  `Worker "${canonical}" could not be wired into wrangler.jsonc.`,
+                  ExitCode.ERROR,
+                  undefined,
+                  true,
+                  `Run \`hoox workers enable ${canonical} --yes\`.`
+                );
+              }
+              name = canonical;
             }
 
             // Adjust path if homeDir is specified

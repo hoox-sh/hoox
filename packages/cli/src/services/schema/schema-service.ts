@@ -48,10 +48,42 @@ export class SchemaService {
       };
     }
 
-    const workersDir = resolve(this.projectRoot, "workers");
     const rootWranglerPath = resolve(this.projectRoot, "wrangler.jsonc");
-    const workerWranglerPath = resolve(workersDir, name, "wrangler.jsonc");
-    const devVarsPath = resolve(workersDir, name, ".dev.vars");
+    const workerWranglerPath = resolve(
+      this.projectRoot,
+      manifest.path,
+      "wrangler.jsonc"
+    );
+    const devVarsPath = resolve(this.projectRoot, manifest.path, ".dev.vars");
+    const tier = manifest.tier ?? "core";
+
+    if (tier === "planned") {
+      return {
+        worker: name,
+        passed: true,
+        errors: [
+          {
+            worker: name,
+            severity: "warning",
+            message: `Planned worker — not shippable yet${manifest.aliases?.length ? ` (formerly ${manifest.aliases.join(", ")})` : ""}`,
+          },
+        ],
+      };
+    }
+
+    if (tier === "optional" && !existsSync(workerWranglerPath)) {
+      return {
+        worker: name,
+        passed: true,
+        errors: [
+          {
+            worker: name,
+            severity: "warning",
+            message: `Optional worker not cloned. Enable with: hoox workers enable ${name}`,
+          },
+        ],
+      };
+    }
 
     const errors: ValidationError[] = [];
 
@@ -77,8 +109,11 @@ export class SchemaService {
           : `Cannot read ${workerWranglerPath}: ${errMessage}`;
       errors.push({
         worker: name,
-        severity: "error",
-        message,
+        severity: isEnoent && tier === "optional" ? "warning" : "error",
+        message:
+          isEnoent && tier === "optional"
+            ? `Optional worker not cloned. Enable with: hoox workers enable ${name}`
+            : message,
       });
     }
 
@@ -116,6 +151,8 @@ export class SchemaService {
   }
 
   validateAll(): SchemaCheckResult[] {
-    return WORKER_NAMES.map((name) => this.validateWorker(name));
+    return WORKER_NAMES.filter(
+      (name) => (WORKER_MANIFESTS[name]?.tier ?? "core") !== "planned"
+    ).map((name) => this.validateWorker(name));
   }
 }

@@ -122,7 +122,9 @@ const ALL_WORKERS = [
 
 /**
  * Tooling isolates outside the mesh auth graph (own auth, not INTERNAL_KEY_BINDING).
- * Still cloned as submodules and verified during setup.
+ * pyne-worker ships as a git submodule and is verified during setup.
+ * pyne-agent-worker is optional — cloned on enable / secrets set, not required
+ * during `hoox setup`.
  */
 const TOOLING_WORKERS = ["pyne-worker"] as const;
 

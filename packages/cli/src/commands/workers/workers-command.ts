@@ -18,8 +18,12 @@
  */
 
 import { Command } from "commander";
-import { WORKER_CATALOG } from "@hoox-sh/hoox-shared";
-import { ConfigService } from "../../services/config/index.js";
+import { WORKER_CATALOG, WORKER_MANIFESTS } from "@hoox-sh/hoox-shared";
+import {
+  cloneWorkerIfMissing,
+  createWorkspaceConfigService,
+  wireCallerBindings,
+} from "../../services/stack/index.js";
 import {
   formatTable,
   formatJson,
@@ -39,7 +43,7 @@ import { CLIError, ExitCode } from "../../utils/errors.js";
  * Respects --json and --quiet flags via FormatOptions.
  */
 async function doListWorkers(fmt: FormatOptions): Promise<void> {
-  const configService = new ConfigService();
+  const configService = createWorkspaceConfigService();
   await configService.load();
 
   const statuses = configService.listWorkerStatuses();
@@ -47,6 +51,7 @@ async function doListWorkers(fmt: FormatOptions): Promise<void> {
   const rows = statuses.map((w) => ({
     Worker: w.name,
     Status: w.enabled ? "enabled" : "disabled",
+    Tier: w.tier ?? "-",
     Default:
       w.defaultEnabled === undefined
         ? "-"
@@ -64,6 +69,8 @@ async function doListWorkers(fmt: FormatOptions): Promise<void> {
         name: w.name,
         enabled: w.enabled,
         defaultEnabled: w.defaultEnabled ?? null,
+        tier: w.tier ?? null,
+        available: w.available,
         path: w.path,
         inConfig: w.inConfig,
         inCatalog: w.inCatalog,
@@ -79,7 +86,9 @@ async function doListWorkers(fmt: FormatOptions): Promise<void> {
 function doCatalog(fmt: FormatOptions): void {
   const rows = WORKER_CATALOG.map((w) => ({
     Worker: w.name,
+    Tier: w.tier,
     Default: w.defaultEnabled ? "enabled" : "disabled",
+    Available: w.available ? "yes" : "planned",
     Path: w.path,
   }));
 
@@ -88,7 +97,11 @@ function doCatalog(fmt: FormatOptions): void {
       WORKER_CATALOG.map((w) => ({
         name: w.name,
         defaultEnabled: w.defaultEnabled,
+        tier: w.tier,
+        available: w.available,
         path: w.path,
+        description: w.description ?? null,
+        aliases: w.aliases ?? [],
       })),
       fmt
     );
@@ -113,7 +126,7 @@ async function doSetEnabled(
     );
   }
 
-  const configService = new ConfigService();
+  const configService = createWorkspaceConfigService();
   await configService.load();
 
   let results: { name: string; enabled: boolean; seeded: boolean }[];
@@ -122,6 +135,17 @@ async function doSetEnabled(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     throw new CLIError(msg, ExitCode.INVALID_USAGE, undefined, true);
+  }
+
+  if (enabled) {
+    for (const r of results) {
+      const manifest = WORKER_MANIFESTS[r.name];
+      if (!manifest) continue;
+      await wireCallerBindings(r.name, fmt);
+      if ((manifest.tier ?? "core") === "optional") {
+        await cloneWorkerIfMissing(r.name, manifest.path, fmt);
+      }
+    }
   }
 
   if (fmt.json) {
@@ -240,7 +264,9 @@ EXAMPLES:
       `Set workers.<name>.enabled = true in the root wrangler.jsonc.
 
 If a worker exists in the catalog but not in config, it is seeded with
-path/secrets from the catalog and enabled.
+path/secrets from the catalog and enabled. Optional satellites
+(pyne-worker, pyne-agent-worker) are cloned and wired into caller
+service bindings. Planned stubs (pynets-worker) cannot be enabled.
 
 ARGUMENTS:
   names    One or more worker names (e.g. trade-worker email-worker)

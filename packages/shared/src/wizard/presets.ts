@@ -50,8 +50,16 @@ export const PRESETS: WorkerPreset[] = [
       "email-worker",
       "web3-wallet-worker",
       "pyne-worker",
+      "pyne-agent-worker",
     ],
-    integrations: ["exchange", "telegram", "openai", "wallet", "pyne"],
+    integrations: [
+      "exchange",
+      "telegram",
+      "openai",
+      "wallet",
+      "pyne",
+      "pyne-agent",
+    ],
   },
 ];
 
@@ -68,6 +76,7 @@ export const WORKER_DEPENDENCIES: Record<string, string[]> = {
   "analytics-worker": ["d1-worker"],
   "web3-wallet-worker": ["d1-worker", "hoox"],
   "pyne-worker": ["trade-worker"],
+  // pyne-agent-worker is standalone; pyne-worker is optional for the validate loop
 };
 
 /**
@@ -181,7 +190,21 @@ export const INTEGRATIONS: IntegratedService[] = [
     workerName: "pyne-worker",
     secrets: {
       API_KEY: "PYNE evaluate API key (X-API-Key)",
+    },
+    optionalSecrets: {
       ALERT_WEBHOOK_URL: "Default alert() webhook URL (optional)",
+    },
+  },
+  {
+    key: "pyne-agent",
+    label: "PYNE Agent (NL → Pine Script)",
+    workerName: "pyne-agent-worker",
+    secrets: {
+      API_KEY: "PYNE Agent HTTP API key (X-API-Key / Bearer)",
+    },
+    optionalSecrets: {
+      AXIS_MCP_KEY: "AXIS MCP Bearer (falls back to API_KEY)",
+      PYNE_WORKER_API_KEY: "pyne-worker API key for HTTP validate loop",
     },
   },
 ];
@@ -209,6 +232,11 @@ export const BASE_WORKERS: Record<
     path: "workers/pyne-worker",
     vars: {},
   },
+  "pyne-agent-worker": {
+    enabled: false,
+    path: "workers/pyne-agent-worker",
+    vars: {},
+  },
 };
 
 /**
@@ -218,4 +246,6 @@ export const BASE_SECRETS: Record<string, string[]> = {
   hoox: ["WEBHOOK_API_KEY_BINDING"],
   "agent-worker": ["AGENT_INTERNAL_KEY", "INTERNAL_KEY_BINDING"],
   "analytics-worker": ["CLOUDFLARE_API_TOKEN"],
+  "pyne-worker": ["API_KEY"],
+  "pyne-agent-worker": ["API_KEY"],
 };

@@ -27,6 +27,7 @@ import {
 } from "../../utils/formatters.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
+import { loadWorkerOrWire } from "../../services/stack/index.js";
 
 /**
  * Injectable filesystem shim for the dashboard presence check.
@@ -80,6 +81,7 @@ PORT ASSIGNMENTS:
   telegram-worker    → 8790
   web3-wallet-worker → 8792
   pyne-worker        → 8799 (Python Workers; prefer host wrangler)
+  pyne-agent-worker  → 8801
   (other workers)    → 8800+
 
 OPTIONS:
@@ -216,6 +218,7 @@ EXAMPLES:
             "telegram-worker": 8790,
             "web3-wallet-worker": 8792,
             "pyne-worker": 8799,
+            "pyne-agent-worker": 8801,
           };
 
           let nextFallbackPort = 8800;
@@ -307,31 +310,15 @@ EXAMPLES:
           const configService = new ConfigService();
           await configService.load();
 
-          // Validate the worker exists in config
-          const worker = configService.getWorker(name);
-          if (!worker) {
-            formatError(
-              new CLIError(
-                `Worker "${name}" not found in wrangler.jsonc.\n` +
-                  `Available workers: ${configService.listWorkers().join(", ")}`,
-                ExitCode.INVALID_USAGE
-              ),
-              fmt
-            );
-            process.exitCode = ExitCode.INVALID_USAGE;
-            return;
-          }
-
-          if (!worker.enabled) {
-            formatError(
-              new CLIError(
-                `Worker "${name}" is disabled. Enable it with the config command first.`,
-                ExitCode.INVALID_USAGE
-              ),
-              fmt
-            );
-            process.exitCode = ExitCode.INVALID_USAGE;
-            return;
+          let worker = configService.getWorker(name);
+          if (!worker?.enabled) {
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            const loaded = await loadWorkerOrWire(configService, name, {
+              format: fmt,
+              yes,
+            });
+            name = loaded.name;
+            worker = loaded.worker;
           }
 
           const port = options.port ?? 8787;

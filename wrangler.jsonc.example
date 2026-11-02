@@ -133,7 +133,7 @@
       "enabled": true,
       "path": "workers/pyne-worker",
       "vars": {},
-      // Tooling isolate (outside mesh INTERNAL_KEY graph).
+      // Optional satellite (outside mesh INTERNAL_KEY graph).
       // API_KEY: X-API-Key for /run and management endpoints.
       // ALERT_WEBHOOK_URL: optional default L2 alert destination.
       "secrets": [
@@ -141,6 +141,20 @@
         "ALERT_WEBHOOK_URL"
       ]
     },
+    "pyne-agent-worker": {
+      "enabled": false,
+      "path": "workers/pyne-agent-worker",
+      "vars": {},
+      // Optional satellite: NL → PYNE (Workers AI). Enable with
+      // `hoox workers enable pyne-agent-worker` (clones + wires
+      // dashboard.PYNE_AGENT_SERVICE).
+      // API_KEY: HTTP auth. AXIS_MCP_KEY / PYNE_WORKER_API_KEY are optional.
+      "secrets": [
+        "API_KEY"
+      ]
+    },
+    // pynets-worker (formerly pine-worker) is catalogued as planned.
+    // PyneTS currently ships as @hoox-sh/pynets — no Worker isolate yet.
     "dashboard": {
       "enabled": true,
       "path": "workers/dashboard",

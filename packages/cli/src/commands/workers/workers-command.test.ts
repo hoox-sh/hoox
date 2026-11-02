@@ -78,6 +78,14 @@ describe("workers enable/disable/catalog", () => {
     expect(parsed.some((w) => w.name === "email-worker")).toBe(true);
     const email = parsed.find((w) => w.name === "email-worker");
     expect(email?.defaultEnabled).toBe(false);
+    const agent = parsed.find((w) => w.name === "pyne-agent-worker") as
+      { name: string; tier?: string; available?: boolean } | undefined;
+    expect(agent?.tier).toBe("optional");
+    expect(agent?.available).toBe(true);
+    const pynets = parsed.find((w) => w.name === "pynets-worker") as
+      { name: string; tier?: string; available?: boolean } | undefined;
+    expect(pynets?.tier).toBe("planned");
+    expect(pynets?.available).toBe(false);
   });
 
   it("disable flips enabled in wrangler.jsonc", async () => {

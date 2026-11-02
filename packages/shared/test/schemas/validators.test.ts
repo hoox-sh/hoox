@@ -69,6 +69,23 @@ describe("validateWranglerJsonc", () => {
     expect(serviceErrors.length).toBeGreaterThan(0);
   });
 
+  it("optional missing service is a warning", () => {
+    const agent = WORKER_MANIFESTS["pyne-agent-worker"]!;
+    const jsonc = JSON.stringify({
+      name: "pyne-agent-worker",
+      vars: {
+        API_KEY: "__SECRET__",
+        PYNE_WORKER_URL: "",
+        AXIS_MCP_URL: "https://worker.axis.hoox.sh/mcp",
+      },
+      services: [],
+    });
+    const errors = validateWranglerJsonc("pyne-agent-worker", agent, jsonc);
+    const missing = errors.filter((e) => e.message.includes("PYNE_SERVICE"));
+    expect(missing[0]?.severity).toBe("warning");
+    expect(errors.filter((e) => e.severity === "error")).toHaveLength(0);
+  });
+
   it("should warn on unexpected service binding", () => {
     const manifest = WORKER_MANIFESTS["telegram-worker"]!;
     const jsonc = JSON.stringify({
@@ -127,6 +144,23 @@ describe("validateRootSecrets", () => {
     });
     const errors = validateRootSecrets("d1-worker", manifest, rootJsonc);
     expect(errors.filter((e) => e.severity === "error")).toHaveLength(0);
+  });
+
+  it("optional secrets missing from root are warnings", () => {
+    const agent = WORKER_MANIFESTS["pyne-agent-worker"]!;
+    const errors = validateRootSecrets(
+      "pyne-agent-worker",
+      agent,
+      JSON.stringify({
+        workers: {
+          "pyne-agent-worker": { secrets: ["API_KEY"] },
+        },
+      })
+    );
+    expect(errors.filter((e) => e.severity === "error")).toHaveLength(0);
+    expect(
+      errors.filter((e) => e.severity === "warning").length
+    ).toBeGreaterThan(0);
   });
 });
 

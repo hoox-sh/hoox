@@ -6,6 +6,39 @@
 import { parse, type ParseError } from "jsonc-parser";
 import type { WorkerManifest, ValidationError } from "./types.js";
 
+/** Secret names that are canonical without a `_BINDING` / `_SECRET` suffix. */
+const EXEMPT_SECRET_NAMES = new Set([
+  "TELEGRAM_SECRET_TOKEN",
+  "TELEGRAM_ALLOWED_CHAT_IDS",
+  "AUTHORIZED_CHAT_IDS",
+  "MAILGUN_API_KEY",
+  "EMAIL_SCAN_SUBJECT",
+  "DASHBOARD_USER",
+  "DASHBOARD_PASS",
+  "SESSION_SECRET",
+  "AGENT_INTERNAL_KEY",
+  "OPENAI_API_KEY",
+  "ANTHROPIC_API_KEY",
+  "GOOGLE_API_KEY",
+  "API_KEY",
+  "ALERT_WEBHOOK_URL",
+  "PYNE_API_KEY",
+  "AXIS_MCP_KEY",
+  "PYNE_WORKER_API_KEY",
+  "PYNE_PRO_API_KEY",
+  "PYNE_LOCAL_API_KEY",
+  "PYNE_CONTAINER_API_KEY",
+  "CUSTOM_MODEL_API_KEY",
+  "HX_ALLOW_SELFHOST",
+]);
+
+function isExemptSecretName(name: string): boolean {
+  if (name.endsWith("_BINDING") || name.endsWith("_SECRET")) return true;
+  if (name.startsWith("CLOUDFLARE_")) return true;
+  if (name.endsWith("_API_KEY") || name === "API_KEY") return true;
+  return EXEMPT_SECRET_NAMES.has(name);
+}
+
 function parseJsoncDocument(content: string): {
   value: unknown;
   errors: ParseError[];
@@ -66,7 +99,7 @@ export function validateWranglerJsonc(
     if (!(name in declaredVars)) {
       errors.push({
         worker: workerName,
-        severity: "error",
+        severity: def.optional ? "warning" : "error",
         message: `Missing var: ${name} (${def.description})`,
         file: "wrangler.jsonc",
       });
@@ -75,24 +108,7 @@ export function validateWranglerJsonc(
 
   // Check naming convention for secret vars
   for (const [name, def] of Object.entries(manifest.vars)) {
-    if (
-      def.type === "secret" &&
-      !name.endsWith("_BINDING") &&
-      !name.endsWith("_SECRET") &&
-      !name.startsWith("CLOUDFLARE_") &&
-      name !== "TELEGRAM_SECRET_TOKEN" &&
-      name !== "TELEGRAM_ALLOWED_CHAT_IDS" &&
-      name !== "AUTHORIZED_CHAT_IDS" &&
-      name !== "MAILGUN_API_KEY" &&
-      name !== "EMAIL_SCAN_SUBJECT" &&
-      name !== "DASHBOARD_USER" &&
-      name !== "DASHBOARD_PASS" &&
-      name !== "SESSION_SECRET" &&
-      name !== "AGENT_INTERNAL_KEY" &&
-      name !== "OPENAI_API_KEY" &&
-      name !== "ANTHROPIC_API_KEY" &&
-      name !== "GOOGLE_API_KEY"
-    ) {
+    if (def.type === "secret" && !isExemptSecretName(name)) {
       errors.push({
         worker: workerName,
         severity: "warning",
@@ -112,17 +128,18 @@ export function validateWranglerJsonc(
       const declared = declaredServices.find(
         (s) => s.binding === expected.binding
       );
+      const severity = expected.optional ? "warning" : "error";
       if (declared) {
         errors.push({
           worker: workerName,
-          severity: "error",
+          severity,
           message: `Service "${expected.binding}" points to "${declared.service}" but manifest expects "${expected.service}"`,
           file: "wrangler.jsonc",
         });
       } else {
         errors.push({
           worker: workerName,
-          severity: "error",
+          severity,
           message: `Missing service binding: ${expected.binding} -> ${expected.service}`,
           file: "wrangler.jsonc",
         });
@@ -181,15 +198,15 @@ export function validateRootSecrets(
   const rootWrangler = parsed as ParsedRootWrangler;
   const rootSecrets: string[] =
     rootWrangler.workers?.[workerName]?.secrets ?? [];
-  const expectedSecrets = Object.entries(manifest.vars)
-    .filter(([_, def]) => def.type === "secret")
-    .map(([name]) => name);
+  const expectedSecrets = Object.entries(manifest.vars).filter(
+    ([, def]) => def.type === "secret"
+  );
 
-  for (const expected of expectedSecrets) {
+  for (const [expected, def] of expectedSecrets) {
     if (!rootSecrets.includes(expected)) {
       errors.push({
         worker: workerName,
-        severity: "error",
+        severity: def.optional ? "warning" : "error",
         message: `Secret "${expected}" missing from root wrangler.jsonc workers.${workerName}.secrets`,
         file: "wrangler.jsonc (root)",
       });
@@ -227,7 +244,7 @@ export function validateDevVars(
     if (!vars.has(name)) {
       errors.push({
         worker: workerName,
-        severity: "error",
+        severity: def.optional ? "warning" : "error",
         message: `Missing "${name}" in .dev.vars`,
         file: ".dev.vars",
       });

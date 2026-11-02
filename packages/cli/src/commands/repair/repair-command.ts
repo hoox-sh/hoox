@@ -19,6 +19,7 @@ import {
 } from "../../utils/formatters.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
+import { loadWorkerOrWire } from "../../services/stack/index.js";
 
 async function handleCheck(
   fmt: FormatOptions,
@@ -66,19 +67,23 @@ async function handleCheck(
   }
 }
 
-async function handleWorker(name: string, fmt: FormatOptions): Promise<void> {
+async function handleWorker(
+  name: string,
+  fmt: FormatOptions,
+  yes = false
+): Promise<void> {
   try {
     const { ConfigService } = await import("../../services/config/index.js");
     const config = new ConfigService();
     await config.load();
-    const workerConfig = config.getWorker(name);
+    let workerConfig = config.getWorker(name);
     if (!workerConfig) {
-      formatError(
-        new CLIError(`Worker "${name}" not found`, ExitCode.ERROR),
-        fmt
-      );
-      process.exitCode = ExitCode.ERROR;
-      return;
+      const loaded = await loadWorkerOrWire(config, name, {
+        format: fmt,
+        yes,
+      });
+      name = loaded.name;
+      workerConfig = loaded.worker;
     }
     const cf = new CloudflareService();
     const result = await cf.deploy(workerConfig.path);
@@ -339,9 +344,10 @@ export function registerRepairCommand(program: Command): void {
     .description("Deploy a specific worker to fix it")
     .action(
       withErrorHandling(
-        async (name: string) => {
+        async (name: string, _opts: unknown, cmd: Command) => {
           const fmt = getFormatOptions(repairCmd);
-          await handleWorker(name, fmt);
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          await handleWorker(name, fmt, yes);
         },
         { service: "repair" }
       )

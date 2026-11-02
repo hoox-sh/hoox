@@ -308,7 +308,7 @@ describe("registerDeployCommand", () => {
       });
 
       expect(deployMock).toHaveBeenCalledTimes(0);
-      expect(process.exitCode).toBe(1);
+      expect(process.exitCode).toBe(2);
     });
   });
 

@@ -338,7 +338,16 @@ describe("SecretsService", () => {
     it("returns error for unknown worker", async () => {
       const svc = await createService();
       const result = await svc.generateDevVars("unknown-worker");
-      expect(expectErr(result)).toContain("not found in config");
+      expect(expectErr(result)).toMatch(/not in wrangler\.jsonc|catalog/i);
+    });
+
+    it("tells the operator to enable an optional satellite", async () => {
+      const svc = await createService();
+      const result = await svc.generateDevVars("pyne-agent-worker");
+      expect(expectErr(result)).toMatch(/optional satellite/i);
+      expect(expectErr(result)).toContain(
+        "hoox workers enable pyne-agent-worker"
+      );
     });
 
     it("overwrites existing .dev.vars", async () => {
@@ -602,7 +611,13 @@ describe("SecretsService", () => {
     it("returns error for unknown worker", async () => {
       const svc = await createService();
       const result = await svc.syncToCloudflare("unknown-worker");
-      expect(expectErr(result)).toContain("not found in config");
+      expect(expectErr(result)).toMatch(/not in wrangler\.jsonc|catalog/i);
+    });
+
+    it("sync of a catalog satellite missing from config hints enable", async () => {
+      const svc = await createService();
+      const result = await svc.syncToCloudflare("pyne-agent-worker");
+      expect(expectErr(result)).toMatch(/optional satellite/i);
     });
 
     describe("execWranglerSecretPut / execWranglerSecretDelete (spawn)", () => {

@@ -435,6 +435,7 @@ describe("env command", () => {
         "workers/email-worker",
         "workers/analytics-worker",
         "workers/pyne-worker",
+        "workers/pyne-agent-worker",
         "workers/dashboard",
       ]) {
         mkdirSync(join(tmpDir, w), { recursive: true });

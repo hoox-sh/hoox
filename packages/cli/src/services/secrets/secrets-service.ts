@@ -8,6 +8,12 @@ import { parse as parseJsonc } from "jsonc-parser";
 import { sanitizeWranglerOutput } from "../../utils/wrangler-output.js";
 import { parseEnvFile } from "../../utils/env-file.js";
 import { isPlaceholderValue } from "../../utils/placeholder.js";
+import {
+  WORKER_MANIFESTS,
+  resolveCatalogWorkerName,
+  isPlannedWorker,
+  plannedWorkerMessage,
+} from "@hoox-sh/hoox-shared";
 import type {
   Result,
   SecretCheckResult,
@@ -72,6 +78,23 @@ export async function resolveWorkerWranglerConfig(
  * ingress. Exchange API keys, bot tokens, and other integration secrets
  * are *not* included; use plain `hoox secrets sync` for those.
  */
+function missingWorkerError(workerName: string): string {
+  const canonical = resolveCatalogWorkerName(workerName) ?? workerName;
+  if (isPlannedWorker(canonical)) {
+    return plannedWorkerMessage(canonical);
+  }
+  if (WORKER_MANIFESTS[canonical]) {
+    return (
+      `Worker "${canonical}" is an optional satellite and is not in wrangler.jsonc. ` +
+      `Enable and wire it: hoox workers enable ${canonical} --yes`
+    );
+  }
+  return (
+    `Worker "${workerName}" is not in wrangler.jsonc. ` +
+    `Run \`hoox workers catalog\` to see known workers, then \`hoox workers enable <name>\`.`
+  );
+}
+
 export const SYSTEM_SECRET_NAMES = [
   "INTERNAL_KEY_BINDING",
   "AGENT_INTERNAL_KEY",
@@ -272,7 +295,7 @@ export class SecretsService {
     if (!worker) {
       return {
         ok: false,
-        error: `Worker "${workerName}" not found in config`,
+        error: missingWorkerError(workerName),
       };
     }
 
@@ -318,7 +341,7 @@ export class SecretsService {
     if (!worker) {
       return {
         ok: false,
-        error: `Worker "${workerName}" not found in config`,
+        error: missingWorkerError(workerName),
       };
     }
 

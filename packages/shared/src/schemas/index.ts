@@ -5,8 +5,10 @@
 
 export type {
   WorkerManifest,
+  WorkerTier,
   VarDef,
   ServiceBindingDef,
+  CallerBindingDef,
   InfraBindings,
   KVBindingDef,
   D1BindingDef,
@@ -24,6 +26,12 @@ export {
   WORKER_CATALOG,
   CALLED_BY,
   getWorkerDefaultEnabled,
+  getWorkerTier,
+  resolveCatalogWorkerName,
+  isPlannedWorker,
+  secretNamesFromManifest,
+  requiredSecretNamesFromManifest,
+  plannedWorkerMessage,
 } from "./registry.js";
 export type { WorkerCatalogEntry } from "./registry.js";
 

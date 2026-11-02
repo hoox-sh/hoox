@@ -12,7 +12,13 @@ import {
   WORKER_CATALOG,
   WORKER_MANIFESTS,
   getWorkerDefaultEnabled,
+  resolveCatalogWorkerName,
+  isPlannedWorker,
+  plannedWorkerMessage,
+  requiredSecretNamesFromManifest,
+  secretNamesFromManifest,
 } from "@hoox-sh/hoox-shared";
+import type { WorkerTier } from "@hoox-sh/hoox-shared";
 import type { HooxConfig, WorkerConfig, GlobalConfig } from "./types";
 
 const JSONC_FORMAT: FormattingOptions = {
@@ -29,10 +35,14 @@ export interface WorkerStatusRow {
   enabled: boolean;
   /** Catalog default (undefined if worker is not in the shared registry). */
   defaultEnabled?: boolean;
+  /** Catalog tier (`core` / `optional` / `planned`). */
+  tier?: WorkerTier;
   /** Whether the worker appears in the root wrangler.jsonc. */
   inConfig: boolean;
   /** Whether the worker is in the shared WORKER_CATALOG. */
   inCatalog: boolean;
+  /** False for planned catalog stubs that cannot be enabled yet. */
+  available: boolean;
 }
 
 /**
@@ -317,13 +327,16 @@ export class ConfigService {
     return [...names].sort().map((name) => {
       const catalog = WORKER_MANIFESTS[name];
       const cfg = config.workers?.[name];
+      const tier = catalog ? (catalog.tier ?? "core") : undefined;
       return {
         name,
         path: cfg?.path ?? catalog?.path ?? `workers/${name}`,
         enabled: cfg?.enabled ?? catalog?.defaultEnabled ?? false,
         defaultEnabled: catalog?.defaultEnabled,
+        tier,
         inConfig: Boolean(cfg),
         inCatalog: Boolean(catalog),
+        available: tier !== "planned",
       };
     });
   }
@@ -331,7 +344,9 @@ export class ConfigService {
   /**
    * Enable or disable one or more workers in wrangler.jsonc.
    *
-   * - Known catalog workers missing from config are seeded (path + empty secrets).
+   * - Known catalog workers missing from config are seeded (path + secrets).
+   * - Aliases are resolved (`pine-worker` → `pynets-worker`).
+   * - Planned catalog stubs cannot be enabled.
    * - Unknown names (not in catalog and not in config) throw.
    * Reloads in-memory config after write.
    */
@@ -350,22 +365,35 @@ export class ConfigService {
     const results: { name: string; enabled: boolean; seeded: boolean }[] = [];
     const unique = [...new Set(names.map((n) => n.trim()).filter(Boolean))];
 
-    for (const name of unique) {
+    for (const input of unique) {
+      const name = resolveCatalogWorkerName(input) ?? input;
       const existing = this.config!.workers?.[name];
       const catalog = WORKER_MANIFESTS[name];
       if (!existing && !catalog) {
         throw new Error(
-          `Unknown worker "${name}". Known workers: ${WORKER_CATALOG.map((w) => w.name).join(", ")}`
+          `Unknown worker "${input}". Known workers: ${WORKER_CATALOG.map((w) => w.name).join(", ")}`
         );
+      }
+
+      if (isPlannedWorker(name) && enabled) {
+        throw new Error(plannedWorkerMessage(name));
       }
 
       let seeded = false;
       if (!existing) {
+        if (isPlannedWorker(name)) {
+          throw new Error(plannedWorkerMessage(name));
+        }
+        const secrets = catalog
+          ? requiredSecretNamesFromManifest(catalog).length > 0
+            ? requiredSecretNamesFromManifest(catalog)
+            : secretNamesFromManifest(catalog)
+          : [];
         const entry: WorkerConfig = {
           enabled,
           path: catalog!.path,
           vars: {},
-          secrets: [],
+          secrets,
         };
         const seedEdits = modify(raw, ["workers", name], entry, {
           formattingOptions: JSONC_FORMAT,

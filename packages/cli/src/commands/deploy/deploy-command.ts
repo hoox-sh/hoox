@@ -44,6 +44,7 @@ import { resolve } from "node:path";
 import { TelegramService } from "./telegram-service.js";
 import { EnvService } from "../../services/env/index.js";
 import * as jsonc from "jsonc-parser";
+import { loadWorkerOrWire } from "../../services/stack/index.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -188,6 +189,7 @@ const DEPLOY_ORDER: string[] = [
   "email-worker",
   "trade-worker",
   "pyne-worker",
+  "pyne-agent-worker",
   "report-worker",
   "agent-worker",
   "hoox",
@@ -1139,11 +1141,20 @@ EXAMPLES:
           const configService = new ConfigService();
           await configService.load();
           const cf = new CloudflareService();
+          let workerName = name;
+          if (!configService.getWorker(workerName)) {
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            const loaded = await loadWorkerOrWire(configService, workerName, {
+              format: fmt,
+              yes,
+            });
+            workerName = loaded.name;
+          }
 
           const result = await deploySingle(
             configService,
             cf,
-            name,
+            workerName,
             options.env
           );
 

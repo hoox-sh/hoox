@@ -7,7 +7,7 @@ tags: [code, packages, schemas, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T16:53:44Z
+  at: 2026-11-02T10:35:54Z
 sources:
   - id: tree
     resource: "packages/shared/src/schemas"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — CALLED_BY, D1BindingDef, DOBindingDef, InfraBindings, KVBindingDef, QueueBindingDef, R2BindingDef, ServiceBindingDef, ValidationError, ValidationReport, VarDef, VectorizeBindingDef
-* `registry.ts` — CALLED_BY, WORKER_CATALOG, WORKER_MANIFESTS, WORKER_NAMES, WorkerCatalogEntry, getWorkerDefaultEnabled
-* `types.ts` — D1BindingDef, DOBindingDef, InfraBindings, KVBindingDef, QueueBindingDef, R2BindingDef, ServiceBindingDef, ValidationError, ValidationReport, VarDef, VectorizeBindingDef, WorkerManifest
+* `index.ts` — CALLED_BY, CallerBindingDef, D1BindingDef, DOBindingDef, InfraBindings, KVBindingDef, QueueBindingDef, R2BindingDef, ServiceBindingDef, ValidationError, ValidationReport, VarDef
+* `registry.ts` — CALLED_BY, WORKER_CATALOG, WORKER_MANIFESTS, WORKER_NAMES, WorkerCatalogEntry, getWorkerDefaultEnabled, getWorkerTier, isPlannedWorker, plannedWorkerMessage, requiredSecretNamesFromManifest, resolveCatalogWorkerName, secretNamesFromManifest
+* `types.ts` — CallerBindingDef, D1BindingDef, DOBindingDef, InfraBindings, KVBindingDef, QueueBindingDef, R2BindingDef, ServiceBindingDef, ValidationError, ValidationReport, VarDef, VectorizeBindingDef
 * `validators.ts` — generateDevVars, generateWranglerJsonc, validateAll, validateDevVars, validateRootSecrets, validateWranglerJsonc
 
 # Packages
