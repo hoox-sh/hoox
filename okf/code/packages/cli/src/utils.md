@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "packages/cli/src/utils"
-description: "packages/cli/src/utils contains async.test.ts, async.ts, completion.test.ts, and 31 more files."
+description: "packages/cli/src/utils contains async.test.ts, async.ts, completion.test.ts, and 33 more files."
 resource: "packages/cli/src/utils"
 tags: [cli, code, packages, utils]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/cli/src/utils"
@@ -36,7 +36,9 @@ okf_lock: generated
 * `git.test.ts`
 * `git.ts` — gitPull, gitSubmoduleUpdate, gitUntrackFile, isGitRepo, isGitTracked, isSubmodule
 * `help-formatter.test.ts`
-* `help-formatter.ts` — renderHelp
+* `help-formatter.ts` — buildUsage, renderHelp
+* `microfeedback.test.ts`
+* `microfeedback.ts` — errorTick, feedbackRow, progressLine, pulseFrame, renderProgressBar, spinnerFrame, stepGlyph, successTick, warnTick
 * `number.test.ts`
 * `number.ts` — formatBytes, formatNumber
 * `placeholder.ts` — isPlaceholderValue, meetsMinVersion
@@ -45,7 +47,7 @@ okf_lock: generated
 * `string.test.ts`
 * `string.ts` — levenshtein
 * `theme.test.ts`
-* `theme.ts` — hr, icons, kv, stripAnsi, tagged, theme
+* `theme.ts` — applyCliTheme, hr, icons, kv, stripAnsi, tagged, theme
 * `timer.test.ts`
 * `timer.ts` — formatDuration, startTimer
 * `update-check.test.ts`
@@ -55,4 +57,4 @@ okf_lock: generated
 
 # Packages
 
-`@clack/prompts`, `ansis`, `bun:test`, `commander`, `deploy`, `node:fs`, `start`
+`@clack/prompts`, `@hoox-sh/hoox-shared`, `ansis`, `bun:test`, `commander`, `deploy`, `node:fs`, `start`

@@ -548,17 +548,6 @@ export function registerTraceCommand(program: Command): void {
 Workers automatic tracing captures telemetry data for fetch calls, binding calls
 (KV, R2, Durable Objects), and handler lifecycle — no code changes required.
 
-SUBCOMMANDS:
-  events              Query trace events (spans) with filters
-  metrics             Calculate trace metrics (p99, avg, counts)
-  live                Live tail traces in real-time
-  keys                List available filter keys
-  values <key>        List values for a filter key
-  destinations        List OTLP export destinations
-  destinations add    Add an OTLP export destination
-  destinations remove Remove an OTLP destination
-  usage               Show trace event count/usage
-
 EXAMPLES:
   hoox trace events                              Recent trace events
   hoox trace events --service trade-worker       Events for specific worker
@@ -567,7 +556,7 @@ EXAMPLES:
   hoox trace metrics                             Count of all events
   hoox trace metrics --operator p99 --key duration.ms   P99 latency
   hoox trace metrics --groupBy $metadata.service        Group by worker
-  hoox trace keys                            List filter keys
+  hoox trace keys                                List filter keys
   hoox trace values '$metadata.service'          List worker names
   hoox trace destinations                        List OTLP destinations
   hoox trace destinations add honeycomb https://api.honeycomb.io/1/traces

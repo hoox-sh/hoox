@@ -17,87 +17,78 @@
  */
 
 import ansis from "ansis";
+import {
+  Colors,
+  DEFAULT_THEME,
+  migrateThemeId,
+  setActiveTheme,
+  type ThemeId,
+} from "@hoox-sh/hoox-shared";
 
-// ── Color primitives (hex) ─────────────────────────────────────────
-// Using hex codes instead of named ansis colors for the new tokens
-// because ansis v4.2.0 only ships the 16 ANSI base colors by name.
+function paint() {
+  const c = Colors;
+  return {
+    text: ansis.hex(c.foreground),
+    textMuted: ansis.hex(c.muted),
+    textSubtle: ansis.hex(c["muted-foreground"]),
+    textFaint: ansis.hex(c.dim),
 
-const HEX = {
-  // Base / text (zinc scale)
-  text200: "#e4e4e7",
-  text400: "#a1a1aa",
-  text500: "#71717a",
-  text600: "#52525b",
-  text700: "#3f3f46",
-  // Accent (indigo)
-  indigo300: "#a5b4fc",
-  indigo400: "#818cf8",
-  // Status
-  emerald400: "#34d399",
-  rose400: "#fb7185",
-  amber400: "#fbbf24",
-  sky400: "#38bdf8",
-} as const;
+    border: ansis.hex(c.border),
+    borderStrong: ansis.hex(c.dim),
 
-// ── Semantic theme ────────────────────────────────────────────────
-export const theme = {
-  // Text (zinc scale)
-  text: ansis.hex(HEX.text200),
-  textMuted: ansis.hex(HEX.text400),
-  textSubtle: ansis.hex(HEX.text500),
-  textFaint: ansis.hex(HEX.text600),
+    success: ansis.hex(c.success),
+    error: ansis.hex(c.error),
+    warning: ansis.hex(c.warning),
+    info: ansis.hex(c.info),
+    accent: ansis.hex(c.accent),
+    highlight: ansis.hex(c.highlight),
 
-  // Borders
-  border: ansis.hex(HEX.text700),
-  borderStrong: ansis.hex(HEX.text600),
+    surface: ansis.hex(c.card),
 
-  // Status
-  success: ansis.hex(HEX.emerald400),
-  error: ansis.hex(HEX.rose400),
-  warning: ansis.hex(HEX.amber400),
-  info: ansis.hex(HEX.sky400),
-  accent: ansis.hex(HEX.indigo400),
-  highlight: ansis.hex(HEX.indigo300),
+    dim: ansis.hex(c.muted),
+    bold: ansis.bold,
+    italic: ansis.italic,
+    underline: ansis.underline,
+    gray: ansis.gray,
+    white: ansis.white,
+    black: ansis.black,
+    heading: ansis.hex(c.accent).bold,
+    label: ansis.hex(c["muted-foreground"]),
+    subtle: ansis.hex(c["muted-foreground"]),
+    muted: ansis.hex(c.dim),
+    value: ansis.hex(c.foreground),
+    key: ansis.hex(c["muted-foreground"]),
 
-  // Surfaces (no background by default; reserved for future card use)
-  surface: ansis.hex("#18181b"),
+    statusOk: ansis.hex(c.success)("✓") + " " + ansis.hex(c.foreground)("ok"),
+    statusWarn:
+      ansis.hex(c.warning)("⚠") + " " + ansis.hex(c.foreground)("warn"),
+    statusError:
+      ansis.hex(c.error)("✗") + " " + ansis.hex(c.foreground)("error"),
+    statusInfo: ansis.hex(c.info)("ℹ") + " " + ansis.hex(c.foreground)("info"),
 
-  // Backward-compatible names with new values
-  dim: ansis.hex(HEX.text400),
-  bold: ansis.bold,
-  italic: ansis.italic,
-  underline: ansis.underline,
-  gray: ansis.gray,
-  white: ansis.white,
-  black: ansis.black,
-  heading: ansis.hex(HEX.indigo400).bold,
-  label: ansis.hex(HEX.text500),
-  subtle: ansis.hex(HEX.text500),
-  muted: ansis.hex(HEX.text600),
-  value: ansis.hex(HEX.text200),
-  key: ansis.hex(HEX.text500),
+    separator: ansis.hex(c.dim)("─"),
+    pipe: ansis.hex(c.dim)("│"),
+    box: {
+      topLeft: ansis.hex(c.dim)("┌"),
+      topRight: ansis.hex(c.dim)("┐"),
+      bottomLeft: ansis.hex(c.dim)("└"),
+      bottomRight: ansis.hex(c.dim)("┘"),
+      horizontal: ansis.hex(c.dim)("─"),
+      vertical: ansis.hex(c.dim)("│"),
+    },
+  };
+}
 
-  // Status-specific (now colored text, no background)
-  statusOk: ansis.hex(HEX.emerald400)("✓") + " " + ansis.hex(HEX.text200)("ok"),
-  statusWarn:
-    ansis.hex(HEX.amber400)("⚠") + " " + ansis.hex(HEX.text200)("warn"),
-  statusError:
-    ansis.hex(HEX.rose400)("✗") + " " + ansis.hex(HEX.text200)("error"),
-  statusInfo: ansis.hex(HEX.sky400)("ℹ") + " " + ansis.hex(HEX.text200)("info"),
+/** Live ANSI theme — mutated by `applyCliTheme`. */
+export const theme = paint();
 
-  // Decorations — box-drawing primitives, named by position so consumers
-  // (banner.ts, menu.ts) don't have to hand-roll them with theme.textFaint.
-  separator: ansis.hex(HEX.text600)("─"),
-  pipe: ansis.hex(HEX.text600)("│"),
-  box: {
-    topLeft: ansis.hex(HEX.text600)("┌"),
-    topRight: ansis.hex(HEX.text600)("┐"),
-    bottomLeft: ansis.hex(HEX.text600)("└"),
-    bottomRight: ansis.hex(HEX.text600)("┘"),
-    horizontal: ansis.hex(HEX.text600)("─"),
-    vertical: ansis.hex(HEX.text600)("│"),
-  },
-} as const;
+/** Apply a named palette to CLI output (and the shared Colors table). */
+export function applyCliTheme(raw: unknown): ThemeId {
+  const id = migrateThemeId(raw ?? DEFAULT_THEME);
+  setActiveTheme(id);
+  Object.assign(theme, paint());
+  return id;
+}
 
 // ── Icons ─────────────────────────────────────────────────────────
 export const icons = {
@@ -106,13 +97,14 @@ export const icons = {
   warning: "⚠",
   info: "ℹ",
   arrow: "→",
-  // Braille dots — 10-frame cycle, the de-facto standard in modern CLIs.
   spinner: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
   dot: "●",
-  // Added in this revision:
   sep: "·",
   bullet: "•",
   pipe: "│",
+  pending: "○",
+  running: "◐",
+  done: "●",
 } as const;
 
 // ── Display helpers ───────────────────────────────────────────────

@@ -21,9 +21,6 @@ export function registerPerfCommand(program: Command): void {
       `Measure latency, throughput, and other performance characteristics of
 the deployed Hoox system.
 
-SUBCOMMANDS:
-  fastpath   Measure the deployed fast-path latency (probe-based)
-
 EXAMPLES:
   hoox perf fastpath run --n 50
   hoox perf fastpath tail --duration 60`

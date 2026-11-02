@@ -504,6 +504,7 @@ async function handleMode(
 export function registerWafCommand(program: Command): void {
   const waf = program
     .command("waf")
+    .summary("Manage Cloudflare WAF (Web Application Firewall)")
     .description("Manage Cloudflare WAF (Web Application Firewall)");
 
   // -- waf status ------------------------------------------------------------

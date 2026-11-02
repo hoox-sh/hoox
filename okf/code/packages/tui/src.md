@@ -7,7 +7,7 @@ tags: [code, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/tui/src"
@@ -24,10 +24,11 @@ okf_lock: generated
 
 * `app.tsx` — AppRoot, CrashRecoveryApp
 * `cli-bridge-test-double.ts` — cliBridgeDouble, createCliBridgeModuleMock, failCliResult, okCliResult, realCliBridge, resetCliBridgeDouble
+* `launcher.tsx`
 * `main.tsx`
 * `network-test-double.ts` — SseSubscriptionEntry, abortAllSseSubscriptions, emitSseEvent, hooxFetchMock, mockApiData, mockApiDelayMs, mockApiErrorMessage, mockApiShouldFail, resetNetworkDoubles, setMockApiData, setMockApiDelay, setMockApiFailure
 * `opentui-augment.d.ts` — CliRenderer, CliRendererConfig, createCliRenderer
-* `opentui-jsx.d.ts` — KeyEvent, createRoot, useKeyboard
+* `opentui-jsx.d.ts` — KeyEvent, createRoot, useKeyboard, useRenderer, useTerminalDimensions
 * `test-setup.ts`
 * `test-utils.ts` — ALL_VIEW_IDS, ConnectionStatus, LogLevel, MockErrorBoundary, TestLogEntry, TestTrade, TestWorkerInfo, TradeSide, WorkerStatus, abortAllSseSubscriptions, cliBridgeDouble, emitSseEvent
 * `types.ts` — ALL_VIEWS, CliCommandState, CliCommandStatus, CliErrorDetails, CliErrorType, CliResult, DEFAULT_SHORTCUTS, ModalState, ModalType, ShortcutMap, VIEW_LABELS, ViewId
@@ -36,7 +37,7 @@ okf_lock: generated
 
 # Packages
 
-`@hoox-sh/hoox-shared`, `@hoox-sh/hoox-shared/api-client`, `@hoox/test-utils/spawn-shim`, `@opentui/core`, `@opentui/core/testing`, `@opentui/react`, `bun:test`, `react`
+`@hoox-sh/hoox-shared`, `@hoox-sh/hoox-shared/api-client`, `@hoox/test-utils/spawn-shim`, `@opentui/core`, `@opentui/core/testing`, `@opentui/react`, `bun:test`, `node:fs`, `react`
 
 # Depends on
 
@@ -45,6 +46,7 @@ okf_lock: generated
 * [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
 * [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
 * [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+* [packages/tui/src/launcher](/code/packages/tui/src/launcher.md)
 * [packages/tui/src/services](/code/packages/tui/src/services.md)
 * [packages/tui/src/services/cli-bridge](/code/packages/tui/src/services/cli-bridge.md)
 
@@ -59,6 +61,7 @@ okf_lock: generated
 # Nested
 
 * [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+* [packages/tui/src/launcher](/code/packages/tui/src/launcher.md)
 * [packages/tui/src/services](/code/packages/tui/src/services.md)
 * [packages/tui/src/stores](/code/packages/tui/src/stores.md)
 * [packages/tui/src/utils](/code/packages/tui/src/utils.md)

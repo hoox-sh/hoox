@@ -25,6 +25,7 @@ import {
   useUIStore,
   useConfigStore,
   Colors,
+  setActiveTheme,
 } from "@hoox-sh/hoox-shared";
 import { restoreSession, saveSession } from "@hoox-sh/hoox-shared";
 import type { ViewId } from "@hoox-sh/hoox-shared";
@@ -117,6 +118,18 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
   const closePalette = useUIStore((s) => s.closePalette);
   const showModal = useUIStore((s) => s.showModal);
   const dismissModal = useUIStore((s) => s.dismissModal);
+  const colorTheme = useConfigStore((s) => s.theme);
+
+  useEffect(() => {
+    setActiveTheme(colorTheme);
+    try {
+      const renderer = getRendererRef() as
+        { backgroundColor?: string } | undefined;
+      if (renderer) renderer.backgroundColor = Colors.background;
+    } catch {
+      // renderer not ready yet
+    }
+  }, [colorTheme]);
 
   const requestQuit = useCallback(() => {
     closePalette();

@@ -16,3 +16,8 @@ export {
   renderCompactBanner,
 } from "./banner.js";
 export { runInteractiveTUI } from "./menu.js";
+export { buildLauncherCatalog } from "./catalog.js";
+export {
+  shouldLaunchStartScreen,
+  resolveLauncherEntry,
+} from "./opentui-launch.js";

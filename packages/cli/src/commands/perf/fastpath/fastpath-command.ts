@@ -301,11 +301,6 @@ real exchange call, so probing is safe to run against the live system.
 Requires CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID env vars (or
 HOOX_GATEWAY_URL) for endpoint resolution and observability queries.
 
-SUBCOMMANDS:
-  run        Send N probes and report a percentile table (default)
-  tail       Send probes for a fixed duration (continuous, Ctrl+C to stop)
-  report     Query past probe events and report
-
 EXAMPLES:
   hoox perf fastpath run --n 50
   hoox perf fastpath run --n 100 --concurrency 8

@@ -7,7 +7,7 @@ tags: [code, packages, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/shared/src"
@@ -23,7 +23,8 @@ okf_lock: generated
 * `analytics.test.ts`
 * `analytics.ts` — AnalyticsEnv, TrackAnalyticsOptions, trackAnalytics
 * `api-client.ts` — HooxFetchOptions, WorkerAPIError, hooxFetch
-* `colors.ts` — AlertSeverityColor, AlertSeverityColorKey, ColorKey, Colors, ConnectionStatusColor, ConnectionStatusKey, CoolBracketColor, CoolBracketPalette, LogLevelColor, LogLevelColorKey, WorkerStatusColor, WorkerStatusKey
+* `colors.test.ts`
+* `colors.ts` — AlertSeverityColor, AlertSeverityColorKey, ColorKey, ColorTokens, Colors, ConnectionStatusColor, ConnectionStatusKey, CoolBracketColor, CoolBracketPalette, DEFAULT_THEME, LogLevelColor, LogLevelColorKey
 * `config.ts` — HOOX_CONFIG_FILE_MODE, HOOX_DIR_MODE, HooxConfig, HooxConfigTransport, ensureHooxDirSecure, formatConfigPermissionWarning, isConfigWorldOrGroupReadable, isUnixModeGroupOrWorldAccessible, readConfig, readConfigSync, validateConfig, writeConfig
 * `cron-handler.ts` — CronHandlerOptions, createCronHandler
 * `dashboard-manifest.test.ts`
@@ -55,7 +56,7 @@ okf_lock: generated
 
 # Packages
 
-`@cloudflare/workers-types`, `@hoox-sh/hoox-shared`, `@hoox-sh/hoox-shared/kvKeys`, `bun:test`, `fs`, `node:fs`, `node:path`, `node:url`, `os`, `path`, `router.ts`, `zod`
+`@cloudflare/workers-types`, `@hoox-sh/hoox-shared/kvKeys`, `bun:test`, `fs`, `node:fs`, `node:path`, `node:url`, `os`, `path`, `router.ts`, `zod`
 
 # Depends on
 

@@ -67,4 +67,14 @@ declare module "@opentui/react" {
     handler?: (key: KeyEvent) => void,
     options?: unknown
   ): unknown;
+
+  export function useTerminalDimensions(): {
+    width: number;
+    height: number;
+  };
+
+  export function useRenderer(): {
+    footerHeight?: number;
+    [key: string]: unknown;
+  };
 }

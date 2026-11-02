@@ -7,7 +7,7 @@ tags: [cli, code, packages, ui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/cli/src/ui"
@@ -20,9 +20,13 @@ okf_lock: generated
 
 * `banner.test.ts`
 * `banner.ts` — BANNER_VARIANTS, BannerVariant, DISCLAIMER, animateBanner, renderBanner, renderBannerHorizon, renderBannerLogo, renderBannerMinimal, renderBannerSignal, renderCompactBanner, renderLegacy
-* `index.ts` — animateBanner, renderBanner, renderBannerLogo, renderCompactBanner, runInteractiveTUI
+* `catalog.test.ts`
+* `catalog.ts` — COMMAND_GROUPS, CommandGroupId, LONG_RUNNING_COMMANDS, LauncherCatalog, LauncherGroup, LauncherItem, buildLauncherCatalog, commandBlurb, firstLine, groupIdForCommand, groupTitle, isLongRunning
+* `index.ts` — animateBanner, buildLauncherCatalog, renderBanner, renderBannerLogo, renderCompactBanner, resolveLauncherEntry, runInteractiveTUI, shouldLaunchStartScreen
 * `menu.ts` — runInteractiveTUI
+* `opentui-launch.test.ts`
+* `opentui-launch.ts` — LauncherResult, resolveLauncherEntry, runOpenTuiLauncher, shouldLaunchStartScreen
 
 # Packages
 
-`@clack/prompts`, `ansis`, `bun:test`, `commander`, `node:fs`, `node:path`, `node:url`
+`@clack/prompts`, `@hoox-sh/hoox-shared`, `ansis`, `bun:test`, `commander`, `node:child_process`, `node:fs`, `node:module`, `node:os`, `node:path`, `node:url`

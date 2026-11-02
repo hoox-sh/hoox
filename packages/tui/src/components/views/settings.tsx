@@ -23,11 +23,17 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 
 import {
   Colors,
+  THEME_HINTS,
+  THEME_IDS,
+  THEME_LABELS,
+  setActiveTheme,
   useServiceStore,
   useUIStore,
   useConfigStore,
   readConfigSync,
+  type ThemeId,
 } from "@hoox-sh/hoox-shared";
+import { PulseWave } from "../ui/pulse";
 import { ErrorBoundary } from "../shared/error-boundary";
 import { ViewHeader } from "../shared/view-header";
 import { Panel } from "../shared/panel";
@@ -271,10 +277,9 @@ function Checkbox({
  * plus a read-only connection/transport snapshot.
  *
  * Local item indices for keyboard navigation:
- *   0 = refresh rate, 1 = default view, 2 = reset button
- * (theme is display-only; connection is read-only)
+ *   0 = color theme, 1 = refresh rate, 2 = default view, 3 = reset
  */
-const THEME_ITEM_COUNT = 3;
+const THEME_ITEM_COUNT = 4;
 
 function ThemePanel({
   active,
@@ -285,6 +290,7 @@ function ThemePanel({
   activeItem: number;
   onResetDefaults: () => void;
 }) {
+  const colorTheme = useConfigStore((s) => s.theme);
   const refreshIntervalMs = useConfigStore((s) => s.refreshIntervalMs);
   const defaultView = useConfigStore((s) => s.defaultView);
 
@@ -311,13 +317,22 @@ function ThemePanel({
 
   return (
     <box flexDirection="column" gap={0} paddingX={1}>
-      {/* Dark-only theme (panel title is THEME; light not implemented) */}
-      <text fg={Colors.accent} bold>
-        (•) DARK
+      <text fg={Colors.foreground} bold dim>
+        COLOR
       </text>
-      <text fg={Colors.muted} dim>
-        Light not implemented
-      </text>
+      <box flexDirection="row" gap={1} alignItems="center">
+        <text
+          fg={Colors.accent}
+          bg={active && activeItem === 0 ? Colors.card : undefined}
+          bold
+        >
+          {"◀ "}
+          {THEME_LABELS[colorTheme].toUpperCase()}
+          {" ▶"}
+        </text>
+        <PulseWave />
+      </box>
+      <text fg={Colors.dim}>{THEME_HINTS[colorTheme]}</text>
 
       {/* Refresh rate selector */}
       <text fg={Colors.foreground} bold dim>
@@ -325,7 +340,7 @@ function ThemePanel({
       </text>
       <text
         fg={Colors.accent}
-        bg={active && activeItem === 0 ? Colors.background : undefined}
+        bg={active && activeItem === 1 ? Colors.background : undefined}
         bold
       >
         {"◀ "}
@@ -339,7 +354,7 @@ function ThemePanel({
       </text>
       <text
         fg={Colors.accent}
-        bg={active && activeItem === 1 ? Colors.background : undefined}
+        bg={active && activeItem === 2 ? Colors.background : undefined}
         bold
       >
         {"◀ "}
@@ -350,7 +365,7 @@ function ThemePanel({
       {/* Reset to Defaults */}
       <text
         fg={Colors.warning}
-        bg={active && activeItem === 2 ? Colors.background : undefined}
+        bg={active && activeItem === 3 ? Colors.background : undefined}
         bold
         onMouseUp={onResetDefaults}
       >
@@ -847,12 +862,9 @@ export function SettingsView({
   const toggleNotification = useConfigStore((s) => s.toggleNotification);
   const soundEnabled = useConfigStore((s) => s.soundEnabled);
 
-  // Light theme is not implemented — coerce any stored "light" to dark.
   useEffect(() => {
-    if (theme === "light") {
-      updateConfig({ theme: "dark" });
-    }
-  }, [theme, updateConfig]);
+    setActiveTheme(theme);
+  }, [theme]);
 
   /** Fail-closed confirm helper for destructive settings actions. */
   const confirmAction = useCallback(
@@ -1020,9 +1032,7 @@ export function SettingsView({
 
       // Apply config values if they match known keys (light theme coerced to dark)
       if (typeof config.theme === "string")
-        updateConfig({
-          theme: config.theme === "light" ? "dark" : (config.theme as "dark"),
-        });
+        updateConfig({ theme: config.theme as ThemeId });
       if (typeof config.refreshIntervalMs === "number")
         updateConfig({ refreshIntervalMs: config.refreshIntervalMs });
       if (typeof config.defaultView === "string")
@@ -1316,10 +1326,24 @@ export function SettingsView({
     // Panel-specific actions
     switch (activePanel) {
       case 0: {
-        // Theme panel — items: 0 refresh, 1 default view, 2 reset
+        // Theme panel — 0 color, 1 refresh, 2 default view, 3 reset
         switch (activeItem) {
           case 0: {
-            // Refresh rate
+            const currentIdx = THEME_IDS.indexOf(theme);
+            if (key.name === "left") {
+              const prev =
+                (currentIdx - 1 + THEME_IDS.length) % THEME_IDS.length;
+              const next = THEME_IDS[prev]!;
+              setActiveTheme(next);
+              updateConfig({ theme: next });
+            } else if (key.name === "right") {
+              const next = THEME_IDS[(currentIdx + 1) % THEME_IDS.length]!;
+              setActiveTheme(next);
+              updateConfig({ theme: next });
+            }
+            break;
+          }
+          case 1: {
             const currentIdx = REFRESH_RATES.indexOf(
               refreshIntervalMs as (typeof REFRESH_RATES)[number]
             );
@@ -1333,8 +1357,7 @@ export function SettingsView({
             }
             break;
           }
-          case 1: {
-            // Default view
+          case 2: {
             const currentIdx = VIEW_IDS.indexOf(defaultView);
             if (key.name === "left") {
               const prev = (currentIdx - 1 + VIEW_IDS.length) % VIEW_IDS.length;
@@ -1345,7 +1368,7 @@ export function SettingsView({
             }
             break;
           }
-          case 2: // Reset defaults
+          case 3:
             if (key.name === "space" || key.name === "return")
               void handleResetDefaults();
             break;

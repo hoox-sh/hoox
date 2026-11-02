@@ -27,6 +27,7 @@ import {
   findHooxSetupRoot,
   resolveHooxRuntimeRoot,
   getTuiEntryCandidates,
+  getTuiLauncherCandidates,
   getRememberedMonorepoRoot,
   rememberMonorepoRoot,
   type HooxPath,
@@ -305,6 +306,18 @@ describe("path-utils - Path Resolution Service", () => {
       const candidates = getTuiEntryCandidates("/tmp/hoox-setup");
       expect(candidates[0]).toMatch(/packages[/\\]tui[/\\]src[/\\]main\.tsx$/);
       expect(candidates[1]).toMatch(/packages[/\\]tui[/\\]dist[/\\]main\.js$/);
+    });
+  });
+
+  describe("getTuiLauncherCandidates", () => {
+    it("lists source and dist launcher under packages/tui", () => {
+      const candidates = getTuiLauncherCandidates("/tmp/hoox-setup");
+      expect(candidates[0]).toMatch(
+        /packages[/\\]tui[/\\]src[/\\]launcher\.tsx$/
+      );
+      expect(candidates[1]).toMatch(
+        /packages[/\\]tui[/\\]dist[/\\]launcher\.js$/
+      );
     });
   });
 

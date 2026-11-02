@@ -7,7 +7,7 @@
  * Colors Utility Tests — Design token validation.
  *
  * Tests that the Hoox design system colors are correctly defined,
- * follow the black / cool-indigo DNA (#050508 bg, #818CF8 accent),
+ * follow the Hoox Signal DNA (OKLCH orange accent on a near-black canvas),
  * and provide adequate contrast ratios for TUI readability.
  *
  * Source of truth: @hoox-sh/hoox-shared (Colors + status maps).
@@ -21,6 +21,8 @@ import {
   WorkerStatusColor,
   LogLevelColor,
   AlertSeverityColor,
+  THEME_PALETTES,
+  setActiveTheme,
 } from "@hoox-sh/hoox-shared";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -95,44 +97,49 @@ describe("Colors Design System", () => {
 
   // ── Black / cool DNA ────────────────────────────────────────────────────
 
-  describe("black / cool DNA", () => {
-    it("background is near-black (#050508)", () => {
-      expect(Colors.background).toBe("#050508");
+  describe("signal DNA (default)", () => {
+    it("background is near-black", () => {
+      setActiveTheme("signal");
+      expect(Colors.background).toBe(THEME_PALETTES.signal.background);
       const rgb = hexToRgb(Colors.background)!;
-      expect(rgb.r).toBeLessThan(12);
-      expect(rgb.g).toBeLessThan(12);
-      expect(rgb.b).toBeLessThan(16);
+      expect(rgb.r).toBeLessThan(30);
+      expect(rgb.g).toBeLessThan(30);
+      expect(rgb.b).toBeLessThan(30);
     });
 
-    it("accent is cool indigo (#818CF8)", () => {
-      expect(Colors.accent).toBe("#818CF8");
+    it("accent is warm orange (OKLCH hue 48)", () => {
+      setActiveTheme("signal");
+      expect(Colors.accent.toUpperCase()).toBe("#F38020");
       const rgb = hexToRgb(Colors.accent)!;
-      // Indigo: blue-ish, not warm orange
-      expect(rgb.b).toBeGreaterThan(rgb.r);
-      expect(rgb.b).toBeGreaterThan(200);
+      expect(rgb.r).toBeGreaterThan(rgb.b);
+      expect(rgb.r).toBeGreaterThan(200);
     });
 
-    it("highlight is cool cyan (distinct from accent)", () => {
-      expect(Colors.highlight).toBe("#22D3EE");
+    it("highlight is a second orange, distinct from accent", () => {
+      setActiveTheme("signal");
       expect(Colors.highlight).not.toBe(Colors.accent);
       const rgb = hexToRgb(Colors.highlight)!;
-      expect(rgb.b).toBeGreaterThan(200);
-      expect(rgb.g).toBeGreaterThan(180);
+      expect(rgb.r).toBeGreaterThan(rgb.b);
     });
 
-    it("cards are near-black elevated (#0A0A0F)", () => {
-      expect(Colors.card).toBe("#0A0A0F");
+    it("cards are elevated above the canvas", () => {
+      setActiveTheme("signal");
       const bg = hexToRgb(Colors.background)!;
       const card = hexToRgb(Colors.card)!;
-      // Slightly elevated vs background
       expect(card.r + card.g + card.b).toBeGreaterThan(bg.r + bg.g + bg.b);
     });
 
-    it("borders are cool dark, not mid-grey", () => {
+    it("volt is PYNE lime and void is AXIS indigo", () => {
+      expect(THEME_PALETTES.volt.accent.toUpperCase()).toBe("#B7EF09");
+      expect(THEME_PALETTES.void.accent.toUpperCase()).toBe("#8B9CFF");
+    });
+
+    it("borders are dark, not mid-grey", () => {
+      setActiveTheme("signal");
       const rgb = hexToRgb(Colors.border)!;
-      expect(rgb.r).toBeLessThan(40);
-      expect(rgb.g).toBeLessThan(40);
-      expect(rgb.b).toBeLessThan(50);
+      expect(rgb.r).toBeLessThan(60);
+      expect(rgb.g).toBeLessThan(60);
+      expect(rgb.b).toBeLessThan(70);
     });
   });
 
@@ -144,38 +151,40 @@ describe("Colors Design System", () => {
       }
     });
 
-    it("starts in cyan/sky range (cool, not orange)", () => {
+    it("signal brackets start in orange", () => {
+      setActiveTheme("signal");
       const first = hexToRgb(CoolBracketPalette[0]!)!;
-      expect(first.b).toBeGreaterThan(first.r);
+      expect(first.r).toBeGreaterThan(first.b);
     });
   });
 
   // ── Semantic Colors ─────────────────────────────────────────────────────
 
   describe("semantic colors", () => {
-    it("success is cool emerald", () => {
-      expect(Colors.success).toBe("#34D399");
+    it("success is green", () => {
+      setActiveTheme("signal");
       const rgb = hexToRgb(Colors.success)!;
-      expect(rgb.g).toBeGreaterThan(180);
+      expect(rgb.g).toBeGreaterThan(rgb.r);
     });
 
-    it("error is cool rose", () => {
-      expect(Colors.error).toBe("#FB7185");
+    it("error is red", () => {
+      setActiveTheme("signal");
       const rgb = hexToRgb(Colors.error)!;
       expect(rgb.r).toBeGreaterThan(200);
     });
 
     it("warning is amber", () => {
-      expect(Colors.warning).toBe("#FBBF24");
+      setActiveTheme("signal");
       const rgb = hexToRgb(Colors.warning)!;
       expect(rgb.r).toBeGreaterThan(200);
       expect(rgb.g).toBeGreaterThan(150);
     });
 
-    it("info is sky blue", () => {
-      expect(Colors.info).toBe("#38BDF8");
+    it("info is cyan", () => {
+      setActiveTheme("signal");
       const rgb = hexToRgb(Colors.info)!;
-      expect(rgb.b).toBeGreaterThan(200);
+      expect(rgb.g).toBeGreaterThan(150);
+      expect(rgb.b).toBeGreaterThan(150);
     });
   });
 

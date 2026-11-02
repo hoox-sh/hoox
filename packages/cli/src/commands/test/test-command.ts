@@ -205,6 +205,7 @@ const PIPELINE_STEPS: { label: string; args: string[] }[] = [
 export function registerTestCommand(program: Command): void {
   const testCmd = program
     .command("test")
+    .summary("Run tests and CI pipeline")
     .description("Run tests and CI pipeline");
 
   // -- test all ----------------------------------------------------------

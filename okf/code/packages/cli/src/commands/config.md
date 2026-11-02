@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/config"
@@ -28,6 +28,8 @@ okf_lock: generated
 * `kv-command.ts` — registerKvCommand
 * `secrets-subcommands.test.ts`
 * `secrets-subcommands.ts` — registerSecretsSubcommands, reportSecretSync, updateDevVars
+* `theme-command.test.ts`
+* `theme-command.ts` — registerThemeCommand
 
 # Packages
 

@@ -11,10 +11,12 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 - **Optional satellite catalog** (`pyne-worker`, `pyne-agent-worker`) plus planned `pynets-worker` (formerly `pine-worker`). `hoox workers catalog` shows tier / availability.
 - **`hx secrets set pyne-agent-worker API_KEY`** (and clone/deploy/dev/test/repair) prompt to enable and wire the satellite when it is missing from `wrangler.jsonc`, instead of `Worker not found in config`. `--yes` skips the prompt.
+- Compact OpenTUI **start intro** on `hoox` with no args. Grouped root `--help`. **`hoox config theme`** (`signal` / `volt` / `void`; Signal default). Themed spinner, progress bar, pulse, and step ticks.
 
 ### Changed
 
 - Enabling an optional satellite seeds required secrets, wires caller service bindings (dashboard `PYNE_AGENT_SERVICE`), and clones the submodule when the tree is empty.
+- Ships with `@hoox-sh/hoox-tui@0.5.0` and `@hoox-sh/hoox-shared@1.7.0`.
 
 ## [0.16.0] — 2026-10-25
 

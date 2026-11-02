@@ -386,6 +386,7 @@ async function tailAllWorkers(
 export function registerLogsCommand(program: Command): void {
   const logsCmd = program
     .command("logs")
+    .summary("Tail and view Cloudflare Worker logs in real-time")
     .description("Tail and view Cloudflare Worker logs in real-time");
 
   // -- logs worker <name> ---------------------------------------------------

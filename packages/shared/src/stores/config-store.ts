@@ -21,6 +21,7 @@ import type { StateStorage } from "zustand/middleware";
 import { chmodSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ViewId, LogFilter, NotificationPreferences } from "../types";
+import { DEFAULT_THEME, migrateThemeId, type ThemeId } from "../colors";
 import { HOOX_CONFIG_FILE_MODE, HOOX_DIR_MODE } from "../config";
 import { getHooxHome } from "../path-utils";
 
@@ -168,7 +169,7 @@ const DEFAULT_NOTIFICATIONS: NotificationPreferences = {
 // ─── State ───────────────────────────────────────────────────────────────────
 
 export interface ConfigState {
-  theme: "dark" | "light";
+  theme: ThemeId;
   refreshIntervalMs: number;
   defaultView: ViewId;
   activeExchanges: string[];
@@ -194,7 +195,7 @@ interface ConfigActions {
 // ─── Default State (fallback when no saved config) ───────────────────────────
 
 const defaults: ConfigState = {
-  theme: "dark",
+  theme: DEFAULT_THEME,
   refreshIntervalMs: 500,
   defaultView: "dashboard",
   activeExchanges: [],
@@ -214,7 +215,8 @@ export const useConfigStore = create<ConfigState & ConfigActions>()(
       updateConfig: (partial) =>
         set((state) => {
           // Merge each key individually so immer tracks mutations correctly
-          if (partial.theme !== undefined) state.theme = partial.theme;
+          if (partial.theme !== undefined)
+            state.theme = migrateThemeId(partial.theme);
           if (partial.refreshIntervalMs !== undefined)
             state.refreshIntervalMs = partial.refreshIntervalMs;
           if (partial.defaultView !== undefined)
@@ -261,10 +263,14 @@ export const useConfigStore = create<ConfigState & ConfigActions>()(
         soundEnabled: state.soundEnabled,
       }),
       // Restore defaults for any missing keys from older schema versions
-      merge: (persisted, current) => ({
-        ...current,
-        ...(persisted as Partial<ConfigState>),
-      }),
+      merge: (persisted, current) => {
+        const partial = persisted as Partial<ConfigState>;
+        return {
+          ...current,
+          ...partial,
+          theme: migrateThemeId(partial.theme ?? current.theme),
+        };
+      },
     }
   )
 );

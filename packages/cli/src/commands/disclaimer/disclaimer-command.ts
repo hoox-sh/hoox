@@ -20,6 +20,7 @@ import { withErrorHandling } from "../../utils/error-handler.js";
 export function registerDisclaimerCommand(program: Command): void {
   program
     .command("disclaimer")
+    .summary("Display legal disclaimers and trademark information")
     .description("Display legal disclaimers and trademark information")
     .action(
       withErrorHandling(async () => {

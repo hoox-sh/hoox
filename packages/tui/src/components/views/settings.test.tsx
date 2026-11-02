@@ -139,7 +139,7 @@ function configureCheckSetup(opts?: {
 
 function resetConfigStore(): void {
   useConfigStore.setState({
-    theme: "dark",
+    theme: "signal",
     refreshIntervalMs: 500,
     defaultView: "dashboard" as ViewId,
     activeExchanges: [],
@@ -242,14 +242,13 @@ describe("SettingsView", () => {
 
   // ── Theme Panel ──────────────────────────────────────────────────────────
 
-  it("shows dark-only theme (light not implemented)", async () => {
-    useConfigStore.setState({ theme: "dark" });
+  it("shows the Signal color theme selector", async () => {
+    useConfigStore.setState({ theme: "signal" });
     const output = await renderSettings(120);
-    // OpenTUI may collapse spaces in the frame capture; match stable tokens.
-    expect(output).toMatch(/\(•\)\s*DARK/);
-    expect(output).toContain("Light not implemented");
-    expect(output).not.toMatch(/\(•\)\s*LIGHT/);
-    expect(output).not.toMatch(/\( \)\s*LIGHT/);
+    expect(output).toContain("COLOR");
+    expect(output).toContain("SIGNAL");
+    expect(output).toMatch(/HOOX|orange/i);
+    expect(output).not.toContain("Light not implemented");
   });
 
   it("shows connection readout without secrets", async () => {
@@ -408,10 +407,10 @@ describe("SettingsView", () => {
 
   // ── Config Store Integration ─────────────────────────────────────────────
 
-  it("coerces stored light theme to dark on mount", async () => {
-    useConfigStore.setState({ theme: "light" });
+  it("keeps volt theme when selected", async () => {
+    useConfigStore.setState({ theme: "volt" });
     await renderSettings();
-    expect(useConfigStore.getState().theme).toBe("dark");
+    expect(useConfigStore.getState().theme).toBe("volt");
   });
 
   it("shows refresh rate as 500ms when config defaults to 500", async () => {

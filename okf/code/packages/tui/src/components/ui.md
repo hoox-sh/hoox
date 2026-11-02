@@ -1,13 +1,13 @@
 ---
 type: "Code Module"
 title: "packages/tui/src/components/ui"
-description: "packages/tui/src/components/ui contains connection-toasts.test.ts, connection-toasts.ts, dialog-state.ts, and 2 more files."
+description: "packages/tui/src/components/ui contains connection-toasts.test.ts, connection-toasts.ts, dialog-state.ts, and 4 more files."
 resource: "packages/tui/src/components/ui"
 tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-02T12:22:43Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/ui"
@@ -22,6 +22,8 @@ okf_lock: generated
 * `connection-toasts.ts` — messageAuthMissing, messageAuthRequired, messageConnected, messageConnectionLost, messageOfflineStartup, messageReconnected, toastAuthMissingRemote, toastAuthRequiredMode, toastConfigSaved, toastConnectedMode, toastConnectionLost, toastConnectionLostMode
 * `dialog-state.ts` — isHooxDialogOpen, setOpenDialogCount
 * `dialog.tsx` — ChoiceDialogOptions, ChoiceOption, ConfirmDialogOptions, DialogHandle, DialogProvider, DialogProviderProps, showChoice, showConfirm, showLoading, useDialog
+* `progress.tsx` — ProgressBar, ProgressBarProps
+* `pulse.tsx` — PulseDot, PulseWave, StepTick
 * `toast.tsx` — ToastId, ToastOptions, dismissToast, messageCopiedToClipboard, toastCopiedToClipboard, toastCopyFailed, toastError, toastInfo, toastLoading, toastSuccess, toastWarning
 
 # Packages
@@ -37,4 +39,5 @@ okf_lock: generated
 * [packages/tui/src](/code/packages/tui/src.md)
 * [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
 * [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+* [packages/tui/src/launcher](/code/packages/tui/src/launcher.md)
 * [packages/tui/src/services](/code/packages/tui/src/services.md)

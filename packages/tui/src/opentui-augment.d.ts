@@ -13,7 +13,9 @@
 // resolve correctly due to Bun's symlinked package resolution.
 declare module "@opentui/core" {
   export interface CliRendererConfig {
-    screenMode?: "main-screen" | "alternate-screen";
+    screenMode?: "main-screen" | "alternate-screen" | "split-footer";
+    footerHeight?: number;
+    consoleMode?: "console-overlay" | "disabled";
     exitOnCtrlC?: boolean;
     targetFps?: number;
     maxFps?: number;

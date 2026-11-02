@@ -165,26 +165,11 @@ export function registerSetupCommand(program: Command): void {
       "Auto-bootstrap everything: install, clone, build, keys, secrets, schema, dashboard"
     )
     .description(
-      `Single-command setup that auto-detects and fixes EVERY issue:
+      `Single-command setup that auto-detects and fixes missing wrangler, uncloned workers, unbuilt packages, D1 schema, keys, and Cloudflare secrets.
 
-  Pre-flight:
-    • Checks/installs wrangler binary (auto: \`bun install -g wrangler\`)
-    • Clones missing worker submodules (auto: \`git submodule update --init --recursive\`)
-    • Builds missing packages (auto: \`bun run build\`)
-    • Fixes null vars in wrangler.jsonc that block secrets
-
-  Core steps:
-    1. Generates all required internal keys
-    2. Stores keys in .keys/setup.env + per-key .env files + worker .dev.vars
-    3. Creates D1 database if missing, applies schema
-    4. Reconciles legacy secret names (e.g., INTERNAL_SERVICE_KEY → INTERNAL_KEY_BINDING)
-    5. Sets secrets on all Cloudflare Workers
-    6. Rebuilds and deploys dashboard
-
-  Post-flight:
-    • Verifies all Cloudflare secrets match generated keys
-    • Verifies all .dev.vars files are current
-    • Detects stale/legacy secrets
+  Pre-flight: wrangler binary, worker submodules, package builds, null wrangler vars.
+  Core: generate keys, apply D1 schema, reconcile legacy secret names, push secrets, rebuild dashboard.
+  Post-flight: verify Cloudflare secrets and .dev.vars; detect stale names.
 
 Each step can be skipped independently.
 

@@ -213,6 +213,7 @@ function isSupportedShell(s: string): s is SupportedShell {
 export function registerCompletionCommand(program: Command): void {
   program
     .command("completion")
+    .summary("Generate shell completion script")
     .description("Generate shell completion script")
     .argument("[shell]", "Shell type (bash, zsh, or fish)")
     .action(

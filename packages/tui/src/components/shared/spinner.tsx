@@ -5,9 +5,7 @@
 
 /** @jsxImportSource @opentui/react */
 import { useState, useEffect } from "react";
-import { Colors } from "@hoox-sh/hoox-shared";
-
-const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+import { Colors, SPINNER_FRAMES } from "@hoox-sh/hoox-shared";
 
 export interface SpinnerProps {
   label?: string;
@@ -16,7 +14,7 @@ export interface SpinnerProps {
 
 export function Spinner({
   label = "Loading...",
-  color = Colors.highlight,
+  color = Colors.accent,
 }: SpinnerProps) {
   const [frame, setFrame] = useState(0);
 

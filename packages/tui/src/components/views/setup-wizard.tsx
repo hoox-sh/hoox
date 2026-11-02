@@ -25,6 +25,7 @@ import type { DialogHandle } from "../ui/dialog";
 import { cliBridge } from "../../services/cli-bridge";
 import { resolveTuiStatePath } from "../../services/hoox-path-service";
 import { useViewKeyboard } from "../../hooks/shell-overlay";
+import { ProgressBar } from "../ui/progress";
 
 // ─── Prerequisite Check Types ───────────────────────────────────────────────
 
@@ -1299,6 +1300,11 @@ export function SetupWizard({ dialog }: SetupWizardProps) {
         />
 
         {/* Progress Indicator */}
+        <ProgressBar
+          current={step + 1}
+          total={TOTAL_SETUP_STEPS}
+          label={`${step + 1}/${TOTAL_SETUP_STEPS}`}
+        />
         <box flexDirection="row" gap={0} paddingBottom={1}>
           {progressLine}
         </box>

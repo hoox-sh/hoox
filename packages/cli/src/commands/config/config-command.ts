@@ -27,6 +27,7 @@ import { registerEnvCommand } from "./env-command.js";
 import { registerKvCommand } from "./kv-command.js";
 import { registerSecretsSubcommands } from "./secrets-subcommands.js";
 import { registerKeysSubcommands } from "./keys-subcommands.js";
+import { registerThemeCommand } from "./theme-command.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
 import {
@@ -114,6 +115,7 @@ KEYS:
 
 EXAMPLES:
   hoox config show                    Display current configuration
+  hoox config theme signal            Set CLI/TUI color theme (signal|volt|void)
   hoox config set workers.agent-worker.enabled false
   hoox config secrets list            List secrets for a worker
   hoox config secrets set trade-worker EXCHANGE_KEY_BINDING
@@ -386,6 +388,8 @@ EXAMPLES:
   // ──────────────────────────────────────────────────────────────────────
   // keys subcommand group (shared with top-level `hoox keys`)
   // ──────────────────────────────────────────────────────────────────────
+  registerThemeCommand(configCmd);
+
   const keysCmd = configCmd
     .command("keys")
     .summary("Manage internal auth keys")

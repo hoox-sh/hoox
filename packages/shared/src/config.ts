@@ -24,6 +24,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { getHooxHome } from "./path-utils";
+import { isThemeId, migrateThemeId, type ThemeId } from "./colors";
 
 function hooxDir(): string {
   return getHooxHome();
@@ -50,7 +51,7 @@ export interface HooxConfig {
    */
   transport?: HooxConfigTransport;
   refreshIntervalMs: number;
-  theme: "dark" | "light";
+  theme: ThemeId;
   activeExchanges: string[];
   notifications: {
     alerts: boolean;
@@ -67,7 +68,7 @@ const DEFAULT_CONFIG: HooxConfig = {
   apiToken: "",
   transport: "public",
   refreshIntervalMs: 500,
-  theme: "dark",
+  theme: "signal",
   activeExchanges: ["binance", "bybit", "mexc"],
   notifications: {
     alerts: true,
@@ -98,13 +99,16 @@ export function readConfigSync(): HooxConfig {
     // Ignore parse errors, use defaults
   }
 
-  return {
+  const merged = {
     ...DEFAULT_CONFIG,
     ...fileConfig,
     ...Object.fromEntries(
       Object.entries(envConfig).filter(([_, v]) => v !== undefined)
     ),
   };
+  const envTheme = process.env.HOOX_THEME;
+  merged.theme = migrateThemeId(envTheme ?? merged.theme);
+  return merged;
 }
 
 /** Async alias of {@link readConfigSync}. */
@@ -216,8 +220,23 @@ export function validateConfig(config: Partial<HooxConfig>): string[] {
   ) {
     errors.push("refreshIntervalMs must be >= 100ms");
   }
-  if (config.theme && !["dark", "light"].includes(config.theme)) {
-    errors.push('theme must be "dark" or "light"');
+  if (config.theme) {
+    const allowed = new Set([
+      "signal",
+      "volt",
+      "void",
+      "dark",
+      "orange",
+      "indigo",
+      "rail",
+      "light",
+      "pyne",
+      "axis",
+      "hoox",
+    ]);
+    if (!allowed.has(String(config.theme)) && !isThemeId(config.theme)) {
+      errors.push('theme must be "signal", "volt", or "void"');
+    }
   }
   if (
     config.transport !== undefined &&

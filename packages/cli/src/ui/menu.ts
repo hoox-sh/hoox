@@ -22,28 +22,58 @@ import {
   isCancel,
   cancel,
 } from "@clack/prompts";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { homedir } from "node:os";
 import { animateBanner, DISCLAIMER } from "./banner.js";
 import { CLIError } from "../utils/errors.js";
 import { formatError } from "../utils/formatters.js";
 import { theme } from "../utils/theme.js";
+import { isLongRunning } from "./catalog.js";
+import {
+  runOpenTuiLauncher,
+  shouldLaunchStartScreen,
+} from "./opentui-launch.js";
 
-/** Commands that block the interactive loop until the process exits. */
-const LONG_RUNNING = new Set([
-  "tui",
-  "dev start",
-  "dashboard dev",
-  "logs",
-  "logs all",
-]);
+function recentsPath(): string {
+  return join(homedir(), ".hoox", ".tui-state", "launcher-recent.json");
+}
 
-function isLongRunning(commandStr: string): boolean {
-  const normalized = commandStr.trim();
-  if (LONG_RUNNING.has(normalized)) return true;
-  // `logs worker X` / `workers logs X` / `workers dev X` / `dev worker X`
-  if (/^(logs|workers logs|workers dev|dev worker)\b/.test(normalized)) {
-    return true;
+function readRecents(): string[] {
+  try {
+    const raw = readFileSync(recentsPath(), "utf-8");
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((x): x is string => typeof x === "string").slice(0, 8);
+  } catch {
+    return [];
   }
-  return false;
+}
+
+function pushRecent(commandStr: string): void {
+  const next = [
+    commandStr,
+    ...readRecents().filter((x) => x !== commandStr),
+  ].slice(0, 8);
+  try {
+    const path = recentsPath();
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, JSON.stringify(next), "utf-8");
+  } catch {
+    /* ignore */
+  }
+}
+
+function cliVersion(): string {
+  try {
+    const pkgPath = new URL("../../package.json", import.meta.url);
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as {
+      version?: string;
+    };
+    return pkg.version ?? "dev";
+  } catch {
+    return "dev";
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -59,7 +89,40 @@ function isLongRunning(commandStr: string): boolean {
  * - Exit or Ctrl+C to quit
  */
 export async function runInteractiveTUI(program: Command): Promise<void> {
-  // Compact HOOX wordmark (animates on TTY, static otherwise)
+  if (shouldLaunchStartScreen()) {
+    const usedOpenTui = await runOpenTuiLoop(program);
+    if (usedOpenTui) return;
+  }
+
+  await runClackMenu(program);
+}
+
+/**
+ * OpenCode-style OpenTUI home. Returns false when the TUI package is
+ * missing so the Clack menu can take over.
+ */
+async function runOpenTuiLoop(program: Command): Promise<boolean> {
+  const version = cliVersion();
+  let launchedOnce = false;
+
+  while (true) {
+    const result = await runOpenTuiLauncher(program, {
+      version,
+      recents: readRecents(),
+    });
+    if (result === null) {
+      return launchedOnce;
+    }
+    launchedOnce = true;
+    if (result.action === "quit") return true;
+
+    const commandStr = result.argv.join(" ");
+    pushRecent(commandStr);
+    await runCommand(program, commandStr);
+  }
+}
+
+async function runClackMenu(program: Command): Promise<void> {
   await animateBanner();
   process.stdout.write("\n");
   intro("hoox");
@@ -70,10 +133,8 @@ export async function runInteractiveTUI(program: Command): Promise<void> {
 
     const result = await handleCategory(category, program);
     if (result === "exit") break;
-    // "back" or "continue" → loop back to main menu
   }
 
-  // Legal footer
   process.stdout.write(
     theme.dim("─".repeat(50)) + "\n" + theme.muted(DISCLAIMER) + "\n"
   );

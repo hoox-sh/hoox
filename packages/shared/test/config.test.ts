@@ -46,7 +46,7 @@ describe("validateConfig", () => {
     const errors = validateConfig({
       apiUrl: "https://api.example.com",
       refreshIntervalMs: 500,
-      theme: "dark",
+      theme: "signal",
     });
     expect(errors).toEqual([]);
   });
@@ -91,23 +91,35 @@ describe("validateConfig", () => {
   });
 
   test("returns error for invalid theme value", () => {
-    const errors = validateConfig({ theme: "blue" as "dark" | "light" });
-    expect(errors).toContain('theme must be "dark" or "light"');
+    const errors = validateConfig({ theme: "blue" as "signal" });
+    expect(errors).toContain('theme must be "signal", "volt", or "void"');
   });
 
-  test("accepts theme 'dark'", () => {
-    expect(validateConfig({ theme: "dark" })).toHaveLength(0);
+  test("accepts theme 'signal'", () => {
+    expect(validateConfig({ theme: "signal" })).toHaveLength(0);
+  });
+
+  test("accepts theme 'volt'", () => {
+    expect(validateConfig({ theme: "volt" })).toHaveLength(0);
+  });
+
+  test("accepts theme 'void'", () => {
+    expect(validateConfig({ theme: "void" })).toHaveLength(0);
   });
 
   test("accepts theme 'light'", () => {
-    expect(validateConfig({ theme: "light" })).toHaveLength(0);
+    expect(validateConfig({ theme: "light" as "signal" })).toHaveLength(0);
+  });
+
+  test("accepts legacy theme 'dark'", () => {
+    expect(validateConfig({ theme: "dark" as "signal" })).toHaveLength(0);
   });
 
   test("returns multiple errors when multiple fields invalid", () => {
     const errors = validateConfig({
       apiUrl: "ftp://bad",
       refreshIntervalMs: 50,
-      theme: "blue" as "dark" | "light",
+      theme: "blue" as "signal",
     });
     expect(errors).toHaveLength(3);
   });
@@ -150,7 +162,7 @@ describe("readConfigSync", () => {
     const config = readConfigSync();
     expect(config.apiUrl).toBe("http://localhost:8787");
     expect(config.refreshIntervalMs).toBe(500);
-    expect(config.theme).toBe("dark");
+    expect(config.theme).toBe("signal");
     expect(config.defaultView).toBe("dashboard");
   });
 
@@ -268,7 +280,7 @@ describe("readConfigSync / write with mocked fs (file paths)", () => {
       apiUrl: "http://x",
       apiToken: "",
       refreshIntervalMs: 500,
-      theme: "dark" as const,
+      theme: "signal" as const,
       activeExchanges: [],
       notifications: { alerts: true, trades: true, debug: false, system: true },
       soundEnabled: true,

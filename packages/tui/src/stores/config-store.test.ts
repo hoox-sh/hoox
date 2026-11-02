@@ -20,7 +20,7 @@ import type {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const DEFAULT_STATE = {
-  theme: "dark" as const,
+  theme: "signal" as const,
   refreshIntervalMs: 500,
   defaultView: "dashboard" as ViewId,
   activeExchanges: [] as string[],
@@ -68,8 +68,8 @@ describe("useConfigStore", () => {
   // ── Initial State ─────────────────────────────────────────────────────────
 
   describe("initial state", () => {
-    it("starts with dark theme", () => {
-      expect(useConfigStore.getState().theme).toBe("dark");
+    it("starts with signal theme", () => {
+      expect(useConfigStore.getState().theme).toBe("signal");
     });
 
     it("starts with 500ms refresh interval", () => {
@@ -108,24 +108,24 @@ describe("useConfigStore", () => {
 
   describe("updateConfig", () => {
     it("updates a single config field", () => {
-      useConfigStore.getState().updateConfig({ theme: "light" });
-      expect(useConfigStore.getState().theme).toBe("light");
+      useConfigStore.getState().updateConfig({ theme: "volt" });
+      expect(useConfigStore.getState().theme).toBe("volt");
     });
 
     it("updates multiple config fields at once", () => {
       useConfigStore.getState().updateConfig({
-        theme: "light",
+        theme: "void",
         refreshIntervalMs: 1000,
         soundEnabled: true,
       });
       const state = useConfigStore.getState();
-      expect(state.theme).toBe("light");
+      expect(state.theme).toBe("void");
       expect(state.refreshIntervalMs).toBe(1000);
       expect(state.soundEnabled).toBe(true);
     });
 
     it("does not change unspecified fields", () => {
-      useConfigStore.getState().updateConfig({ theme: "light" });
+      useConfigStore.getState().updateConfig({ theme: "volt" });
       const state = useConfigStore.getState();
       expect(state.refreshIntervalMs).toBe(500); // unchanged
       expect(state.defaultView).toBe("dashboard"); // unchanged
@@ -205,7 +205,7 @@ describe("useConfigStore", () => {
     it("resets all fields to factory defaults", () => {
       // First, mutate everything
       useConfigStore.getState().updateConfig({
-        theme: "light",
+        theme: "void",
         refreshIntervalMs: 2000,
         defaultView: "settings",
         activeExchanges: ["binance"],
@@ -218,7 +218,7 @@ describe("useConfigStore", () => {
       useConfigStore.getState().resetDefaults();
 
       const state = useConfigStore.getState();
-      expect(state.theme).toBe("dark");
+      expect(state.theme).toBe("signal");
       expect(state.refreshIntervalMs).toBe(500);
       expect(state.defaultView).toBe("dashboard");
       expect(state.soundEnabled).toBe(false);

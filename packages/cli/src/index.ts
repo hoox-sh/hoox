@@ -24,13 +24,16 @@ if (typeof Bun === "undefined") {
 
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
-import { toError } from "@hoox-sh/hoox-shared";
+import {
+  toError,
+  readConfigSync,
+  WIZARD_STATE_PATH,
+} from "@hoox-sh/hoox-shared";
 import { COPYRIGHT } from "@hoox-sh/hoox-shared/legal";
-import { WIZARD_STATE_PATH } from "@hoox-sh/hoox-shared";
 import { CLIError, ExitCode } from "./utils/errors.js";
 import { formatError, formatCompletion } from "./utils/formatters.js";
 import { suggestForCommand } from "./utils/error-handler.js";
-import { theme } from "./utils/theme.js";
+import { theme, applyCliTheme } from "./utils/theme.js";
 import { renderHelp } from "./utils/help-formatter.js";
 import { suggestNextCommand, getCmdPath } from "./utils/completion.js";
 import { registerInitCommand } from "./commands/init/index.js";
@@ -65,6 +68,7 @@ import { registerPerfCommand } from "./commands/perf/index.js";
 import { registerCompletionCommand } from "./commands/completion/index.js";
 import { runInteractiveTUI } from "./ui/index.js";
 import { ensureWorkspaceContext } from "./services/workspace/index.js";
+import { shouldLaunchStartScreen } from "./ui/opentui-launch.js";
 
 // ---------------------------------------------------------------------------
 // Program setup
@@ -84,10 +88,7 @@ program
     "Hoox CLI — manage Cloudflare Workers, infrastructure, secrets, and deployments"
   )
   .version(`${pkgVersion}\n\n${COPYRIGHT}`)
-  .addHelpText(
-    "beforeAll",
-    theme.heading("\nHoox CLI — Cloudflare Workers Platform\n")
-  )
+  .helpOption("-h, --help", "Display help")
   .configureHelp({
     // Cast the helper param: renderHelp accepts the standard
     // helpInformation signature but Commander types it as Help class.
@@ -120,6 +121,20 @@ program.option("--json", "Output in JSON format");
 program.option("--quiet", "Minimal output");
 program.option("--no-color", "Disable color output");
 program.option("-y, --yes", "Skip confirmation prompts");
+program.option("--theme <name>", "Color theme: signal | volt | void");
+
+function applyStartupTheme(): void {
+  const flagIdx = process.argv.indexOf("--theme");
+  const fromFlag =
+    flagIdx >= 0 ? process.argv[flagIdx + 1] : process.env.HOOX_THEME;
+  try {
+    const cfg = readConfigSync();
+    applyCliTheme(fromFlag ?? cfg.theme);
+  } catch {
+    applyCliTheme(fromFlag);
+  }
+}
+applyStartupTheme();
 
 // ---------------------------------------------------------------------------
 // Completion hooks — stamp start time + print footer on success
@@ -390,7 +405,14 @@ export async function main(): Promise<void> {
         }
       }
 
-      // Interactive TUI mode — launches when hoox is called with no arguments
+      // Interactive launcher (OpenTUI home, Clack fallback). Non-TTY
+      // prints the grouped catalog instead of hanging on a prompt.
+      if (!shouldLaunchStartScreen()) {
+        process.stdout.write(
+          renderHelp(program, program.helpInformation as never)
+        );
+        return;
+      }
       await runInteractiveTUI(program);
     }
   } catch (err) {

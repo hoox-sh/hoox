@@ -334,6 +334,17 @@ export function getTuiEntryCandidates(runtimeRoot: string): string[] {
 }
 
 /**
+ * Candidate CLI launcher (start-screen) entry files under a monorepo root.
+ */
+export function getTuiLauncherCandidates(runtimeRoot: string): string[] {
+  const root = resolve(runtimeRoot);
+  return [
+    join(root, "packages", "tui", "src", "launcher.tsx"),
+    join(root, "packages", "tui", "dist", "launcher.js"),
+  ];
+}
+
+/**
  * Resolves a relative path within the Hoox home directory.
  *
  * Behavior:

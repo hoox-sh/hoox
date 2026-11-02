@@ -373,6 +373,7 @@ function isDevLogEnabled(): boolean {
 export function registerTUICommand(program: Command): void {
   program
     .command("tui")
+    .summary("Launch the OpenTUI terminal operations center")
     .description("Launch the OpenTUI terminal operations center")
     .option("--fps <number>", "Target frames per second", "30")
     .option("--no-mouse", "Disable mouse support")

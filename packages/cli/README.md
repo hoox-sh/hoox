@@ -27,7 +27,7 @@
 - **Repair & Recovery** (`hoox repair`): Comprehensive system check, guided rebuild, per-component repair.
 - **Top-level Secrets & Keys**: `hoox secrets` and `hoox keys` for Cloudflare Worker secrets and internal auth keys.
 - **Unified Dashboard** (`hoox dashboard dev | deploy`): Start the dev server or build & deploy the Next.js dashboard.
-- **Interactive menu & TUI**: Running `hoox` with **no arguments**: if `wrangler.jsonc` is missing, auto-runs `onboard` (or `onboard --resume` when `.wizard-state.json` exists); otherwise opens the interactive menu. `hoox tui` launches the full OpenTUI operations center.
+- **Interactive launcher & TUI**: Running `hoox` with **no arguments**: if `wrangler.jsonc` is missing, auto-runs `onboard` (or `onboard --resume` when `.wizard-state.json` exists); otherwise opens the OpenTUI start screen (command search, recommended actions). `hoox tui` launches the full operations center. `hoox --help` prints a grouped catalog. Non-TTY sessions print help instead of prompting.
 - **Operator security plane** (`hoox doctor`, `hoox tunnel`): Path/TUI hygiene, fail-closed remote transport (Bearer + Access), and private-ingress checks.
 - **Modern-minimal output**: Zinc/indigo palette, completion footer with “next step” suggestions, “did you mean …” for typos, custom help formatter, `--no-color` / `NO_COLOR` / `TERM=dumb`, compact `formatNumber` / `formatBytes`. Shared `format*` helpers available to plugin authors.
 - **Shell Completions**: bash, zsh, and fish completion scripts via `hoox completion <shell>`.
