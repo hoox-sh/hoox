@@ -14,7 +14,7 @@
     "test:all": "bun test test/",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bun check --no-script"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

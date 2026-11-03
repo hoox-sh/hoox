@@ -53,7 +53,7 @@ jobs:
       - name: Build shared package
         # Required: the shared package's `exports` map points `import`/`types`
         # at `dist/*.js` / `dist/*.d.ts`, so consumers (dashboard, workers,
-        # etc.) need `packages/shared/dist/` to exist before `tsc --noEmit`
+        # etc.) need `packages/shared/dist/` to exist before `bun check`
         # can resolve type declarations. PR #109 (#7d6abcc) switched the
         # `import` condition from `src/*.ts` to `dist/*.js` and broke this
         # implicitly — no previous CI run built the package.

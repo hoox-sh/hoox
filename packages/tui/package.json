@@ -33,7 +33,7 @@
     "start": "bun run bin/hoox-tui.js",
     "test": "bun test --preload ./src/test-setup.ts",
     "test:e2e": "bun test --preload ./src/test-setup.ts test/e2e/",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "bun check --no-script",
     "prepublishOnly": "bun run typecheck && bun run build"
   },
   "dependencies": {

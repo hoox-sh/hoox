@@ -346,7 +346,7 @@ bun run build    # Uses next build with Turbopack
 bun run dev      # Development with Turbopack
 
 # Type checking
-bunx tsc --noEmit
+bun check --no-script
 
 # Clear caches if build issues persist
 rm -rf .next && rm -rf .next/cache

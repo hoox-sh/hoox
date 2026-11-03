@@ -496,7 +496,7 @@ bun run typecheck
 The CI pipeline runs in this order:
 
 1. `bun run lint` — ESLint check
-2. `bun run typecheck` — TypeScript check (`tsc --noEmit`)
+2. `bun run typecheck` — TypeScript check (`bun check --no-script`)
 3. `bun test packages/cli --coverage` — Run tests with coverage (~80%+ overall; `src/` ~95%)
 4. `bun run build` — TypeScript build check
 

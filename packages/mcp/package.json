@@ -15,7 +15,7 @@
   "scripts": {
     "start": "bun src/main.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "bun check --no-script",
     "build": "bun build ./src/main.ts --outdir ./dist --target bun"
   },
   "dependencies": {

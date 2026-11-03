@@ -80,7 +80,7 @@
   "scripts": {
     "build": "bun run scripts/build.ts",
     "prepublishOnly": "bun run build && bun run typecheck",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "bun check --no-script",
     "test": "bun test"
   },
   "peerDependencies": {

@@ -30,7 +30,7 @@
     "build:dashboard": "cd workers/dashboard && bun run build",
     "typecheck": "bun scripts/typecheck-all.ts",
     "types:workers": "bun scripts/generate-worker-types.ts",
-    "typecheck:root": "tsc --noEmit",
+    "typecheck:root": "bun check --no-script",
     "typecheck:prod": "tsc -p tsconfig.prod.json --noEmit",
     "graph": "bun scripts/extract-graph.ts",
     "coverage:check": "bun scripts/check-coverage.ts",
