@@ -32,7 +32,10 @@ import {
   formatSecretFailureDetails,
 } from "../../utils/wrangler-output.js";
 import { serializeEnvLine } from "../../utils/env-file.js";
-import { ensureWorkerInStack } from "../../services/stack/index.js";
+import {
+  ensureWorkerInStack,
+  cloneWorkerIfMissing,
+} from "../../services/stack/index.js";
 import {
   WORKER_MANIFESTS,
   resolveCatalogWorkerName,
@@ -50,6 +53,29 @@ function rejectPlannedWorker(name: string): void {
     true,
     "Use pyne-worker or pyne-agent-worker."
   );
+}
+
+/**
+ * Ensure the worker is in wrangler.jsonc and checked out before secrets I/O.
+ * Enables missing satellites (prompt / `--yes`); clones empty trees.
+ */
+async function ensureSecretsWorkerReady(
+  canonical: string,
+  opts: FormatOptions,
+  yes: boolean,
+  svc: SecretsService
+): Promise<SecretsService> {
+  const manifest = WORKER_MANIFESTS[canonical];
+  if (!manifest) return svc;
+
+  if (!svc.getWorkerPath(canonical)) {
+    await ensureWorkerInStack(canonical, { format: opts, yes });
+    return SecretsService.create();
+  }
+
+  const workerPath = svc.getWorkerPath(canonical) ?? manifest.path;
+  await cloneWorkerIfMissing(canonical, workerPath, opts);
+  return svc;
 }
 
 /** Render a structured secret-sync result; set exitCode on failure. */
@@ -352,7 +378,8 @@ It writes to the worker's .dev.vars file and syncs to Cloudflare.
 
 Optional satellites (pyne-worker, pyne-agent-worker) that are missing
 from wrangler.jsonc are offered to enable and wire into the stack.
-Pass --yes to skip that confirmation.
+If the worker is already in config but the checkout is empty, the CLI
+clones the submodule automatically. Pass --yes to skip enable prompts.
 
 EXAMPLES:
   hoox secrets set trade-worker EXCHANGE_KEY_BINDING
@@ -366,11 +393,8 @@ EXAMPLES:
           const canonical = resolveCatalogWorkerName(workerName) ?? workerName;
           rejectPlannedWorker(canonical);
 
-          if (!svc.getWorkerPath(canonical) && !svc.getWorkerPath(workerName)) {
-            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-            await ensureWorkerInStack(canonical, { format: opts, yes });
-            svc = await SecretsService.create();
-          }
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          svc = await ensureSecretsWorkerReady(canonical, opts, yes, svc);
 
           const declared = svc.listSecrets(canonical);
           const manifestSecrets = WORKER_MANIFESTS[canonical]
@@ -417,7 +441,7 @@ EXAMPLES:
                 ExitCode.ERROR,
                 undefined,
                 true,
-                `Enable the worker with \`hoox workers enable ${canonical} --yes\`, then re-run.`
+                `If the worker tree is empty, re-run so the CLI can clone it, or \`hoox workers enable ${canonical} --yes\`.`
               ),
               opts
             );
@@ -475,11 +499,8 @@ EXAMPLES:
           const canonical = resolveCatalogWorkerName(workerName) ?? workerName;
           rejectPlannedWorker(canonical);
 
-          if (!svc.getWorkerPath(canonical) && !svc.getWorkerPath(workerName)) {
-            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-            await ensureWorkerInStack(canonical, { format: opts, yes });
-            svc = await SecretsService.create();
-          }
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          svc = await ensureSecretsWorkerReady(canonical, opts, yes, svc);
 
           const declared = svc.listSecrets(canonical);
 
@@ -496,7 +517,8 @@ EXAMPLES:
             `workers/${canonical}`;
           const { configPath, deployName } =
             await resolveWorkerWranglerConfig(workerPath);
-          const deploy = deployName ?? workerName;
+          const deploy = deployName ?? canonical;
+          // Wrangler prompts `Are you sure? (y/n)` — pipe yes for non-TTY.
           const proc = Bun.spawn(
             [
               "wrangler",
@@ -510,10 +532,13 @@ EXAMPLES:
             ],
             {
               cwd: workerPath,
+              stdin: "pipe",
               stdout: "pipe",
               stderr: "pipe",
             }
           );
+          await proc.stdin.write("y\n");
+          await proc.stdin.end();
 
           const exitCode = await proc.exited;
           if (exitCode !== 0) {
@@ -602,14 +627,8 @@ EXAMPLES:
             const canonical =
               resolveCatalogWorkerName(workerName) ?? workerName;
             rejectPlannedWorker(canonical);
-            if (
-              !svc.getWorkerPath(canonical) &&
-              !svc.getWorkerPath(workerName)
-            ) {
-              const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-              await ensureWorkerInStack(canonical, { format: opts, yes });
-              svc = await SecretsService.create();
-            }
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            svc = await ensureSecretsWorkerReady(canonical, opts, yes, svc);
             const syncSpin = createCliSpinner(opts);
             syncSpin.start(`Syncing ${scopeLabel} for "${canonical}"...`);
             const result = await svc.syncToCloudflare(canonical, syncOpts);
@@ -636,16 +655,16 @@ EXAMPLES:
             );
             reportSecretSync(result.value!, opts, scopeLabel);
           } else {
-            // Include every worker that declares secrets; under --system also
-            // walk all configured workers so mesh keys in .dev.vars are found.
-            const all = svc.listAllSecrets();
-            let workers = Object.keys(all);
-            if (systemOnly && workers.length === 0) {
-              formatSuccess("No workers with secrets in wrangler.jsonc.", opts);
-              return;
-            }
+            // Full sync: workers with declared secrets. --system: every worker
+            // in root config (including empty secrets arrays) so mesh keys sync.
+            let workers = svc.listWorkersForSync(systemOnly);
             if (workers.length === 0) {
-              formatSuccess("No secrets to sync.", opts);
+              formatSuccess(
+                systemOnly
+                  ? "No workers in wrangler.jsonc."
+                  : "No secrets to sync.",
+                opts
+              );
               return;
             }
 
@@ -654,8 +673,10 @@ EXAMPLES:
             let totalSecrets = 0;
             const syncSpin = createCliSpinner(opts);
             const failures: string[] = [];
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
 
             for (const name of workers) {
+              svc = await ensureSecretsWorkerReady(name, opts, yes, svc);
               syncSpin.start(`Syncing ${name}...`);
               const result = await svc.syncToCloudflare(name, syncOpts);
               if (!result.ok) {

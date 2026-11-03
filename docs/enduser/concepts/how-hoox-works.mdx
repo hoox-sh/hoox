@@ -140,9 +140,9 @@ Once validated, the gateway bypasses public internet routing and calls the inter
 
 ### 4. Exchange Execution & Cryptographic Signing
 
-The `trade-worker` loads your encrypted API credentials from Cloudflare Secrets, computes the HMAC-SHA256 signature for the order parameters, and pushes the signed request to the exchange's nearest API gateway:
+The `trade-worker` loads your encrypted API credentials from Cloudflare® Secrets, computes the HMAC-SHA256 signature for the order parameters, and pushes the signed request to the exchange's nearest API gateway:
 
-- **Smart Placement**: Because Smart Placement is enabled, Cloudflare automatically runs your worker on the physical edge node located geographically closest to the exchange's servers (e.g. Frankfurt for Bybit, Tokyo for Binance), cutting network transit time by up to 60%.
+- **Smart Placement**: Because Smart Placement is enabled, Cloudflare® automatically runs your worker on the physical edge node located geographically closest to the exchange's servers (e.g. Frankfurt for Bybit, Tokyo for Binance), cutting network transit time by up to 60%.
 
 ---
 
@@ -167,7 +167,7 @@ Finally, the `trade-worker` pings **`telegram-worker`** via an internal binding:
 
 <Tip>
   If the exchange API experiences transient network dropouts or severe rate
-  limits, the Hoox Gateway automatically transfers the payload to **Cloudflare
+  limits, the Hoox Gateway automatically transfers the payload to **Cloudflare®
   Queues** with an exponential retry schedule (`30s` → `1m` → `5m` → `15m`),
   keeping your strategy fully reliable even during periods of heavy market
   volatility.

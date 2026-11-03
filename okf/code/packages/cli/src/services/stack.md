@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-02T10:35:54Z
+  at: 2026-11-03T12:12:12Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/stack"
@@ -24,4 +24,4 @@ okf_lock: generated
 
 # Packages
 
-`@clack/prompts`, `@hoox-sh/hoox-shared`, `bun:test`, `jsonc-parser`, `node:fs/promises`, `node:os`, `node:path`
+`@clack/prompts`, `@hoox-sh/hoox-shared`, `bun:test`, `jsonc-parser`, `node:fs`, `node:fs/promises`, `node:os`, `node:path`

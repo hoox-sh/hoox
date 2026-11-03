@@ -5,6 +5,24 @@ This project adheres loosely to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## [0.18.0] — 2026-11-03
+
+### Fixed
+
+- **`secrets set` / `secrets sync` / `secrets delete`**: when a worker is already in `wrangler.jsonc` but the checkout is empty (only `.dev.vars`), clone the submodule automatically before Cloudflare sync. Previously only missing-from-config satellites were enabled/cloned.
+- **`secrets sync` (all workers)** and **`repair secrets`**: clone empty trees; `--system` walks every configured worker (including empty `secrets: []`).
+- **`deploy` / `dev` / `test` / `repair` / `update` worker**: always `loadWorkerOrWire` (empty-tree clone + enable), via workspace `wrangler.jsonc`.
+- **`secrets delete`**: pipes `y\n` to wrangler confirmation; uses canonical deploy name.
+- **`keys generate`**: prints redacted names only (no plaintext mesh values).
+- **`wireCallerBindings`**: materializes `wrangler.jsonc` from `.example` before writing; never mutates tracked examples.
+- **Mesh maps**: telegram gets `TELEGRAM_INTERNAL_KEY_BINDING`; Jupiter placeholders skipped; keys/setup share `serializeEnvLine`.
+- **`git submodule add -f`** for optional satellites under gitignored `workers/*`; restore stashed `.dev.vars` even if clone fails.
+
+### Changed
+
+- Ships with `@hoox-sh/hoox-tui@0.5.0` and `@hoox-sh/hoox-shared@1.7.0`.
+- Optional satellites `workers/pyne-worker` and `workers/pyne-agent-worker` are un-ignored in `.gitignore` for submodule registration.
+
 ## [0.17.0] — 2026-11-02
 
 ### Added

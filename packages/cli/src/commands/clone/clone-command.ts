@@ -119,11 +119,15 @@ async function cloneWorker(
     : targetPath;
   const finalPath = homeDir ? `${homeDir}/workers/${adjustedPath}` : targetPath;
 
-  const proc = Bun.spawn(["git", "submodule", "add", repoUrl, finalPath], {
-    cwd,
-    stdout: "pipe",
-    stderr: "pipe",
-  });
+  // `-f` allows adding optional satellites under gitignored `workers/*`.
+  const proc = Bun.spawn(
+    ["git", "submodule", "add", "-f", repoUrl, finalPath],
+    {
+      cwd,
+      stdout: "pipe",
+      stderr: "pipe",
+    }
+  );
 
   const exitCode = await proc.exited;
 

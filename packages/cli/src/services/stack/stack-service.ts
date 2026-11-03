@@ -11,7 +11,7 @@
  * "Worker not found in config".
  */
 
-import { readdir, rename, rm } from "node:fs/promises";
+import { copyFile, mkdir, readdir, rename, rm } from "node:fs/promises";
 import { join, resolve as resolvePath } from "node:path";
 import { parse as parseJsonc, modify, applyEdits } from "jsonc-parser";
 import type { FormattingOptions } from "jsonc-parser";
@@ -118,12 +118,14 @@ export async function ensureWorkerInStack(
     if (!options.skipClone) {
       cloned = await cloneWorkerIfMissing(name, manifest.path, fmt);
     }
+    // Clone may have just landed wrangler.jsonc — wire callers that were skipped earlier.
+    const wired = await wireCallerBindings(name, fmt, config);
     return {
       name,
       alreadyEnabled: true,
       seeded: false,
       cloned,
-      wired: false,
+      wired,
     };
   }
 
@@ -157,11 +159,11 @@ export async function ensureWorkerInStack(
     );
   }
 
-  const wired = await wireCallerBindings(name, fmt, config);
   let cloned = false;
   if (!options.skipClone) {
     cloned = await cloneWorkerIfMissing(name, manifest.path, fmt);
   }
+  const wired = await wireCallerBindings(name, fmt, config);
 
   return {
     name,
@@ -183,7 +185,11 @@ export async function loadWorkerOrWire(
 ): Promise<{ name: string; worker: WorkerConfig }> {
   const name = requireCatalogWorker(input);
   let worker = config.getWorker(name);
-  if (!worker?.enabled) {
+  // Ensure unless skipClone and already enabled (tests / callers that only
+  // need config). When already enabled with skipClone false, ensure still
+  // clones an empty tree and wires callers.
+  const needsEnsure = !worker?.enabled || !options.skipClone;
+  if (needsEnsure) {
     await ensureWorkerInStack(name, { ...options, config });
     await config.load();
     worker = config.getWorker(name);
@@ -237,7 +243,7 @@ export async function wireCallerBindings(
   for (const caller of callers) {
     const callerCfg = config.getWorker(caller.worker);
     if (!callerCfg) continue;
-    const wranglerPath = await resolveExistingWrangler(callerCfg.path);
+    const wranglerPath = await resolveWritableWrangler(callerCfg.path);
     if (!wranglerPath) continue;
     const added = await addServiceBinding(
       wranglerPath,
@@ -258,15 +264,22 @@ export async function wireCallerBindings(
   return wired;
 }
 
-async function resolveExistingWrangler(
+/**
+ * Prefer real `wrangler.jsonc`. If only the tracked `.example` exists,
+ * materialize a local copy first — never mutate `*.example`.
+ */
+async function resolveWritableWrangler(
   workerPath: string
 ): Promise<string | null> {
   const abs = resolvePath(workerPath);
-  for (const file of ["wrangler.jsonc", "wrangler.jsonc.example"]) {
-    const candidate = join(abs, file);
-    if (await Bun.file(candidate).exists()) return candidate;
-  }
-  return null;
+  const real = join(abs, "wrangler.jsonc");
+  if (await Bun.file(real).exists()) return real;
+
+  const example = join(abs, "wrangler.jsonc.example");
+  if (!(await Bun.file(example).exists())) return null;
+
+  await copyFile(example, real);
+  return real;
 }
 
 async function addServiceBinding(
@@ -314,11 +327,20 @@ export async function cloneWorkerIfMissing(
   const abs = resolvePath(workerPath);
   if (await isGitCheckout(abs)) return false;
 
+  // Only auto-clone catalog paths inside this workspace. Temp dirs / absolute
+  // paths outside the monorepo are left alone (tests, custom layouts).
+  const root = process.cwd();
+  if (abs !== root && !abs.startsWith(`${root}/`)) {
+    return false;
+  }
+
   const prepared = await prepareCloneTarget(abs);
   if (!prepared) return false;
 
   const repo = `https://github.com/hoox-sh/${WORKER_MANIFESTS[name]?.repo ?? name}.git`;
-  const proc = Bun.spawn(["git", "submodule", "add", repo, workerPath], {
+  // `-f` is required when `workers/*` is gitignored and the path is not yet
+  // a registered submodule (optional satellites like pyne-agent-worker).
+  const proc = Bun.spawn(["git", "submodule", "add", "-f", repo, workerPath], {
     cwd: process.cwd(),
     stdout: "pipe",
     stderr: "pipe",
@@ -393,6 +415,7 @@ async function prepareCloneTarget(
 
 async function restoreStash(abs: string, stashPath: string): Promise<void> {
   try {
+    await mkdir(abs, { recursive: true });
     await rename(stashPath, join(abs, ".dev.vars"));
   } catch {
     /* stash restore is best-effort */

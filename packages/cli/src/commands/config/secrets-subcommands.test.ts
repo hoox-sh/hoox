@@ -98,6 +98,7 @@ function okSync(
 function mockService(impl: {
   listSecrets?: (w: string) => string[];
   listAllSecrets?: () => Record<string, string[]>;
+  listWorkersForSync?: (systemOnly?: boolean) => string[];
   getWorkerPath?: (w: string) => string | null;
   syncToCloudflare?: (
     w: string,
@@ -106,10 +107,16 @@ function mockService(impl: {
     { ok: true; value: SecretSyncResult } | { ok: false; error: string }
   >;
 }): void {
+  const all = impl.listAllSecrets ?? (() => ({ "trade-worker": ["API_KEY"] }));
   const svc = {
     listSecrets: impl.listSecrets ?? (() => ["API_KEY"]),
-    listAllSecrets:
-      impl.listAllSecrets ?? (() => ({ "trade-worker": ["API_KEY"] })),
+    listAllSecrets: all,
+    listWorkersForSync:
+      impl.listWorkersForSync ??
+      ((systemOnly?: boolean) => {
+        const keys = Object.keys(all());
+        return systemOnly ? keys : keys;
+      }),
     getWorkerPath: impl.getWorkerPath ?? (() => "workers/trade-worker"),
     syncToCloudflare:
       impl.syncToCloudflare ??
@@ -524,9 +531,12 @@ describe("registerSecretsSubcommands", () => {
     });
 
     it("prints no workers under --system when empty", async () => {
-      mockService({ listAllSecrets: () => ({}) });
+      mockService({
+        listAllSecrets: () => ({}),
+        listWorkersForSync: () => [],
+      });
       const { stdout } = await run(["secrets", "sync", "--system"]);
-      expect(stdout).toContain("No workers with secrets");
+      expect(stdout).toContain("No workers in wrangler.jsonc");
     });
   });
 
@@ -719,7 +729,7 @@ describe("registerSecretsSubcommands", () => {
       }
     });
 
-    it("allows any secret when the worker declares none", async () => {
+    it("falls back to catalog secrets when wrangler declares none", async () => {
       const { dir, workerPath } = makeWorkerDir("hoox-set-any-");
       try {
         mockStdinChunks(["anything\n"]);
@@ -730,8 +740,8 @@ describe("registerSecretsSubcommands", () => {
             ok: true,
             value: okSync({
               worker: w,
-              synced: ["CUSTOM"],
-              items: [{ name: "CUSTOM", status: "synced" }],
+              synced: ["EXCHANGE_KEY_BINDING"],
+              items: [{ name: "EXCHANGE_KEY_BINDING", status: "synced" }],
             }),
           }),
         });
@@ -739,13 +749,34 @@ describe("registerSecretsSubcommands", () => {
           "secrets",
           "set",
           "trade-worker",
-          "CUSTOM",
+          "EXCHANGE_KEY_BINDING",
         ]);
-        expect(stdout).toContain('Secret "CUSTOM" updated in');
+        expect(stdout).toContain('Secret "EXCHANGE_KEY_BINDING" updated in');
         expect(readFileSync(join(workerPath, ".dev.vars"), "utf-8")).toContain(
-          "CUSTOM=anything"
+          "EXCHANGE_KEY_BINDING=anything"
         );
         expect(exitCode).toBe(0);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects secrets outside the catalog when wrangler declares none", async () => {
+      const { dir, workerPath } = makeWorkerDir("hoox-set-catalog-");
+      try {
+        mockStdinChunks(["anything\n"]);
+        mockService({
+          listSecrets: () => [],
+          getWorkerPath: () => workerPath,
+        });
+        const { stdout, exitCode } = await run([
+          "secrets",
+          "set",
+          "trade-worker",
+          "CUSTOM",
+        ]);
+        expect(exitCode).toBe(ExitCode.INVALID_USAGE);
+        expect(stdout).toContain('Secret "CUSTOM" is not declared');
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -940,6 +971,10 @@ describe("registerSecretsSubcommands", () => {
       ) => {
         return {
           exited: Promise.resolve(0),
+          stdin: {
+            write: async () => 2,
+            end: async () => {},
+          },
           stdout: new ReadableStream({
             start(c) {
               c.close();
@@ -982,6 +1017,10 @@ describe("registerSecretsSubcommands", () => {
       ) => {
         return {
           exited: Promise.resolve(1),
+          stdin: {
+            write: async () => 2,
+            end: async () => {},
+          },
           stdout: new ReadableStream({
             start(c) {
               c.close();

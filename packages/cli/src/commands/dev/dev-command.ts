@@ -27,7 +27,10 @@ import {
 } from "../../utils/formatters.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
-import { loadWorkerOrWire } from "../../services/stack/index.js";
+import {
+  createWorkspaceConfigService,
+  loadWorkerOrWire,
+} from "../../services/stack/index.js";
 
 /**
  * Injectable filesystem shim for the dashboard presence check.
@@ -307,19 +310,16 @@ EXAMPLES:
           cmd: Command
         ) => {
           const fmt = getFormatOptions(cmd);
-          const configService = new ConfigService();
+          const configService = createWorkspaceConfigService();
           await configService.load();
 
-          let worker = configService.getWorker(name);
-          if (!worker?.enabled) {
-            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-            const loaded = await loadWorkerOrWire(configService, name, {
-              format: fmt,
-              yes,
-            });
-            name = loaded.name;
-            worker = loaded.worker;
-          }
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          const loaded = await loadWorkerOrWire(configService, name, {
+            format: fmt,
+            yes,
+          });
+          name = loaded.name;
+          const worker = loaded.worker;
 
           const port = options.port ?? 8787;
 

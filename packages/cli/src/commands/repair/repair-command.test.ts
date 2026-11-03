@@ -551,6 +551,8 @@ describe("registerRepairCommand", () => {
       (SecretsService as unknown as Record<string, unknown>).create = mock(
         async () => ({
           listAllSecrets: () => ({}),
+          listWorkersForSync: () => [],
+          getWorkerPath: () => null,
           syncToCloudflare: mock(async () => ({
             ok: true,
             value: { ok: true, synced: [], failed: [], skipped: [] },
@@ -578,6 +580,9 @@ describe("registerRepairCommand", () => {
             hoox: ["A"],
             "trade-worker": ["B"],
           }),
+          listWorkersForSync: () => ["hoox", "trade-worker"],
+          getWorkerPath: (n: string) =>
+            n === "hoox" ? "workers/hoox-worker" : `workers/${n}`,
           syncToCloudflare: sync,
         })
       );
@@ -591,6 +596,8 @@ describe("registerRepairCommand", () => {
       (SecretsService as unknown as Record<string, unknown>).create = mock(
         async () => ({
           listAllSecrets: () => ({ hoox: ["A"] }),
+          listWorkersForSync: () => ["hoox"],
+          getWorkerPath: () => "workers/hoox-worker",
           syncToCloudflare: mock(async () => ({
             ok: true as const,
             value: {
@@ -611,6 +618,8 @@ describe("registerRepairCommand", () => {
       (SecretsService as unknown as Record<string, unknown>).create = mock(
         async () => ({
           listAllSecrets: () => ({ hoox: ["A"] }),
+          listWorkersForSync: () => ["hoox"],
+          getWorkerPath: () => "workers/hoox-worker",
           syncToCloudflare: mock(async () => ({
             ok: false as const,
             error: "auth",

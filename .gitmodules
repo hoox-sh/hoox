@@ -31,3 +31,6 @@
 	path = workers/pyne-worker
 	url = https://github.com/hoox-sh/pyne-worker.git
 	branch = main
+[submodule "workers/pyne-agent-worker"]
+	path = workers/pyne-agent-worker
+	url = https://github.com/hoox-sh/pyne-agent-worker.git

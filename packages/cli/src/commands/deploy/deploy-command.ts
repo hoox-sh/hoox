@@ -44,7 +44,10 @@ import { resolve } from "node:path";
 import { TelegramService } from "./telegram-service.js";
 import { EnvService } from "../../services/env/index.js";
 import * as jsonc from "jsonc-parser";
-import { loadWorkerOrWire } from "../../services/stack/index.js";
+import {
+  createWorkspaceConfigService,
+  loadWorkerOrWire,
+} from "../../services/stack/index.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1138,18 +1141,16 @@ EXAMPLES:
       withErrorHandling(
         async (name: string, options: { env?: string }, cmd: Command) => {
           const fmt = getFormatOptions(cmd);
-          const configService = new ConfigService();
+          const configService = createWorkspaceConfigService();
           await configService.load();
           const cf = new CloudflareService();
-          let workerName = name;
-          if (!configService.getWorker(workerName)) {
-            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-            const loaded = await loadWorkerOrWire(configService, workerName, {
-              format: fmt,
-              yes,
-            });
-            workerName = loaded.name;
-          }
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          // Always ensure/clone — covers missing, disabled, and empty trees.
+          const loaded = await loadWorkerOrWire(configService, name, {
+            format: fmt,
+            yes,
+          });
+          const workerName = loaded.name;
 
           const result = await deploySingle(
             configService,
@@ -1160,11 +1161,11 @@ EXAMPLES:
 
           if (result.success) {
             const url = result.url ? ` — ${result.url}` : "";
-            formatSuccess(`Deployed ${name}${url}`, fmt);
+            formatSuccess(`Deployed ${workerName}${url}`, fmt);
           } else {
             formatError(
               new CLIError(
-                `Failed to deploy "${name}": ${result.error}`,
+                `Failed to deploy "${workerName}": ${result.error}`,
                 ExitCode.ERROR
               ),
               fmt

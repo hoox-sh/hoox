@@ -23,7 +23,7 @@ HOOX is the **execution mesh**. It is not the Pine language, and it is not the c
 | **HOOX** | Signal in → risk → CEX/DEX hop → notify | this site |
 | **PYNE** | Pine parse / evaluate (`hoox-pyne`, `Runtime.run`) | [hoox.sh/pyne/docs](https://hoox.sh/pyne/docs) |
 | **PyneTS** | TypeScript library `@hoox-sh/pynets` | [PyneTS](https://hoox.sh/pyne/docs/pynets) |
-| **pyne-worker** | Python Cloudflare isolate, `POST /run` | [isolate](/docs/devops/workers/pyne-worker) · [PYNE docs](https://hoox.sh/pyne/docs/pyne-worker) |
+| **pyne-worker** | Python Cloudflare® isolate, `POST /run` | [isolate](/docs/devops/workers/pyne-worker) · [PYNE docs](https://hoox.sh/pyne/docs/pyne-worker) |
 | **pyne-agent-worker** | Natural language → Pine | [agent](https://hoox.sh/pyne/docs/agent) |
 | **AXIS** | Charting PWA | [hoox.sh/axis/docs](https://hoox.sh/axis/docs) |
 
@@ -34,7 +34,7 @@ flowchart LR
   AXIS[AXIS chart] -->|evaluate| PYNE[PYNE Flask / Pyodide]
   AXIS -->|optional URL| PYW[pyne-worker]
   AGENT[pyne-agent-worker] -->|optional validate| PYW
-  TV[TradingView webhook] --> GW[hoox gateway]
+  TV[TradingView® webhook] --> GW[hoox gateway]
   MAIL[Mailgun] --> EW[email-worker]
   PYW -->|StrategyEvent + internal auth| TW[trade-worker]
   GW --> TW
@@ -51,7 +51,7 @@ flowchart LR
 
 Only **trade-worker** holds exchange keys. Paths that reach it:
 
-- HOOX gateway `POST /webhook` (TradingView / HTTP), after `WEBHOOK_API_KEY_BINDING`
+- HOOX gateway `POST /webhook` (TradingView® / HTTP), after `WEBHOOK_API_KEY_BINDING`
 - email-worker `POST /webhook` (Mailgun HMAC) or `POST /email-signal` (internal JSON only)
 - telegram-worker commands (allowlisted)
 - **pyne-worker** `TRADE_SERVICE` on `StrategyEvent` (`X-Internal-Auth-Key`)

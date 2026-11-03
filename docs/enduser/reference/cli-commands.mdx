@@ -8,7 +8,7 @@ title: "CLI Commands Reference"
 description: "Command tree, flags, and examples for the hoox CLI (0.16.0)."
 ---
 
-The `@hoox-sh/hoox-cli` tool (**0.16.0**) manages workspace bootstrap, Cloudflare provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
+The `@hoox-sh/hoox-cli` tool (**0.16.0**) manages workspace bootstrap, Cloudflare® provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
 
 <Frame caption="hoox deploy --help">
   <img src="/docs/images/cli/help-deploy.png" alt="Terminal showing hoox deploy help" />
@@ -105,12 +105,12 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 │   ├── kv-config                    Synchronize KV manifest variables
 │   ├── history <worker>             Show deployment history
 │   └── rollback <worker> [version]  Rollback to a previous version
-├── infra                            Cloudflare resource provisioning
+├── infra                            Cloudflare® resource provisioning
 │   ├── provision [--dry-run]        Auto-provision all required services
 │   ├── d1 [list/create/delete]      Manage D1 databases
 │   ├── kv [list/create/delete]      Manage KV namespaces
 │   ├── r2 [list/create/delete]      Manage R2 object storage buckets
-│   ├── queues [list/create/delete]  Manage Cloudflare Queues
+│   ├── queues [list/create/delete]  Manage Cloudflare® Queues
 │   ├── vectorize [list/create/delete]  Manage vector search indexes
 │   └── analytics [list/create]      Manage Analytics Engine datasets
 ├── config                           Manage wrangler.jsonc configuration
@@ -119,9 +119,9 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 │   ├── env [init/show/validate/generate-dev-vars]
 │   ├── kv [set/get/list/delete/apply-manifest/manifest]  CONFIG_KV runtime keys
 │   ├── transport [show|set]         Operator transport (public|access|mtls|tunnel)
-│   ├── secrets [list/set/delete/sync]  Cloudflare Worker secrets (legacy location)
+│   ├── secrets [list/set/delete/sync]  Cloudflare® Worker secrets (legacy location)
 │   └── keys [generate/list]         Internal auth keys (legacy location)
-├── secrets                          Manage Cloudflare Worker secrets [top-level]
+├── secrets                          Manage Cloudflare® Worker secrets [top-level]
 │   ├── list [worker]                List secrets for a worker
 │   ├── set <worker> <name>          Set a secret (worker required; prompts for value)
 │   ├── delete <worker> <name>       Delete a secret
@@ -167,7 +167,7 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 │   ├── kv                           Restore KV manifest defaults
 │   ├── db                           Re-apply schema.sql and tracking migrations
 │   └── rebuild                      Full destructive interactive rebuild
-├── logs                             Real-time Cloudflare Worker log tailing
+├── logs                             Real-time Cloudflare® Worker log tailing
 │   ├── worker <name>                Tail logs for a specific worker [--no-follow]
 │   └── all                          Tail logs from all enabled workers
 ├── schema                           Validate/generate worker manifests
@@ -178,8 +178,8 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 ├── test                             Run verification pipeline (CI)
 │   ├── all                          lint → typecheck → unit → integration
 │   ├── unit / integration / worker  Scoped test runs
-│   └── live                         Live Cloudflare service tests (no mocks)
-├── waf                              Cloudflare WAF
+│   └── live                         Live Cloudflare® service tests (no mocks)
+├── waf                              Cloudflare® WAF
 │   ├── status                       Show WAF status
 │   ├── rules [list/add/remove]      Manage firewall rules
 │   └── mode [enable/disable]        Enable or disable WAF
@@ -199,7 +199,7 @@ hoox                                 Startup: resolve monorepo + chdir. No args:
 │   ├── ingest                       Fetch OHLCV into storage
 │   ├── sync-vendor                  Sync pynescript vendor modules
 │   └── deploy                       sync-vendor + wrangler deploy
-├── trace                            Cloudflare Workers Observability (beta)
+├── trace                            Cloudflare® Workers Observability (beta)
 │   ├── events                       Query trace events (spans) with filters
 │   ├── metrics                      Aggregate metrics (count, p99, …)
 │   ├── live                         Live tail traces
@@ -233,7 +233,7 @@ hoox onboard --token cfut_xxx --account xxx --preset full
 hoox init        # Write wrangler.jsonc, collect integration secrets
 hoox setup       # Mesh keys, D1 schema, secrets, dashboard
 
-# Self-hosted (no Cloudflare): print VPS / Docker path and exit
+# Self-hosted (no Cloudflare®): print VPS / Docker path and exit
 # Does not write wrangler.jsonc
 hoox init --self-hosted
 
@@ -263,7 +263,7 @@ hoox dashboard dev
 ### C. Edge Provisioning & Deployment
 
 ```bash
-# Provision all databases, buckets, and queues on your Cloudflare account
+# Provision all databases, buckets, and queues on your Cloudflare® account
 hoox infra provision
 hoox infra provision --dry-run
 
@@ -317,7 +317,7 @@ hoox monitor analytics errors --hours 24
 Canonical trade-worker exchange secrets are **`EXCHANGE_KEY_BINDING`** and **`EXCHANGE_SECRET_BINDING`**. `hoox secrets set` requires the worker name and prompts for the value (hidden stdin). There is no third positional argument.
 
 ```bash
-# Set a Cloudflare Worker secret (live exchange keys)
+# Set a Cloudflare® Worker secret (live exchange keys)
 hoox secrets set trade-worker EXCHANGE_KEY_BINDING
 hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
 
@@ -389,7 +389,7 @@ hoox tui --debug
 hoox tui --remote --allow-insecure
 ```
 
-Remote mode requires Bearer (`--token` / `HOOX_API_TOKEN`), Cloudflare Access service-token env, or `--allow-insecure`.
+Remote mode requires Bearer (`--token` / `HOOX_API_TOKEN`), Cloudflare® Access service-token env, or `--allow-insecure`.
 
 ### J. Update (git, not npm)
 

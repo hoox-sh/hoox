@@ -6,6 +6,7 @@
 export {
   SecretsService,
   SYSTEM_SECRET_NAMES,
+  WORKER_SYSTEM_SECRETS,
   isSystemSecret,
   resolveWorkerWranglerConfig,
   default as SecretsServiceDefault,

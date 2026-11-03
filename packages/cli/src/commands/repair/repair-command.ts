@@ -19,7 +19,13 @@ import {
 } from "../../utils/formatters.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
-import { loadWorkerOrWire } from "../../services/stack/index.js";
+import {
+  cloneWorkerIfMissing,
+  createWorkspaceConfigService,
+  ensureWorkerInStack,
+  loadWorkerOrWire,
+} from "../../services/stack/index.js";
+import { WORKER_MANIFESTS } from "@hoox-sh/hoox-shared";
 
 async function handleCheck(
   fmt: FormatOptions,
@@ -73,18 +79,14 @@ async function handleWorker(
   yes = false
 ): Promise<void> {
   try {
-    const { ConfigService } = await import("../../services/config/index.js");
-    const config = new ConfigService();
+    const config = createWorkspaceConfigService();
     await config.load();
-    let workerConfig = config.getWorker(name);
-    if (!workerConfig) {
-      const loaded = await loadWorkerOrWire(config, name, {
-        format: fmt,
-        yes,
-      });
-      name = loaded.name;
-      workerConfig = loaded.worker;
-    }
+    const loaded = await loadWorkerOrWire(config, name, {
+      format: fmt,
+      yes,
+    });
+    name = loaded.name;
+    const workerConfig = loaded.worker;
     const cf = new CloudflareService();
     const result = await cf.deploy(workerConfig.path);
     if (result.ok) {
@@ -190,11 +192,10 @@ async function handleInfra(
 
 async function handleSecrets(fmt: FormatOptions): Promise<void> {
   try {
-    const secrets = await SecretsService.create();
-    const allSecrets = secrets.listAllSecrets();
-    const workers = Object.keys(allSecrets);
+    let secrets = await SecretsService.create();
+    const workers = secrets.listWorkersForSync(true);
     if (workers.length === 0) {
-      formatSuccess("No workers with declared secrets", fmt);
+      formatSuccess("No workers in wrangler.jsonc", fmt);
       return;
     }
 
@@ -203,6 +204,19 @@ async function handleSecrets(fmt: FormatOptions): Promise<void> {
     const issues: string[] = [];
 
     for (const name of workers) {
+      const manifest = WORKER_MANIFESTS[name];
+      if (manifest) {
+        if (!secrets.getWorkerPath(name)) {
+          await ensureWorkerInStack(name, { format: fmt, yes: true });
+          secrets = await SecretsService.create();
+        } else {
+          await cloneWorkerIfMissing(
+            name,
+            secrets.getWorkerPath(name) ?? manifest.path,
+            fmt
+          );
+        }
+      }
       const result = await secrets.syncToCloudflare(name, { systemOnly: true });
       if (!result.ok) {
         workersFailed++;

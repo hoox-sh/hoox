@@ -49,16 +49,16 @@ A curated vocabulary of terms used throughout the Hoox documentation. Understand
 | **V8 Isolate**              | A sandboxed JavaScript runtime instance within Cloudflare® Workers, providing strong isolation between tenants with zero shared memory.                          |
 | **pyne-worker**             | Python PYNE tooling isolate for Pine Script™ edge evaluate (`/run`, bar-close cron, R2 OHLCV); managed via `hoox pyne`. Mesh-auth when forwarding to trade-worker. |
 | **Microservice**            | A small, independently deployable service that performs a single business function within the Hoox architecture.                                                 |
-| **Service Binding**         | A Cloudflare feature enabling direct, low-latency communication between edge workers inside the V8 engine — no public internet routing required.                 |
-| **Durable Object (DO)**     | A Cloudflare primitive providing single-threaded, persistent server-side state. Used by Hoox for idempotency locks and distributed coordination.                 |
-| **D1 Database**             | Cloudflare's serverless, edge-native SQLite database offering ACID-compliant transactions with sub-5ms query latency.                                            |
+| **Service Binding**         | A Cloudflare® feature enabling direct, low-latency communication between edge workers inside the V8 engine — no public internet routing required.                 |
+| **Durable Object (DO)**     | A Cloudflare® primitive providing single-threaded, persistent server-side state. Used by Hoox for idempotency locks and distributed coordination.                 |
+| **D1 Database**             | Cloudflare®'s serverless, edge-native SQLite database offering ACID-compliant transactions with sub-5ms query latency.                                            |
 | **KV (Key-Value Store)**    | A globally distributed, highly available key-value store optimized for high-read/low-write operations at sub-millisecond latency.                                |
 | **R2 Object Storage**       | An S3-compatible, zero-egress-fee object storage service for storing arbitrary data (logs, reports, backups).                                                    |
-| **Cloudflare Queues**       | A serverless message broker providing at-least-once delivery with built-in exponential backoff retry for asynchronous processing.                                |
+| **Cloudflare® Queues**       | A serverless message broker providing at-least-once delivery with built-in exponential backoff retry for asynchronous processing.                                |
 | **Vectorize**               | A serverless vector search database enabling semantic matching and retrieval-augmented generation (RAG).                                                         |
-| **Browser Rendering**       | A Cloudflare service providing headless Chrome instances at the edge for automated web interaction and PDF generation.                                           |
+| **Browser Rendering**       | A Cloudflare® service providing headless Chrome instances at the edge for automated web interaction and PDF generation.                                           |
 | **Analytics Engine**        | A time-series metrics platform for tracking API call latency, error rates, and custom events across all workers.                                                 |
-| **Smart Placement**         | A Cloudflare optimization that automatically deploys worker code to the edge node geographically closest to its external API dependencies.                       |
+| **Smart Placement**         | A Cloudflare® optimization that automatically deploys worker code to the edge node geographically closest to its external API dependencies.                       |
 | **Zero Trust Architecture** | A security model where no service trusts any other by default. All access is authenticated, authorized, and encrypted — even internal communications.            |
 | **Kill Switch**             | An emergency mechanism (stored in KV) that instantly halts all trade execution globally when activated, requiring no code redeployment.                          |
 
@@ -87,10 +87,10 @@ A curated vocabulary of terms used throughout the Hoox documentation. Understand
 | **Wrangler**                      | Cloudflare®'s official CLI for Workers. Hoox embeds it; prefer `hoox` / `hx` for operator workflows.                           |
 | **Linear Rail banner**            | Default CLI banner style (`◆ H · O · O · X`) with tagline/version; compact TTY animation.                                      |
 | **Docker Compose**                | A container orchestration tool used by Hoox for running isolated local development environments with all services.             |
-| **TUI (Terminal User Interface)** | A full-screen, keyboard-driven terminal dashboard (`hoox tui` / `@hoox-sh/hoox-tui` 0.3.x) for monitoring and controlling the Hoox platform. |
+| **TUI (Terminal User Interface)** | A full-screen, keyboard-driven terminal dashboard (`hoox tui` / `@hoox-sh/hoox-tui` 0.4.0) for monitoring and controlling the Hoox platform. |
 | **MCP server**                    | Stdio MCP process (`bun run mcp`, `packages/mcp`) that exposes one tool per `hoox` command with a confirm gate. See [MCP](/docs/devops/mcp). |
 | **OpenTUI**                       | A React-based framework for building terminal user interfaces, used to construct Hoox's TUI.                                   |
-| **OpenNext**                      | An adapter enabling Next.js applications to run on Cloudflare Workers. Hoox uses it for the dashboard Command Center.          |
+| **OpenNext**                      | An adapter enabling Next.js applications to run on Cloudflare® Workers. Hoox uses it for the dashboard Command Center.          |
 | **schema.sql**                    | Canonical D1 DDL at `workers/trade-worker/schema.sql`. Apply with `hoox db apply`; tracking columns with `hoox db migrate`.   |
 | **CI/CD**                         | Continuous Integration / Continuous Deployment. Hoox's pipeline runs linting, type checks, unit tests, and build verification. |
 

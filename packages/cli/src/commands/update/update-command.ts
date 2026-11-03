@@ -5,7 +5,6 @@
 
 import { Command } from "commander";
 import { createCliSpinner } from "../../utils/format-mode.js";
-import { ConfigService } from "../../services/config/index.js";
 import { UpdateService } from "../../services/update/index.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
@@ -18,7 +17,10 @@ import {
   isGitRepo,
   isSubmodule,
 } from "../../utils/git.js";
-import { loadWorkerOrWire } from "../../services/stack/index.js";
+import {
+  createWorkspaceConfigService,
+  loadWorkerOrWire,
+} from "../../services/stack/index.js";
 
 export function registerUpdateCommand(program: Command): void {
   program
@@ -67,19 +69,15 @@ EXAMPLES:
           }
 
           if (target) {
-            const configService = new ConfigService();
+            const configService = createWorkspaceConfigService();
             await configService.load();
-            let worker = configService.getWorker(target);
-
-            if (!worker) {
-              const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-              const loaded = await loadWorkerOrWire(configService, target, {
-                format: fmt,
-                yes,
-              });
-              target = loaded.name;
-              worker = loaded.worker;
-            }
+            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+            const loaded = await loadWorkerOrWire(configService, target, {
+              format: fmt,
+              yes,
+            });
+            target = loaded.name;
+            const worker = loaded.worker;
 
             const submodulePath = worker.path;
             if (!(await isSubmodule(cwd, submodulePath))) {

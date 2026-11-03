@@ -5,7 +5,7 @@
 
 ---
 title: "FAQ"
-description: "Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.15.x."
+description: "Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.16.0."
 ---
 
 # ❓ Frequently Asked Questions (FAQ)
@@ -117,7 +117,7 @@ The change takes effect on the next worker request — no redeployment needed.
 
 ### Q: Why does my first deploy take longer than subsequent ones?
 
-The initial deployment provisions Cloudflare resources (D1 databases, KV namespaces, Queue topics, R2 buckets). Subsequent deploys only update the worker code, which is much faster.
+The initial deployment provisions Cloudflare® resources (D1 databases, KV namespaces, Queue topics, R2 buckets). Subsequent deploys only update the worker code, which is much faster.
 
 ### Q: How do I change the exchange routing?
 
@@ -142,7 +142,7 @@ The `trade:kill_switch` flag is set to `true` in KV. On the next incoming webhoo
 
 This means the Durable Object idempotency engine detected a duplicate request. This typically happens when:
 
-- TradingView fires multiple alerts for the same signal (configure `alert.freq_once_per_bar_close`)
+- TradingView® fires multiple alerts for the same signal (configure `alert.freq_once_per_bar_close`)
 - You accidentally reused the same `idempotencyKey` in a manual test
 
 This is **by design** — it protects you from accidentally executing a trade twice. Wait for the TTL to expire, or send a unique `idempotencyKey` / `Idempotency-Key` header. Auto fingerprints already include a per-minute time bucket.
@@ -178,7 +178,7 @@ Follow the guided repair prompts:
 1. Submodule failure → `git submodule update --init --recursive`
 2. Dependency failure → `bun install`
 3. Type error → `bun run typecheck`
-4. Missing Cloudflare binding → `hoox repair infra`
+4. Missing Cloudflare® binding → `hoox repair infra`
 5. Missing secret → `hoox secrets set <worker> <NAME>`
 
 ---
@@ -197,7 +197,7 @@ No. The `agent-worker` can run trailing-stop and kill-switch logic **without any
 
 All five are supported with automatic fallback ordering:
 
-1. **Workers AI** (Cloudflare) — Free with generous limits, runs at the edge
+1. **Workers AI** (Cloudflare®) — Free with generous limits, runs at the edge
 2. **Anthropic** (Claude) — Strong reasoning, complex analysis
 3. **Google AI** (Gemini) — Large context windows, multimodal
 4. **OpenAI** (GPT-4o) — Most capable general-purpose model
@@ -207,7 +207,7 @@ Providers are tried sequentially on failure. You only pay for the one that respo
 
 ### Q: What does the agent-worker cron do exactly?
 
-The `agent-worker` runs on a **configurable Cloudflare Cron** (any interval from **1 to 1440 minutes**; default **15 minutes** via `*/15 * * * *` in `wrangler.jsonc`) and performs:
+The `agent-worker` runs on a **configurable Cloudflare® Cron** (any interval from **1 to 1440 minutes**; default **15 minutes** via `*/15 * * * *` in `wrangler.jsonc`) and performs:
 
 1. Reads all open positions from D1
 2. Fetches current market prices from exchange APIs
@@ -232,7 +232,7 @@ To change the interval, update `triggers.crons` and redeploy. See [agent-worker 
 
 ### Q: How does Hoox handle exchange downtime?
 
-When a direct exchange API call fails (timeout, rate limit, HTTP 5xx), the gateway automatically enqueues the trade payload into **Cloudflare Queues** with exponential backoff:
+When a direct exchange API call fails (timeout, rate limit, HTTP 5xx), the gateway automatically enqueues the trade payload into **Cloudflare® Queues** with exponential backoff:
 
 - Retry 1: 30 seconds
 - Retry 2: 1 minute
@@ -247,7 +247,7 @@ No. Opt-in tenant isolation exists in open core and is **off by default**. Exist
 
 ### Q: Can I use a custom domain?
 
-Yes. Cloudflare Workers supports custom domains. After deploying, configure your domain in the Cloudflare dashboard under **Workers & Pages → Custom Domains**.
+Yes. Cloudflare® Workers supports custom domains. After deploying, configure your domain in the Cloudflare® dashboard under **Workers & Pages → Custom Domains**.
 
 ---
 
@@ -255,7 +255,7 @@ Yes. Cloudflare Workers supports custom domains. After deploying, configure your
 
 ### Q: Why edge workers instead of a VPS?
 
-| Factor                         | VPS            | Cloudflare Edge |
+| Factor                         | VPS            | Cloudflare® Edge |
 | ------------------------------ | -------------- | --------------- |
 | Latency to Binance (Frankfurt) | 80-150ms       | 2-8ms           |
 | Cold-start time                | 1,000-15,000ms | \&lt;3ms        |
@@ -264,12 +264,12 @@ Yes. Cloudflare Workers supports custom domains. After deploying, configure your
 | DDoS protection                | Self-managed   | Built-in WAF    |
 | Global failover                | Complex setup  | Automatic       |
 
-### Q: Why Cloudflare over AWS Lambda@Edge?
+### Q: Why Cloudflare® over AWS Lambda@Edge?
 
 - **No cold starts** — V8 isolates stay warm between requests
 - **True global distribution** — 330+ PoPs vs. Lambda@Edge's 6 regions
 - **Native SQLite** — D1 is first-class, not bolted-on
-- **Built-in queuing** — Cloudflare Queues vs. SQS
+- **Built-in queuing** — Cloudflare® Queues vs. SQS
 - **Zero egress fees** — R2 is S3-compatible with no bandwidth charges
 
 ---

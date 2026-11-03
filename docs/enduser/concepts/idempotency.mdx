@@ -10,13 +10,13 @@ description: "Two-phase Durable Object reserve/commit/release so webhook retries
 
 # 🔒 Idempotency & Durable Objects
 
-How Hoox uses Cloudflare Durable Objects for **at-most-once acceptance** at the gateway (two-phase reserve/commit/release) so webhook retries cannot double-dispatch orders during network dropouts.
+How Hoox uses Cloudflare® Durable Objects for **at-most-once acceptance** at the gateway (two-phase reserve/commit/release) so webhook retries cannot double-dispatch orders during network dropouts.
 
 ---
 
 ## ⚠️ The Danger: How Webhook Retries Lead to Double-Ordering
 
-Gateway **two-phase** flow (since 0.13, current in 0.15.x): **reserve** the key as `pending` before queue/service work, **commit** only when the trade truly succeeds (including soft-fail HTTP 2xx with `success: false` → **release**), so failed attempts can retry. Auto fingerprints include a **per-minute time bucket** so intentional same-size trades later are not blocked for the full TTL. Prefer a client `idempotencyKey` / `Idempotency-Key` header when you need cross-minute uniqueness.
+Gateway **two-phase** flow (since 0.13, current HOOX 0.16.0): **reserve** the key as `pending` before queue/service work, **commit** only when the trade truly succeeds (including soft-fail HTTP 2xx with `success: false` → **release**), so failed attempts can retry. Auto fingerprints include a **per-minute time bucket** so intentional same-size trades later are not blocked for the full TTL. Prefer a client `idempotencyKey` / `Idempotency-Key` header when you need cross-minute uniqueness.
 
 Without idempotency, a typical signal failure sequence looks like this:
 
@@ -38,9 +38,9 @@ Without idempotency, a typical signal failure sequence looks like this:
 
 ## 🛡️ The Hoox Solution: Durable Objects Mutex Locking
 
-To enforce at-most-once acceptance within the TTL, Hoox implements an **atomic two-phase dedup** inside `workers/hoox-worker` utilizing **Cloudflare Durable Objects**.
+To enforce at-most-once acceptance within the TTL, Hoox implements an **atomic two-phase dedup** inside `workers/hoox-worker` utilizing **Cloudflare® Durable Objects**.
 
-A Durable Object is a unique, single-threaded compute isolate managed by Cloudflare that maintains its own highly optimized, in-memory state and persistent on-disk SQLite storage. Because access to a specific Durable Object instance is single-threaded, it acts as an absolute **distributed lock** (mutex).
+A Durable Object is a unique, single-threaded compute isolate managed by Cloudflare® that maintains its own highly optimized, in-memory state and persistent on-disk SQLite storage. Because access to a specific Durable Object instance is single-threaded, it acts as an absolute **distributed lock** (mutex).
 
 ### The Idempotency Workflow (two-phase)
 
@@ -116,7 +116,7 @@ Before any queue or service dispatch:
 
 ### 4. Cold-Start Resilience
 
-When a DO instance has been idle (no requests for the TTL period), Cloudflare may evict it from memory. Upon the next request:
+When a DO instance has been idle (no requests for the TTL period), Cloudflare® may evict it from memory. Upon the next request:
 
 <ol>
   <li>

@@ -89,6 +89,9 @@ test_output.txt
 workers/*
 !workers/*/
 !workers/analytics-worker
+# Optional satellites (not in default clone); allow `git submodule add` without -f
+!workers/pyne-worker
+!workers/pyne-agent-worker
 
 skills-lock.json
 
@@ -194,3 +197,6 @@ TAGLINES.md
 .agent-sync-notice.md
 .agent_sync*.md
 .agent-sync/
+
+# Local nested worker checkouts under the CLI package (not submodules)
+packages/cli/workers/

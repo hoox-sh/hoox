@@ -138,7 +138,7 @@ const SECRET_WORKER_MAP: Record<string, readonly string[]> = {
   AGENT_INTERNAL_KEY: ["agent-worker", "dashboard"],
   SESSION_SECRET: ["dashboard"],
   WEBHOOK_API_KEY_BINDING: ["hoox"],
-  TELEGRAM_INTERNAL_KEY_BINDING: ["trade-worker"],
+  TELEGRAM_INTERNAL_KEY_BINDING: ["trade-worker", "telegram-worker"],
   // env-service + wrangler: trade-worker; dashboard also declares it for outbound calls
   API_SERVICE_KEY_BINDING: ["trade-worker", "dashboard"],
   // env-service + wrangler: dashboard only (trade alias for execute auth)
@@ -166,7 +166,7 @@ const DEV_VARS_WORKER_KEYS: Record<string, (keyof GeneratedKeys)[]> = {
     "WALLET_EXECUTE_KEY_BINDING",
   ],
   "web3-wallet-worker": ["INTERNAL_KEY_BINDING", "WALLET_EXECUTE_KEY_BINDING"],
-  "telegram-worker": ["INTERNAL_KEY_BINDING"],
+  "telegram-worker": ["INTERNAL_KEY_BINDING", "TELEGRAM_INTERNAL_KEY_BINDING"],
   dashboard: [
     "AGENT_INTERNAL_KEY",
     "SESSION_SECRET",
@@ -440,7 +440,9 @@ export class SetupService {
     if (solanaKey && !isPlaceholderValue(solanaKey)) {
       puts.push(["SOLANA_PRIVATE_KEY", solanaKey]);
     }
-    if (jupiterKey) puts.push(["JUPITER_API_KEY", jupiterKey]);
+    if (jupiterKey && !isPlaceholderValue(jupiterKey)) {
+      puts.push(["JUPITER_API_KEY", jupiterKey]);
+    }
     for (const [name, value] of puts) {
       this.onProgress({
         type: "secret-start",

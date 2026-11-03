@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "❓ Frequently Asked Questions (FAQ)"
-description: "description: \"Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.15.x.\"."
+description: "description: \"Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.16.0.\"."
 resource: "docs/enduser/reference/faq.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-03T12:12:12Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/faq.mdx"
@@ -57,4 +57,4 @@ Repo path `docs/enduser/reference/faq.mdx`.
   * Q: Can I use a custom domain?
 * 📋 Comparisons
   * Q: Why edge workers instead of a VPS?
-  * Q: Why Cloudflare over AWS Lambda@Edge?
+  * Q: Why Cloudflare® over AWS Lambda@Edge?

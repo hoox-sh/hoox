@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-03T12:12:12Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/secrets"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — Result, SYSTEM_SECRET_NAMES, SecretCheckResult, SecretStatus, SecretSyncItem, SecretSyncResult, SecretSyncStatus, SecretsService, SecretsServiceDefault, SyncSecretsOptions, WorkerSecretConfig, WorkersJsonc
+* `index.ts` — Result, SYSTEM_SECRET_NAMES, SecretCheckResult, SecretStatus, SecretSyncItem, SecretSyncResult, SecretSyncStatus, SecretsService, SecretsServiceDefault, SyncSecretsOptions, WORKER_SYSTEM_SECRETS, WorkerSecretConfig
 * `secrets-service.test.ts`
 * `secrets-service.ts` — SYSTEM_SECRET_NAMES, SecretsService, WORKER_SYSTEM_SECRETS, isSystemSecret, resolveWorkerWranglerConfig
 * `types.ts` — Result, SecretCheckResult, SecretStatus, SecretSyncItem, SecretSyncResult, SecretSyncStatus, SyncSecretsOptions, WorkerSecretConfig, WorkersJsonc

@@ -48,7 +48,7 @@ Use `hoox_catalog` to list paths, risk, and tool names. Use `hoox_describe` for 
 | `hoox_catalog` / `hoox_describe` | Live Commander catalog. New CLI commands appear without a second list.                                                              |
 | `hoox_plan`                      | Builds argv. Mutations return a confirm token and do not run.                                                                       |
 | redacting runner                 | Every command result strips ANSI, redacts secrets, parses JSON, and includes exit code, duration, and the CLI next-step hint.       |
-| `hoox_snapshot`                  | Read-only bundle: doctor, schema validate, schema list, repair check. `remote: true` adds health, workers, kill switch, and tunnel. |
+| `hoox_snapshot`                  | Read-only bundle: doctor, schema validate, schema list, repair check (`--no-typecheck`). `remote: true` adds health, workers, kill switch, and tunnel. |
 | `hoox_advise`                    | Next-step suggestion plus worker names and whether `.dev.vars` exists. File contents are not read.                                  |
 
 ## Confirm gate

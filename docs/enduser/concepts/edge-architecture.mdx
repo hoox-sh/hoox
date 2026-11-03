@@ -5,12 +5,12 @@
 
 ---
 title: "Edge-first architecture"
-description: "Why V8 isolates and Cloudflare Workers cut order-path latency versus a single VPS."
+description: "Why V8 isolates and Cloudflare® Workers cut order-path latency versus a single VPS."
 ---
 
 # ⚡ Edge-First Architecture
 
-Why running algorithmic trading bots on V8 isolates and Cloudflare's 330+ global data centers cuts latency by 60% and eliminates slippage.
+Why running algorithmic trading bots on V8 isolates and Cloudflare®'s 330+ global data centers cuts latency by 60% and eliminates slippage.
 
 ---
 
@@ -33,7 +33,7 @@ Traditional trading bots are deployed on a single virtual private server (VPS) i
 ### The Hoox Edge Path (Under 15ms latency)
 
 1. **Signal Generation**: A TradingView® alert fires in London.
-2. **Edge Ingestion**: The alert hits Cloudflare's nearest London Point of Presence (PoP) in **1.8ms**.
+2. **Edge Ingestion**: The alert hits Cloudflare®'s nearest London Point of Presence (PoP) in **1.8ms**.
 3. **V8 Isolate Processing**: A sandboxed V8 isolate processes and validates the order instantly (**\&lt;3ms**).
 4. **Smart Placement Routing**: The internal service binding transfers compute to the edge node geographically closest to Bybit's servers (Frankfurt) within **8ms**.
 5. **Total Edge Latency**: **Under 15ms** total network transit time.
@@ -48,7 +48,7 @@ Traditional trading bots are deployed on a single virtual private server (VPS) i
 
 Traditional architectures run on Virtual Machines or Docker containers. These runtimes carry significant memory overhead and introduce **cold starts**—the time required to spin up a container after inactivity.
 
-| Architectural Dimension |      Traditional VM / Container (VPS)       |       Cloudflare Edge Worker (V8 Isolate)        |
+| Architectural Dimension |      Traditional VM / Container (VPS)       |       Cloudflare® Edge Worker (V8 Isolate)        |
 | :---------------------- | :-----------------------------------------: | :----------------------------------------------: |
 | **Boot Architecture**   |  Heavy guest OS, Node runtime, npm modules  |      Sandboxed JavaScript V8 Engine runtime      |
 | **Cold-Start Delay**    |   **1,000ms – 15,000ms** (system stalls)    |        **< 3ms** (virtually non-existent)        |
@@ -56,14 +56,14 @@ Traditional architectures run on Virtual Machines or Docker containers. These ru
 | **Global Failover**     |  Requires complex DNS/Load Balancer setup   |    Natively distributed across 330+ locations    |
 | **Geographic Location** |              Fixed data center              |    Automatically routes to nearest user node     |
 | **Scaling Model**       |  Manual provisioning or autoscaling groups  | Automatic — each request may hit a different PoP |
-| **DDoS Protection**     | Requires separate service (e.g. Cloudflare) |           Built-in at the network edge           |
+| **DDoS Protection**     | Requires separate service (e.g. Cloudflare®) |           Built-in at the network edge           |
 | **Cost Model**          |         Pay for idle capacity 24/7          |       Pay-per-request; zero cost when idle       |
 
 ---
 
 ## 🎯 Smart Placement: Zero-Config Latency Optimizer
 
-To achieve sub-millisecond edge execution, Hoox enables Cloudflare's **Smart Placement** engine natively on all critical workers:
+To achieve sub-millisecond edge execution, Hoox enables Cloudflare®'s **Smart Placement** engine natively on all critical workers:
 
 ```json
 "placement": {
@@ -73,8 +73,8 @@ To achieve sub-millisecond edge execution, Hoox enables Cloudflare's **Smart Pla
 
 ### How Smart Placement Works
 
-1. When you deploy `trade-worker`, Cloudflare monitors its network dependencies. It notices that `trade-worker` makes outbound signed HTTPS REST requests to Bybit's Frankfurt server (`api.bybit.com`) and writes transaction rows to the `d1-worker` SQLite database.
-2. Instead of running the worker's CPU compute at the location where the user's browser or alert hits (e.g. California), Smart Placement **automatically shifts the compute isolate** to the Cloudflare node physically closest to the Bybit servers (Frankfurt).
+1. When you deploy `trade-worker`, Cloudflare® monitors its network dependencies. It notices that `trade-worker` makes outbound signed HTTPS REST requests to Bybit's Frankfurt server (`api.bybit.com`) and writes transaction rows to the `d1-worker` SQLite database.
+2. Instead of running the worker's CPU compute at the location where the user's browser or alert hits (e.g. California), Smart Placement **automatically shifts the compute isolate** to the Cloudflare® node physically closest to the Bybit servers (Frankfurt).
 3. The V8 engine performs all signature calculations and database writes at the edge gateway node, reducing the final API transit time to **under 2 milliseconds**.
 
 ### Latency Comparison: Real Numbers
@@ -88,7 +88,7 @@ To achieve sub-millisecond edge execution, Hoox enables Cloudflare's **Smart Pla
 
 <Note>
   Actual latency depends on exchange API server location, network conditions,
-  and Cloudflare PoP availability. Measurements represent typical round-trip
+  and Cloudflare® PoP availability. Measurements represent typical round-trip
   times observed in production.
 </Note>
 
@@ -123,11 +123,11 @@ All `SB:` prefixed connections occur **inside the V8 engine** with zero TCP hand
 
 <Tip>
   By removing VPS management, you do not just save latency—you also save
-  operational overhead. Cloudflare natively manages automatic scaling, load
+  operational overhead. Cloudflare® natively manages automatic scaling, load
   balancing, SSL negotiation, and route failovers for free.
 </Tip>
 
 ### 🔗 Next Steps
 
-- **[Cloudflare Services Explained](/docs/enduser/concepts/cloudflare-services)** — Learn how D1 SQLite databases, KV, and Queues fit together on the edge.
+- **[Cloudflare® Services Explained](/docs/enduser/concepts/cloudflare-services)** — Learn how D1 SQLite databases, KV, and Queues fit together on the edge.
 - **[AI Risk Manager](/docs/enduser/concepts/ai-risk-manager)** — Understand how autonomous risk checks run on global cron schedules.

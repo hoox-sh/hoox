@@ -13,6 +13,30 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-03
+
+CLI deep plumbing for optional satellites and mesh secrets: auto-clone empty worker trees, consistent ensure on deploy/dev/test/repair/update, safer secrets sync/delete/keys generate, and aligned telegram/dashboard mesh maps.
+
+### Fixed
+
+- Named and all-worker **`secrets`** flows clone empty checkouts (`git submodule add -f`); `--system` / **`repair secrets`** include workers with empty `secrets: []`.
+- **`deploy` / `dev` / `test` / `repair` / `update` worker** always run `loadWorkerOrWire` against the workspace `wrangler.jsonc`.
+- **`secrets delete`** confirms wrangler with `y\n`; **`keys generate`** prints redacted names only.
+- **`wireCallerBindings`** materializes `wrangler.jsonc` from `.example` instead of mutating tracked examples.
+- Mesh maps: telegram `TELEGRAM_INTERNAL_KEY_BINDING`; Jupiter placeholders skipped on DEX push.
+
+### Changed
+
+- `.gitignore` un-ignores optional satellites `workers/pyne-worker` and `workers/pyne-agent-worker`; `pyne-agent-worker` registered as a submodule.
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.18.0  |
+| `@hoox-sh/hoox-tui`    | 0.5.0   |
+| `@hoox-sh/hoox-shared` | 1.7.0   |
+
 ## [0.17.0] - 2026-11-02
 
 CLI schema upgrade for optional PYNE satellites, plus a visual CLI/TUI pass: compact OpenTUI launcher, grouped help, and the hoox.sh Signal / Volt / Void color packs.

@@ -15,7 +15,6 @@
  */
 import { Command } from "commander";
 import { createCliSpinner } from "../../utils/format-mode.js";
-import { ConfigService } from "../../services/config/index.js";
 import { theme, icons } from "../../utils/theme.js";
 import {
   formatSuccess,
@@ -28,7 +27,10 @@ import {
 import { startTimer } from "../../utils/timer.js";
 import { CLIError, ExitCode } from "../../utils/errors.js";
 import { withErrorHandling } from "../../utils/error-handler.js";
-import { loadWorkerOrWire } from "../../services/stack/index.js";
+import {
+  createWorkspaceConfigService,
+  loadWorkerOrWire,
+} from "../../services/stack/index.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -334,19 +336,15 @@ export function registerTestCommand(program: Command): void {
         async (name: string, options: { coverage?: boolean }, cmd: Command) => {
           const fmt = getFormatOptions(cmd);
 
-          const configService = new ConfigService();
+          const configService = createWorkspaceConfigService();
           await configService.load();
-          let workerConfig = configService.getWorker(name);
-
-          if (!workerConfig) {
-            const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
-            const loaded = await loadWorkerOrWire(configService, name, {
-              format: fmt,
-              yes,
-            });
-            name = loaded.name;
-            workerConfig = loaded.worker;
-          }
+          const yes = Boolean(cmd.optsWithGlobals<{ yes?: boolean }>().yes);
+          const loaded = await loadWorkerOrWire(configService, name, {
+            format: fmt,
+            yes,
+          });
+          name = loaded.name;
+          const workerConfig = loaded.worker;
 
           const workerDir = `${process.cwd()}/${workerConfig.path}`;
           const args = ["bun", "test"];

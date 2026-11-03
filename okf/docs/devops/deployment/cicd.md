@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cicd.mdx"
-description: "description: \"How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare edge…"
+description: "description: \"How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare® edge…"
 resource: "docs/devops/deployment/cicd.mdx"
 tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-03T12:12:12Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/cicd.mdx"

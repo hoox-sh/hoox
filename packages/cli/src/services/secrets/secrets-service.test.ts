@@ -540,7 +540,7 @@ describe("SecretsService", () => {
       }
     });
 
-    it("with systemOnly syncs telegram mesh INTERNAL key (not bot token)", async () => {
+    it("with systemOnly syncs telegram mesh keys (not bot token)", async () => {
       const dir = tmpDir();
       try {
         writeFileSync(
@@ -548,6 +548,7 @@ describe("SecretsService", () => {
           [
             "TG_BOT_TOKEN_BINDING=my-real-token",
             "INTERNAL_KEY_BINDING=int-real",
+            "TELEGRAM_INTERNAL_KEY_BINDING=int-real",
           ].join("\n") + "\n"
         );
 
@@ -566,9 +567,14 @@ describe("SecretsService", () => {
         });
         const sync = expectOk(result);
         expect(sync.ok).toBe(true);
-        // Bot token is user secret — only mesh INTERNAL is system for telegram
-        expect(sync.synced).toEqual(["INTERNAL_KEY_BINDING"]);
-        expect(called).toEqual([["INTERNAL_KEY_BINDING", "int-real"]]);
+        // Bot token is user secret — mesh INTERNAL + TELEGRAM_INTERNAL only
+        expect(sync.synced.sort()).toEqual(
+          ["INTERNAL_KEY_BINDING", "TELEGRAM_INTERNAL_KEY_BINDING"].sort()
+        );
+        expect(called.map(([n]) => n).sort()).toEqual(
+          ["INTERNAL_KEY_BINDING", "TELEGRAM_INTERNAL_KEY_BINDING"].sort()
+        );
+        expect(called.find(([n]) => n.startsWith("TG_"))).toBeUndefined();
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }

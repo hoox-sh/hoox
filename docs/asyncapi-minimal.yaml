@@ -4,9 +4,9 @@ info:
   version: 1.0.0
   description: |
     Event-driven message flows powering the Hoox algorithmic trading
-    platform on the Cloudflare edge.
+    platform on the Cloudflare® edge.
 
-    Covers Cloudflare Service Bindings (V8 worker-to-worker calls),
+    Covers Cloudflare® Service Bindings (V8 worker-to-worker calls),
     Queues (async trade execution), Cron triggers (AI risk assessment),
     Durable Objects (idempotency), and Email Routing (signal parsing).
 
@@ -24,18 +24,18 @@ servers:
   production:
     host: cloudflare-workers
     protocol: cloudflare-workers
-    description: Cloudflare Workers edge runtime with V8 Service Bindings
+    description: Cloudflare® Workers edge runtime with V8 Service Bindings
   queue:
     host: cloudflare-queues
     protocol: cloudflare-queues
-    description: Cloudflare Queues for asynchronous message delivery
+    description: Cloudflare® Queues for asynchronous message delivery
 defaultContentType: application/json
 channels:
   TradeWebhook:
     address: /webhook
     title: Trade signal webhook
     description: |
-      Incoming trade signals from TradingView, cURL, or any HTTP client.
+      Incoming trade signals from TradingView®, cURL, or any HTTP client.
       Received by the hoox gateway, validated, and forwarded to the
       execution engine.
     messages:
@@ -54,7 +54,7 @@ channels:
     address: TRADE_QUEUE
     title: Trade execution queue
     description: |
-      Cloudflare Queue for asynchronous trade execution. Three modes
+      Cloudflare® Queue for asynchronous trade execution. Three modes
       controlled by KV config: queue_everywhere, queue_failover (default),
       or queue_disabled.
     messages:
@@ -65,7 +65,7 @@ channels:
     title: D1 database operations
     description: |
       Parameterized SQL queries and batch statements executed against
-      Cloudflare D1 (SQLite at the edge). Accessed via service binding
+      Cloudflare® D1 (SQLite at the edge). Accessed via service binding
       from trade-worker, agent-worker, and dashboard.
     messages:
       SqlQuery:
@@ -96,7 +96,7 @@ channels:
     title: Scheduled AI risk assessment (cron)
     description: |
       Scheduled AI-powered risk analysis running every 5 minutes via the
-      Cloudflare Workers `scheduled` handler in `workers/agent-worker`.
+      Cloudflare® Workers `scheduled` handler in `workers/agent-worker`.
       The cron trigger invokes `runHousekeeping` and `processRoutine`,
       analyzing positions, market conditions, and adjusting trailing
       stops. Receives a `RiskOverride` message that may carry a
@@ -143,7 +143,7 @@ channels:
     title: Idempotency Durable Object
     description: |
       Durable Object that maintains a 24-hour lock on processed trade
-      keys to prevent duplicate execution. Accessed via **Cloudflare
+      keys to prevent duplicate execution. Accessed via **Cloudflare®
       Durable Object RPC** (not HTTP) from the gateway's logic layer
       using the `IDEMPOTENCY_STORE` binding declared in
       `workers/hoox-worker/wrangler.jsonc`. The DO class name is
@@ -162,7 +162,7 @@ channels:
     title: Email signal parsing
     description: |
       Parses incoming trade signals from forwarded emails. Uses
-      Cloudflare Email Routing to receive and process messages,
+      Cloudflare® Email Routing to receive and process messages,
       then forwards parsed signals to trade-worker.
     messages:
       EmailSignal:
@@ -180,7 +180,7 @@ channels:
     address: report-worker
     title: PDF report generation
     description: |
-      Generates PDF trade reports using Cloudflare Browser Rendering
+      Generates PDF trade reports using Cloudflare® Browser Rendering
       API. Triggered on demand via service binding from the dashboard
       or CLI.
     messages:
@@ -297,7 +297,7 @@ components:
     QueuedTrade:
       name: QueuedTrade
       title: Queued trade message
-      summary: Trade message enqueued via Cloudflare Queue
+      summary: Trade message enqueued via Cloudflare® Queue
       contentType: application/json
       payload:
         type: object
@@ -518,7 +518,7 @@ components:
         Trade signal parsed from a forwarded email. Two delivery paths
         converge on the same envelope:
 
-        1. **Cloudflare Email Routing** — the email worker receives a
+        1. **Cloudflare® Email Routing** — the email worker receives a
            `ForwardableEmailMessage` whose `.raw` field is the RFC 822
            message stream. The worker reads it as a multipart MIME
            body and extracts `from`, `subject`, and the plain-text part.
@@ -534,7 +534,7 @@ components:
         description: |
           Multipart form body. Field names match the upstream provider:
 
-          - Cloudflare Email Routing: `from`, `subject`, `body`
+          - Cloudflare® Email Routing: `from`, `subject`, `body`
             (extracted from the raw RFC 822 stream by the worker).
           - Mailgun: `from`, `subject`, `body-plain` or `stripped-text`.
 
@@ -553,7 +553,7 @@ components:
             description: |
               Plain-text email body. The worker reads either
               `body-plain` / `stripped-text` (Mailgun) or the raw
-              text MIME part (Cloudflare Email Routing).
+              text MIME part (Cloudflare® Email Routing).
           parsedSignal:
             type: object
             description: |

@@ -11,8 +11,10 @@ import {
   requireCatalogWorker,
   ensureWorkerInStack,
   wireCallerBindings,
+  cloneWorkerIfMissing,
 } from "./stack-service.js";
 import { CLIError } from "../../utils/errors.js";
+import { writeFileSync, mkdirSync } from "node:fs";
 
 describe("requireCatalogWorker", () => {
   it("resolves pyne-agent-worker", () => {
@@ -130,5 +132,65 @@ describe("ensureWorkerInStack", () => {
       quiet: true,
     });
     expect(second).toBe(false);
+  });
+
+  it("cloneWorkerIfMissing runs git submodule add -f for an empty tree", async () => {
+    const workerPath = "workers/pyne-agent-worker";
+    mkdirSync(join(tmpDir, workerPath), { recursive: true });
+    writeFileSync(join(tmpDir, workerPath, ".dev.vars"), "API_KEY=x\n");
+
+    const calls: string[][] = [];
+    const realSpawn = Bun.spawn;
+    (Bun as unknown as { spawn: typeof Bun.spawn }).spawn = ((
+      cmd: string[]
+    ) => {
+      calls.push(cmd);
+      return {
+        exited: Promise.resolve(0),
+        stdout: new ReadableStream({
+          start(c) {
+            c.close();
+          },
+        }),
+        stderr: new ReadableStream({
+          start(c) {
+            c.close();
+          },
+        }),
+      } as unknown as ReturnType<typeof Bun.spawn>;
+    }) as typeof Bun.spawn;
+
+    try {
+      const cloned = await cloneWorkerIfMissing(
+        "pyne-agent-worker",
+        workerPath,
+        {
+          quiet: true,
+        }
+      );
+      expect(cloned).toBe(true);
+      expect(calls[0]).toEqual([
+        "git",
+        "submodule",
+        "add",
+        "-f",
+        "https://github.com/hoox-sh/pyne-agent-worker.git",
+        workerPath,
+      ]);
+    } finally {
+      (Bun as unknown as { spawn: typeof Bun.spawn }).spawn = realSpawn;
+    }
+  });
+
+  it("cloneWorkerIfMissing skips paths outside the workspace", async () => {
+    const outside = await mkdtemp(join(tmpdir(), "hoox-outside-"));
+    try {
+      const cloned = await cloneWorkerIfMissing("pyne-agent-worker", outside, {
+        quiet: true,
+      });
+      expect(cloned).toBe(false);
+    } finally {
+      await rm(outside, { recursive: true, force: true });
+    }
   });
 });

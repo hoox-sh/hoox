@@ -17,7 +17,7 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 | #   | Title                                         | Status   | Date    |
 | --- | --------------------------------------------- | -------- | ------- |
-| 001 | Cloudflare Workers as Execution Platform      | Accepted | 2025-04 |
+| 001 | Cloudflare® Workers as Execution Platform     | Accepted | 2025-04 |
 | 002 | SQLite-backed Durable Objects for Idempotency | Accepted | 2025-05 |
 | 003 | Mesh of specialized Workers (now 11 surfaces) | Accepted | 2025-06 |
 | 004 | Dual-Layer Configuration (Env \+ KV)          | Accepted | 2025-06 |
@@ -27,13 +27,13 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 ---
 
-## ADR-001: Cloudflare Workers as Execution Platform
+## ADR-001: Cloudflare® Workers as Execution Platform
 
 **Status:** Accepted
 
 **Context:** Algorithmic trading requires ultra-low latency between signal generation and order execution. Traditional VPS-based bots suffer from 200ms\+ round-trip latency due to fixed geographic locations and heavy runtime overhead.
 
-**Decision:** Deploy all trading logic as Cloudflare Workers running on V8 isolates at the edge.
+**Decision:** Deploy all trading logic as Cloudflare® Workers running on V8 isolates at the edge.
 
 **Consequences:**
 
@@ -49,7 +49,7 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 **Context:** Webhook-based trade execution is inherently unreliable — network timeouts can cause TradingView® to retry the same signal, potentially resulting in duplicate trades. Gateways need **at-most-once acceptance** within a TTL without permanently blocking legitimate retries after soft failures.
 
-**Decision:** Implement idempotency using Cloudflare Durable Objects with SQLite-backed state (`IdempotencyStore`). Keys prefer client `idempotencyKey` / `Idempotency-Key`; else a composite fingerprint with live/test mode and a **per-minute time bucket**. Flow is **two-phase**: `reserve` (pending) before queue/service work, `commit` only on true success, `release` on soft-fail or error. Missing DO binding is **fail-closed**. A separate `RateLimiterStore` DO provides atomic multi-isolate rate limits.
+**Decision:** Implement idempotency using Cloudflare® Durable Objects with SQLite-backed state (`IdempotencyStore`). Keys prefer client `idempotencyKey` / `Idempotency-Key`; else a composite fingerprint with live/test mode and a **per-minute time bucket**. Flow is **two-phase**: `reserve` (pending) before queue/service work, `commit` only on true success, `release` on soft-fail or error. Missing DO binding is **fail-closed**. A separate `RateLimiterStore` DO provides atomic multi-isolate rate limits.
 
 **Consequences:**
 
@@ -61,7 +61,7 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 ## ADR-003: Mesh of specialized Workers
 
-**Status:** Accepted (evolved: **11 compute surfaces** as of 0.15.0)
+**Status:** Accepted (evolved: **11 compute surfaces** as of 0.15.0; unchanged in **0.16.0**)
 
 **Context:** Monolithic trading systems are fragile — a crash in any component (portfolio calculation, notification, database) takes down the entire system. Microservices provide isolation but increase operational complexity.
 
@@ -106,7 +106,7 @@ This directory contains the Architecture Decision Records for the Hoox trading p
     <code>hoox secrets set</code> and <code>hoox config env</code>.
   </li>
   <li>
-    <strong>Runtime (Cloudflare KV):</strong> Kill switch, exchange routing,
+    <strong>Runtime (Cloudflare® KV):</strong> Kill switch, exchange routing,
     rate-limiter thresholds, email regex patterns. Managed via{" "}
     <code>hoox config kv set</code> and propagates globally in under 10 seconds.
   </li>

@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-03T12:12:12Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/adrs.mdx"
@@ -23,7 +23,7 @@ Repo path `docs/devops/architecture/adrs.mdx`.
 # Outline
 
 * ADR Index
-* ADR-001: Cloudflare Workers as Execution Platform
+* ADR-001: Cloudflare® Workers as Execution Platform
 * ADR-002: SQLite-backed Durable Objects for Idempotency
 * ADR-003: Mesh of specialized Workers
 * ADR-004: Dual-Layer Configuration (Environment \+ KV)

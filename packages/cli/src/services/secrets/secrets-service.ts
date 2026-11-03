@@ -66,8 +66,8 @@ export async function resolveWorkerWranglerConfig(
 
   throw new Error(
     `No wrangler.jsonc (or wrangler.jsonc.example) in ${workerPath}. ` +
-      `Copy the example config into wrangler.jsonc and fill account resources, ` +
-      `then re-run secrets sync.`
+      `Run \`hoox workers enable <name> --yes\` (clones optional satellites) ` +
+      `or \`hoox secrets sync <name>\` so the CLI can clone/materialize, then re-run.`
   );
 }
 
@@ -133,7 +133,7 @@ export const WORKER_SYSTEM_SECRETS: Readonly<
     "WALLET_EXECUTE_KEY_BINDING",
   ],
   "web3-wallet-worker": ["INTERNAL_KEY_BINDING", "WALLET_EXECUTE_KEY_BINDING"],
-  "telegram-worker": ["INTERNAL_KEY_BINDING"],
+  "telegram-worker": ["INTERNAL_KEY_BINDING", "TELEGRAM_INTERNAL_KEY_BINDING"],
   dashboard: [
     "AGENT_INTERNAL_KEY",
     "SESSION_SECRET",
@@ -228,6 +228,20 @@ export class SecretsService {
       }
     }
     return result;
+  }
+
+  /**
+   * Workers to visit for `hoox secrets sync` / repair.
+   *
+   * Full sync: only workers with a non-empty declared `secrets` array.
+   * `--system`: every worker in root config (including `secrets: []`) so
+   * mesh keys from `WORKER_SYSTEM_SECRETS` / `.dev.vars` still sync.
+   */
+  listWorkersForSync(systemOnly = false): string[] {
+    if (!systemOnly) {
+      return Object.keys(this.listAllSecrets()).sort();
+    }
+    return Object.keys(this.config.workers).sort();
   }
 
   /**

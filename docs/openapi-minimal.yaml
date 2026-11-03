@@ -5,9 +5,9 @@ info:
     REST API for the Hoox algorithmic trading platform.
 
     Ingest trade signals, check system health, and manage DeFi wallet
-    operations on the Cloudflare edge. All requests are handled by the
+    operations on the Cloudflare® edge. All requests are handled by the
     Hoox gateway worker (`workers/hoox-worker`) running at the network edge.
-  version: "0.15.0"
+  version: "0.16.0"
   contact:
     name: Hoox Support
     email: support@hoox.sh
@@ -24,13 +24,13 @@ paths:
       summary: Ingest trade signal
       description: |
         Primary endpoint for receiving automated trade signals from
-        TradingView webhooks, cURL scripts, or any HTTP client.
+        TradingView® webhooks, cURL scripts, or any HTTP client.
 
         The gateway validates the API key (provided in the JSON body as
         `apiKey`), checks the IP allowlist, enforces rate limits, and
         verifies the kill switch before routing the trade to the execution
         engine — either directly via service binding or asynchronously via
-        Cloudflare Queue (depending on queue mode).
+        Cloudflare® Queue (depending on queue mode).
       operationId: ingestTradeSignal
       tags:
         - Trades

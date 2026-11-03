@@ -67,8 +67,8 @@ hoox deploy dashboard
 | `--auto`    | Skip dashboard rebuild prompt; use existing OpenNext build if any | `hoox deploy all --auto`         |
 | `--rebuild` | Force rebuild the dashboard before deploying                      | `hoox deploy all --rebuild`      |
 | `--dry-run` | Preview the worker order without uploading                        | `hoox deploy all --dry-run`      |
-| `--env`     | Cloudflare environment name                                       | `hoox deploy all --env production` |
-| `--json`    | Print the task-result array (0.15.0)                              | `hoox deploy all --json`         |
+| `--env`     | Cloudflare® environment name                                       | `hoox deploy all --env production` |
+| `--json`    | Print the task-result array (since 0.15.0)                        | `hoox deploy all --json`         |
 
 Workers only (skip dashboard): `hoox deploy workers`.
 
@@ -79,7 +79,7 @@ Workers only (skip dashboard): `hoox deploy workers`.
 Once `hoox deploy all` finishes uploading the workers, you must run three final scripts to link webhooks and sync environment databases:
 
 ```bash
-# A. Register your private Telegram Bot webhook with Cloudflare
+# A. Register your private Telegram Bot webhook with Cloudflare®
 hoox deploy telegram-webhook
 
 # B. Auto-update and bind internal Service URLs across all workers
@@ -178,7 +178,7 @@ hoox deploy all --auto
 
 ### Rollback Procedure
 
-If the new deployment causes issues, roll a worker back to a previous Cloudflare version:
+If the new deployment causes issues, roll a worker back to a previous Cloudflare® version:
 
 ```bash
 # Interactive: pick from the last 5 versions

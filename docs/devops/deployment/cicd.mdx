@@ -5,10 +5,10 @@
 
 ---
 title: "CI/CD Pipeline Automation"
-description: "How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare edge uploads."
+description: "How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare® edge uploads."
 ---
 
-Automating your deployment pipeline ensures that every commit pushed to your repository is systematically vetted for code style, type safety, syntax regressions, and unit test coverage before being deployed to your live production trading nodes.
+Automating your deployment pipeline ensures that every commit pushed to your repository is systematically vetted for code style, type safety, syntax regressions, and unit test coverage before being deployed to your live production trading nodes. The repo CI pin for Bun is **1.4.3** (see `.github/workflows/ci.yml`).
 
 This guide provides the complete specification and production-grade YAML workflow for implementing **GitHub Actions** integration pipelines.
 
@@ -82,7 +82,7 @@ jobs:
       - name: "Setup Bun Runtime"
         uses: "oven-sh/setup-bun@v2"
         with:
-          bun-version: "1.4.0"
+          bun-version: "1.4.3"
 
       # 3. Cache Bun dependency modules to optimize pipeline speeds
       - name: "Cache Workspace Dependencies"
@@ -140,10 +140,10 @@ jobs:
 
 ## 🔒 Managing Secrets & Variable Scopes
 
-To authorize GitHub to interact with your Cloudflare account, navigate to your repository's **Settings > Secrets and variables > Actions** and register the following Action Secrets:
+To authorize GitHub to interact with your Cloudflare® account, navigate to your repository's **Settings > Secrets and variables > Actions** and register the following Action Secrets:
 
 1. **`CLOUDFLARE_API_TOKEN`**: A secure, scoped token with Workers, D1, KV, and DNS write permissions.
-2. **`CLOUDFLARE_ACCOUNT_ID`**: Your unique 32-character Cloudflare dashboard hash.
+2. **`CLOUDFLARE_ACCOUNT_ID`**: Your unique 32-character Cloudflare® dashboard hash.
 3. **`SUBDOMAIN_PREFIX`**: The subdomain namespace chosen for your deployments.
 4. **`GITHUB_TOKEN`**: Auto-provided, used by gitleaks for PR annotations.
 5. **`INTERNAL_AUTH_KEY`**, **`HOOX_API_KEY`**, **`LOAD_TEST_BASE_URL`**: Required for nightly k6 load tests (see [Security Overview](/docs/devops/security/overview#environment-setup)).
@@ -151,9 +151,9 @@ To authorize GitHub to interact with your Cloudflare account, navigate to your r
 <Note>
   You **never** need to store worker-specific secrets (like Bybit API keys or
   Telegram Bot tokens) in GitHub Secrets. These are stored directly in
-  Cloudflare's secured key vaults. The CI pipeline only deploys the code logic;
-  the running edge isolates pull their credentials locally from Cloudflare’s
-  hardware-level Secret Store at runtime.
+  Cloudflare® secured key vaults. The CI pipeline only deploys the code logic;
+  the running edge isolates pull their credentials locally from the Cloudflare®
+  Secret Store at runtime.
 </Note>
 
 ---

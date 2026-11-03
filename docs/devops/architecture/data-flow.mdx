@@ -32,7 +32,7 @@ sequenceDiagram
 
     TV->>GW: POST /webhook (JSON + apiKey)
     Note over GW: Kill switch · IP allowlist · 64 KiB · timing-safe apiKey
-    GW->>RL: checkAndIncrement (atomic DO; KV/memory fallback)
+    GW->>RL: checkAndIncrement (atomic DO · KV/memory fallback)
     alt Rate limited
         GW-->>TV: 429 RATE_LIMITED
     else Under limit
@@ -107,7 +107,7 @@ sequenceDiagram
     Cron->>AW: Fire trigger: triggers.crons (default */15 * * * *)
     AW->>D1: GET /api/dashboard/positions and /api/dashboard/balances
     D1-->>AW: OPEN positions + balances (skip *-testnet-* ids)
-    Note over AW: Mark price from public CEX REST; trailing stop / take-profit
+    Note over AW: Mark price from public CEX REST · trailing stop / take-profit
     alt Trailing stop or take-profit hit
         AW->>TW: POST /webhook CLOSE_LONG or CLOSE_SHORT (Idempotency-Key)
         TW-->>AW: Fill result
@@ -210,7 +210,7 @@ sequenceDiagram
         PY->>PY: Evaluate Pine (interpret / compile)
         Note over PY: Map StrategyEvent → WebhookPayload
         PY->>TW: TRADE_SERVICE POST /webhook<br/>X-Internal-Auth-Key + Idempotency-Key
-        Note over TW: requireInternalAuth; dedupe by idempotency key
+        Note over TW: requireInternalAuth · dedupe by idempotency key
         TW->>D1: Persist fill / position updates
         TW-->>PY: 200 Executed (or 409 duplicate)
     else No new bar
