@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-03T12:40:06Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/local-development.mdx"
@@ -30,3 +30,7 @@ Repo path `docs/enduser/guides/local-development.mdx`.
 * 🛠️ Operating Individual Services
 * 🧪 Running the Verification CI Pipeline
   * 🔗 Next Steps
+
+# Mentions
+
+* [scripts](/code/scripts.md)

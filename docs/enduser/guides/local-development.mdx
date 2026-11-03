@@ -130,7 +130,7 @@ hoox test all
 The pipeline executes four verification steps in a strict dependency sequence:
 
 1. **Lint Check** (`bun run lint`): Validates ESLint styling rules across the monorepo.
-2. **Type Check** (`bun run typecheck`): Compiles code via `tsc --noEmit` to verify type safety.
+2. **Type Check** (`bun run typecheck`): Runs Bun's native checker (`bun check --no-script`) in every workspace via `scripts/typecheck-all.ts`.
 3. **Unit Tests** (`bun test`): Fires all unit and integration test assertions using Bun's native test runner.
 4. **Build Check** (`bun run build`): Compiles all workspaces (`cli`, `tui`, `shared`, `dashboard`) to verify production packaging.
 

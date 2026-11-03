@@ -66,7 +66,7 @@ bun test:load             # k6 load test suite (4 scripts)
 bun test:all              # lint → typecheck → unit → live
 bun run lint              # ESLint (flat config)
 bun run lint:fix          # ESLint + auto-fix
-bun run typecheck         # multi-project tsc via scripts/typecheck-all.ts
+bun run typecheck         # multi-project bun check --no-script via scripts/typecheck-all.ts
 bun run build             # build:packages + typecheck
 bun run format            # Prettier
 bun run graph             # regenerate graph.json (~25s, scripts/extract-graph.ts)

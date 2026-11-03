@@ -165,7 +165,7 @@ describe("trade-worker Gateway Router Mocking", () => {
 
 Our GitHub Actions workflows enforce the following quality gates:
 
-1. **TypeScript Type Safety**: All workspaces must compile without errors using `tsc --noEmit`.
+1. **TypeScript Type Safety**: All workspaces must typecheck without errors using `bun check --no-script` (`bun run typecheck` at the repo root).
 2. **Coverage Thresholds**: CI and contributor standards target **≥80% line coverage** on core execution paths (`packages/cli`, `packages/shared`, gateway/trade workers), with aspirational **90% line / 95% function** floors in `.opencode/context/core/standards/test-coverage.md`. Shared is already ~98%; CLI `src/` averages ~95%. Per-file CLI floor: `bun run coverage:check` (50% hard floor on `packages/cli/src/**`, ratcheting upward).
 3. **Dependency Audit**: `bun audit` runs after tests to detect known vulnerabilities (informational, doesn't block CI).
 4. **Secret Scanning**: `gitleaks` scans all commits for hardcoded secrets on every push/PR (informational).

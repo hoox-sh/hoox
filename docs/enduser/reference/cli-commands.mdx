@@ -314,12 +314,15 @@ hoox monitor analytics errors --hours 24
 
 ### E. Secrets & Keys Management
 
-Canonical trade-worker exchange secrets are **`EXCHANGE_KEY_BINDING`** and **`EXCHANGE_SECRET_BINDING`**. `hoox secrets set` requires the worker name and prompts for the value (hidden stdin). There is no third positional argument.
+Canonical trade-worker exchange secrets are **`EXCHANGE_KEY_BINDING`** and **`EXCHANGE_SECRET_BINDING`**. `hoox secrets set` requires the worker name and prompts for the value (hidden stdin). There is no third positional argument. Optional satellites (`pyne-worker`, `pyne-agent-worker`) are enabled and cloned when missing or empty (`--yes` skips the prompt).
 
 ```bash
 # Set a Cloudflare® Worker secret (live exchange keys)
 hoox secrets set trade-worker EXCHANGE_KEY_BINDING
 hoox secrets set trade-worker EXCHANGE_SECRET_BINDING
+
+# Optional satellite (clones if the tree is empty)
+hoox secrets set pyne-agent-worker API_KEY --yes
 
 # List secrets for a worker
 hoox secrets list trade-worker
@@ -332,7 +335,7 @@ hoox secrets sync --system
 # Reports partial results: synced / skipped (placeholders) / failed
 hoox secrets sync
 
-# Generate internal auth keys
+# Generate internal auth keys (prints redacted names only)
 hoox keys generate
 
 # List existing keys
@@ -341,12 +344,13 @@ hoox keys list
 
 ### F. Workers catalog
 
-The shared worker catalog is the source of known isolates and default enabled flags. `enable` / `disable` write `workers.<name>.enabled` in the root `wrangler.jsonc`. Missing catalog workers are seeded on enable.
+The shared worker catalog is the source of known isolates (tiers: core / optional / planned) and default enabled flags. `enable` / `disable` write `workers.<name>.enabled` in the root `wrangler.jsonc`. Missing catalog workers are seeded on enable; optional satellites also clone and wire caller bindings.
 
 ```bash
 hoox workers list
 hoox workers catalog
 hoox workers enable trade-worker agent-worker
+hoox workers enable pyne-agent-worker --yes
 hoox workers disable web3-wallet-worker email-worker
 hoox workers catalog --json
 ```

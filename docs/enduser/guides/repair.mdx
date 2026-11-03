@@ -26,7 +26,7 @@ The diagnostics engine runs a strict, sequential analysis of your entire monorep
 
 - Submodule Integrity (verify worker trees are cloned: 10 isolates + dashboard)
 - Dependency Resolution (verify bun workspaces)
-- TypeScript Type Safety (run tsc --noEmit)
+- TypeScript Type Safety (run `bun run typecheck` → `bun check --no-script` per workspace)
 - Cloudflare® Edge Bindings (verify D1, KV, R2, Queues)
 - Hardware Secrets Validation (verify API keys are bound)
 

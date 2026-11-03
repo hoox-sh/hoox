@@ -101,7 +101,7 @@ jobs:
       - name: "Run Lint Checks"
         run: "bun run lint"
 
-      # 6. Verify TypeScript compile-time type-safety (tsc --noEmit)
+      # 6. Verify TypeScript compile-time type-safety (bun check --no-script)
       - name: "Run Type Checks"
         run: "bun run typecheck"
 
