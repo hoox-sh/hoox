@@ -63,6 +63,8 @@ import { CommandPalette } from "./components/shared/command-palette";
 import { QuitModal } from "./components/shared/quit-modal";
 import { StatusBar } from "./components/layout/statusbar";
 import { Sidebar } from "./components/layout/sidebar";
+import { HooxMark, HooxWordmark } from "./components/shared/hoox-mark";
+import { OrbitSpinner, ShimmerText } from "./components/shared/motion";
 
 // ─── View keyboard shortcuts (derived from view-registry) ────────────────────
 
@@ -532,13 +534,12 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
         justifyContent="center"
         alignItems="center"
         backgroundColor={Colors.background}
+        gap={1}
       >
-        <text fg={Colors.highlight} bold>
-          ┌ HOOX ┐
-        </text>
-        <text fg={Colors.muted} dim>
-          Restoring session…
-        </text>
+        <HooxMark size="md" animated />
+        <HooxWordmark tagline="edge ops" />
+        <OrbitSpinner label="" />
+        <ShimmerText text="Restoring session…" baseColor={Colors.muted} />
       </box>
     );
   }
@@ -559,7 +560,12 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
         <Sidebar />
 
         {/* Content area: View (fills remaining space) */}
-        <box flexDirection="column" flexGrow={1} padding={1}>
+        <box
+          flexDirection="column"
+          flexGrow={1}
+          paddingLeft={1}
+          paddingRight={1}
+        >
           {safeMode ? (
             <box
               flexDirection="row"

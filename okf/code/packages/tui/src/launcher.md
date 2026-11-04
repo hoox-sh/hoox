@@ -7,7 +7,7 @@ tags: [code, launcher, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-02T12:22:43Z
+  at: 2026-11-04T00:45:28Z
 sources:
   - id: tree
     resource: "packages/tui/src/launcher"
@@ -31,7 +31,7 @@ okf_lock: generated
 
 # Depends on
 
-* [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
+* [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
 
 # Used by
 

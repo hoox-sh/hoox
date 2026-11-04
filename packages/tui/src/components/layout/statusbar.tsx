@@ -21,7 +21,7 @@
  *     the raw error.
  */
 import { useCallback, memo } from "react";
-import { useKeyboard } from "@opentui/react";
+import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import {
   Colors,
   ConnectionStatusColor,
@@ -36,7 +36,7 @@ import {
   resolveTuiConnectionEnv,
 } from "../../services/tui-connection";
 import { redactSecretsInText } from "../../services/dev-log";
-import { CoolGlyph } from "../shared/cool-brackets";
+import { AnimatedRule, BreatheGlyph, OrbitSpinner } from "../shared/motion";
 import { isShellOverlayOpen } from "../../hooks/shell-overlay";
 
 /** Map each CliErrorType to a short, human-readable label. */
@@ -241,6 +241,8 @@ export function StatusBar() {
   const conn = resolveTuiConnectionEnv();
   const tuiMode = conn.mode;
   const apiHost = conn.apiHost;
+  const dims = useTerminalDimensions();
+  const barWidth = Math.max(1, dims?.width ?? 80);
   // Fail-closed readiness: Bearer and/or Access pair (not token alone)
   const authReady = conn.hasAuth;
   const errorKind = classifyConnectionError(lastError);
@@ -319,6 +321,9 @@ export function StatusBar() {
 
   return (
     <box flexDirection="column" width="100%">
+      {/* ── Frameless divider ─────────────────────────────────────────────── */}
+      <AnimatedRule width={barWidth} />
+
       {/* ── One-line summary ──────────────────────────────────────────────── */}
       <box
         flexDirection="row"
@@ -326,10 +331,39 @@ export function StatusBar() {
         justifyContent="space-between"
         paddingLeft={1}
         paddingRight={1}
-        backgroundColor={Colors.card}
       >
-        <box flexDirection="row" gap={1}>
-          <CoolGlyph char="┌" />
+        <box flexDirection="row" gap={1} alignItems="center">
+          {connectionStatus === "reconnecting" ||
+          connectionStatus === "polling" ? (
+            <OrbitSpinner
+              variant="wheel"
+              color={
+                ConnectionStatusColor[
+                  connectionStatus as keyof typeof ConnectionStatusColor
+                ] ?? Colors.muted
+              }
+              speedMs={110}
+            />
+          ) : connectionStatus === "connected" ? (
+            <BreatheGlyph
+              color={
+                ConnectionStatusColor[
+                  connectionStatus as keyof typeof ConnectionStatusColor
+                ] ?? Colors.success
+              }
+              accentColor={Colors.success}
+            />
+          ) : (
+            <text
+              fg={
+                ConnectionStatusColor[
+                  connectionStatus as keyof typeof ConnectionStatusColor
+                ] ?? Colors.muted
+              }
+            >
+              ○
+            </text>
+          )}
           <text fg={modeColor} bold>
             [{modeLabel}]
           </text>
@@ -348,7 +382,6 @@ export function StatusBar() {
           >
             {parts.join("  ")}
           </SummaryLine>
-          <CoolGlyph char="┐" />
         </box>
         <text fg={Colors.dim} dim>
           ^P · ^B · ^Q · ^⇧D err

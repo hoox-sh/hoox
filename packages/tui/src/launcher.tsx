@@ -80,7 +80,7 @@ async function main(): Promise<void> {
   const targetFps = resolveTargetFps();
   const renderer = await createCliRenderer({
     screenMode: "split-footer",
-    footerHeight: 10,
+    footerHeight: 12,
     exitOnCtrlC: false,
     targetFps,
     maxFps: Math.max(60, targetFps),

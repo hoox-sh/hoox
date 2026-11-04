@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-04T00:45:28Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/shared"
@@ -23,6 +23,9 @@ okf_lock: generated
 * `cool-brackets.tsx` — CoolBrackets, CoolBracketsProps, CoolGlyph, useCoolHue
 * `crash-screen.tsx` — CrashAction, CrashScreen, CrashScreenProps, formatCrashMessage
 * `error-boundary.tsx` — ErrorBoundary, formatBoundaryErrorMessage
+* `hoox-mark.tsx` — HOOX_MARK_MEDIUM, HOOX_MARK_SMALL, HOOX_MARK_TINY, HooxMark, HooxMarkProps, HooxMarkSize, HooxWordmark, HooxWordmarkProps, hooxMarkHeight, hooxMarkRows, hooxMarkWidth
+* `motion.test.tsx`
+* `motion.tsx` — AnimatedRule, AnimatedRuleProps, BREATHE_FRAMES, BreatheGlyph, BreatheGlyphProps, ORBIT_FRAMES, OrbitSpinner, ShimmerText, ShimmerTextProps, SpinnerProps, SpinnerVariant, WHEEL_FRAMES
 * `panel.tsx` — Panel, PanelProps
 * `quit-modal.tsx` — QuitModal, QuitModalProps
 * `shared.test.tsx`
@@ -32,7 +35,7 @@ okf_lock: generated
 
 # Packages
 
-`@/components/shared/command-palette`, `@/components/shared/crash-screen`, `@/components/shared/error-boundary`, `@hoox-sh/hoox-shared`, `@opentui/react`, `bun:test`, `react`
+`@/components/shared/command-palette`, `@/components/shared/crash-screen`, `@/components/shared/error-boundary`, `@hoox-sh/hoox-shared`, `@opentui/react`, `@opentui/react/test-utils`, `bun:test`, `react`
 
 # Depends on
 
@@ -44,3 +47,4 @@ okf_lock: generated
 * [packages/tui/src/components/layout](/code/packages/tui/src/components/layout.md)
 * [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
 * [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
+* [packages/tui/src/launcher](/code/packages/tui/src/launcher.md)

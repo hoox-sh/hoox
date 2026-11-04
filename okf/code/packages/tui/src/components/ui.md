@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-02T12:22:43Z
+  at: 2026-11-04T00:45:28Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/ui"
@@ -39,5 +39,4 @@ okf_lock: generated
 * [packages/tui/src](/code/packages/tui/src.md)
 * [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
 * [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
-* [packages/tui/src/launcher](/code/packages/tui/src/launcher.md)
 * [packages/tui/src/services](/code/packages/tui/src/services.md)

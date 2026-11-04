@@ -13,6 +13,31 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-04
+
+Frameless OpenTUI shell and compact CLI start screen: the official HOOX mark rendered as a braille dot matrix, Grok-style motion, and a tighter left-rail layout.
+
+### Added
+
+- **Dotted HOOX mark** (`HooxMark`) rasterised from the production SVG into braille cells at `xs` / `sm` / `md` sizes, with an optional colour-wave animation.
+- **Motion kit** (`OrbitSpinner`, `ShimmerText`, `AnimatedRule`, `BreatheGlyph`) for orbit spinners, shimmering labels, travelling dividers and breathing status dots; all animations freeze under the test renderer.
+- Launcher layout: dotted logo rail, top status line, contextual group menu (active group pinned), filterable command content, and a commands/legend footer with the selected command preview.
+- Frameless sidebar and status bar in the operations center, with the animated HOOX mark anchoring the left rail.
+
+### Changed
+
+- `hoox` start screen footer grows to 12 rows and adapts down to 40 columns; `q quit` remains visible on narrow terminals.
+- `hoox tui` shell drops card/border chrome; the restore screen now uses the dotted mark and shimmer text.
+- `@hoox-sh/hoox-tui` bumped to 0.6.0 (new visual surface).
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.19.0  |
+| `@hoox-sh/hoox-tui`    | 0.6.0   |
+| `@hoox-sh/hoox-shared` | 1.7.0   |
+
 ## [0.18.0] - 2026-11-03
 
 CLI deep plumbing for optional satellites and mesh secrets: auto-clone empty worker trees, consistent ensure on deploy/dev/test/repair/update, safer secrets sync/delete/keys generate, and aligned telegram/dashboard mesh maps.

@@ -6,46 +6,22 @@
 /** @jsxImportSource @opentui/react */
 
 /**
- * OpenCode-style half-block wordmark: muted HO + bold OX.
- * 3 rows, ~23 cols. Hidden on very short terminals.
+ * Launcher logo — thin wrapper around the dotted HOOX mark.
+ *
+ * Kept as a stable import point for the start screen; the canonical mark
+ * lives in `components/shared/hoox-mark.tsx`.
  */
-import { Colors } from "@hoox-sh/hoox-shared";
+import {
+  HooxMark,
+  HooxWordmark,
+  hooxMarkHeight,
+  hooxMarkWidth,
+} from "../components/shared/hoox-mark";
 
-const HO = ["█  █  █▀▀█", "█▀▀█  █  █", "█  █  █▄▄█"] as const;
-
-const OX = ["  █▀▀█  █  █", "  █  █   ██ ", "  █▄▄█  █  █"] as const;
-
-export const LOGO_WIDTH = 23;
-export const LOGO_HEIGHT = 3;
+export const LOGO_WIDTH = hooxMarkWidth("sm");
+export const LOGO_HEIGHT = hooxMarkHeight("sm");
 
 export function HooxLogo({ compact = false }: { compact?: boolean }) {
-  if (compact) {
-    return (
-      <box flexDirection="row" gap={1} alignItems="center">
-        <text fg={Colors.muted}>HO</text>
-        <text fg={Colors.foreground} bold>
-          OX
-        </text>
-      </box>
-    );
-  }
-
-  return (
-    <box flexDirection="row" gap={1}>
-      <box flexDirection="column">
-        {HO.map((line) => (
-          <text key={line} fg={Colors.muted}>
-            {line}
-          </text>
-        ))}
-      </box>
-      <box flexDirection="column">
-        {OX.map((line) => (
-          <text key={line} fg={Colors.foreground} bold>
-            {line}
-          </text>
-        ))}
-      </box>
-    </box>
-  );
+  if (compact) return <HooxWordmark />;
+  return <HooxMark size="sm" animated />;
 }
