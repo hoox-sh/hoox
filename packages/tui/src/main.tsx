@@ -14,12 +14,7 @@
 import { createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import { CrashRecoveryApp } from "./app";
-import {
-  Colors,
-  saveSession,
-  useServiceStore,
-  useUIStore,
-} from "@hoox-sh/hoox-shared";
+import { saveSession, useServiceStore, useUIStore } from "@hoox-sh/hoox-shared";
 import { setRendererRef } from "./hooks";
 import { enableAutoCopyOnSelection } from "./services/clipboard";
 import { ensureTuiStateDir } from "./services/hoox-path-service";
@@ -48,7 +43,6 @@ const RENDERER_CONFIG = {
   targetFps,
   maxFps: Math.max(60, targetFps),
   useMouse: resolveUseMouse(),
-  backgroundColor: Colors.background,
   useKittyKeyboard: {
     disambiguate: true,
     alternateKeys: true,

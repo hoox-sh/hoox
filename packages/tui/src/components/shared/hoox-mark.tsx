@@ -11,9 +11,11 @@
  * The shape is rasterised from the production SVG (corner blocks, side
  * hexagons and the centre diamond) into braille cells, so every "pixel" is a
  * real terminal dot. Two sizes are provided for the compact shell rails.
+ *
+ * On startup the rows light up sequentially with a dim → foreground ramp,
+ * then settle to the terminal's default text colour. No looping animation.
  */
-import { Colors } from "@hoox-sh/hoox-shared";
-import { useMotionTick } from "./motion";
+import { isMotionMuted, useCountUp } from "./motion";
 
 /** 11 cols × 4 rows — sidebar rail / very tight layouts. */
 export const HOOX_MARK_TINY = [
@@ -49,12 +51,16 @@ export type HooxMarkSize = "xs" | "sm" | "md";
 
 export interface HooxMarkProps {
   size?: HooxMarkSize;
-  /** Fixed dot colour. Defaults to the theme accent. */
+  /** Explicit dot colour. Omit to inherit the terminal foreground. */
   color?: string;
-  /** Slowly cycle accent → highlight → warning across the dot rows. */
-  animated?: boolean;
-  /** Milliseconds per colour phase. */
+  /** Dim → default-foreground reveal while the rows light up (default on). */
+  gradient?: boolean;
+  /** One-shot row-by-row reveal on mount (default on). */
+  reveal?: boolean;
+  /** Milliseconds per row. */
   speedMs?: number;
+  /** Milliseconds to hold the reveal before settling. */
+  holdMs?: number;
 }
 
 export function hooxMarkRows(size: HooxMarkSize = "sm"): readonly string[] {
@@ -71,36 +77,39 @@ export function hooxMarkHeight(size: HooxMarkSize = "sm"): number {
   return hooxMarkRows(size).length;
 }
 
-const MARK_PALETTE = () => [Colors.accent, Colors.highlight, Colors.warning];
+// ─── Startup reveal ─────────────────────────────────────────────────────────
 
 /**
  * HooxMark — dotted logo block.
  *
- * `animated` shifts the dot colour in a slow diagonal wave. The glyphs never
- * change shape, so the logo stays recognisable while it breathes.
+ * By default the dots inherit the terminal foreground, so the mark is legible
+ * on both light and dark backgrounds. `reveal` lights rows top-to-bottom with
+ * a dim → default-foreground ramp, then settles. No colour, no loop.
  */
 export function HooxMark({
   size = "sm",
   color,
-  animated = false,
-  speedMs = 700,
+  gradient = true,
+  reveal = true,
+  speedMs = 55,
+  holdMs = 420,
 }: HooxMarkProps) {
-  const tick = useMotionTick(speedMs, animated);
   const rows = hooxMarkRows(size);
   const width = hooxMarkWidth(size);
-  const palette = MARK_PALETTE();
+  const muted = isMotionMuted();
+  const holdFrames = Math.max(1, Math.ceil(holdMs / speedMs));
+  const total = rows.length + holdFrames;
+  const tick = useCountUp(total, speedMs, reveal && !muted);
+  const revealed = Math.min(tick, rows.length);
+  const settled = tick >= total;
 
   return (
     <box flexDirection="column">
       {rows.map((row, index) => {
-        const fg =
-          color ??
-          (animated
-            ? (palette[(tick + Math.floor(index / 2)) % palette.length] ??
-              Colors.accent)
-            : Colors.accent);
+        const visible = index < revealed;
+        const dim = !visible || (!settled && gradient && !color);
         return (
-          <text key={index} fg={fg}>
+          <text key={index} fg={color} dim={dim}>
             {row.padEnd(width, " ")}
           </text>
         );
@@ -112,25 +121,18 @@ export function HooxMark({
 export interface HooxWordmarkProps {
   /** Optional tagline rendered after the wordmark. */
   tagline?: string;
-  /** Use the accent for "OX" instead of the foreground colour. */
-  accentOx?: boolean;
 }
 
-/** HO + OX wordmark — muted first half, bright second half. */
-export function HooxWordmark({ tagline, accentOx = true }: HooxWordmarkProps) {
+/**
+ * HO + OX wordmark — terminal foreground only: dim first half, bold second
+ * half. No accent colour, so it tracks light/dark terminal themes.
+ */
+export function HooxWordmark({ tagline }: HooxWordmarkProps) {
   return (
-    <box flexDirection="row" gap={1} alignItems="center">
-      <text>
-        <span fg={Colors.muted}>HO</span>
-        <span fg={accentOx ? Colors.accent : Colors.foreground} bold>
-          OX
-        </span>
-      </text>
-      {tagline ? (
-        <text fg={Colors.dim} dim>
-          {tagline}
-        </text>
-      ) : null}
+    <box flexDirection="row" alignItems="center">
+      <text dim>HO</text>
+      <text bold>OX</text>
+      {tagline ? <text dim>{` ${tagline.toUpperCase()}`}</text> : null}
     </box>
   );
 }

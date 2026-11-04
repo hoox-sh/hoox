@@ -17,7 +17,6 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import {
-  Colors,
   migrateThemeId,
   setActiveTheme,
   readConfigSync,
@@ -85,7 +84,6 @@ async function main(): Promise<void> {
     targetFps,
     maxFps: Math.max(60, targetFps),
     useMouse: resolveUseMouse(),
-    backgroundColor: Colors.background,
     consoleMode: "disabled",
     useKittyKeyboard: {
       disambiguate: true,

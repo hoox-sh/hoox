@@ -33,7 +33,6 @@ import {
   readConfigSync,
   type ThemeId,
 } from "@hoox-sh/hoox-shared";
-import { PulseWave } from "../ui/pulse";
 import { ErrorBoundary } from "../shared/error-boundary";
 import { ViewHeader } from "../shared/view-header";
 import { Panel } from "../shared/panel";
@@ -330,7 +329,7 @@ function ThemePanel({
           {THEME_LABELS[colorTheme].toUpperCase()}
           {" ▶"}
         </text>
-        <PulseWave />
+        <text fg={Colors.accent}>▁▂▃▅▃▂▁</text>
       </box>
       <text fg={Colors.dim}>{THEME_HINTS[colorTheme]}</text>
 

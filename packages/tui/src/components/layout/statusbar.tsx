@@ -36,7 +36,7 @@ import {
   resolveTuiConnectionEnv,
 } from "../../services/tui-connection";
 import { redactSecretsInText } from "../../services/dev-log";
-import { AnimatedRule, BreatheGlyph, OrbitSpinner } from "../shared/motion";
+import { MechanicalSpinner, Rule } from "../shared/motion";
 import { isShellOverlayOpen } from "../../hooks/shell-overlay";
 
 /** Map each CliErrorType to a short, human-readable label. */
@@ -121,7 +121,6 @@ export const ExpandedErrorPanel = memo(function ExpandedErrorPanel({
       paddingRight={2}
       paddingTop={1}
       paddingBottom={1}
-      backgroundColor={Colors.card}
     >
       {/* Header — classification + recovery hint (sibling <text>, never nested) */}
       <box flexDirection="column">
@@ -322,7 +321,7 @@ export function StatusBar() {
   return (
     <box flexDirection="column" width="100%">
       {/* ── Frameless divider ─────────────────────────────────────────────── */}
-      <AnimatedRule width={barWidth} />
+      <Rule width={barWidth} />
 
       {/* ── One-line summary ──────────────────────────────────────────────── */}
       <box
@@ -335,23 +334,13 @@ export function StatusBar() {
         <box flexDirection="row" gap={1} alignItems="center">
           {connectionStatus === "reconnecting" ||
           connectionStatus === "polling" ? (
-            <OrbitSpinner
-              variant="wheel"
+            <MechanicalSpinner
               color={
                 ConnectionStatusColor[
                   connectionStatus as keyof typeof ConnectionStatusColor
                 ] ?? Colors.muted
               }
-              speedMs={110}
-            />
-          ) : connectionStatus === "connected" ? (
-            <BreatheGlyph
-              color={
-                ConnectionStatusColor[
-                  connectionStatus as keyof typeof ConnectionStatusColor
-                ] ?? Colors.success
-              }
-              accentColor={Colors.success}
+              speedMs={140}
             />
           ) : (
             <text
@@ -361,15 +350,13 @@ export function StatusBar() {
                 ] ?? Colors.muted
               }
             >
-              ○
+              {connectionStatus === "connected" ? "■" : "□"}
             </text>
           )}
           <text fg={modeColor} bold>
             [{modeLabel}]
           </text>
-          <text fg={Colors["muted-foreground"]} dim>
-            {apiHost}
-          </text>
+          <text dim>{apiHost}</text>
           <SummaryLine
             statusColor={
               ConnectionStatusColor[
@@ -383,9 +370,7 @@ export function StatusBar() {
             {parts.join("  ")}
           </SummaryLine>
         </box>
-        <text fg={Colors.dim} dim>
-          ^P · ^B · ^Q · ^⇧D err
-        </text>
+        <text dim>^P · ^B · ^Q · ^⇧D ERR</text>
       </box>
 
       {/* ── Expanded error panel (visible on click) ───────────────────────── */}

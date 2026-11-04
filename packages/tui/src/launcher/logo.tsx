@@ -23,5 +23,5 @@ export const LOGO_HEIGHT = hooxMarkHeight("sm");
 
 export function HooxLogo({ compact = false }: { compact?: boolean }) {
   if (compact) return <HooxWordmark />;
-  return <HooxMark size="sm" animated />;
+  return <HooxMark size="sm" />;
 }

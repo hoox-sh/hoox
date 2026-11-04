@@ -131,7 +131,7 @@ describe("animateBanner", () => {
     }
   });
 
-  it("plays assemble + pulse frames when animation is allowed", async () => {
+  it("stays static even on a TTY (mechanical shell)", async () => {
     const origTTY = process.stdout.isTTY;
     const origNoColor = process.env.NO_COLOR;
     const origTerm = process.env.TERM;
@@ -152,14 +152,12 @@ describe("animateBanner", () => {
     }) as typeof process.stdout.write;
 
     try {
-      // Very short budget so the test stays fast but still runs both phases
       const lines = await animateBanner({ durationMs: 50 });
       expect(lines).toBeGreaterThan(0);
       const out = chunks.join("");
-      // Animation hides cursor and clears lines
-      expect(out).toContain("\x1b[?25l");
-      expect(out).toContain("\x1b[?25h");
-      expect(out).toContain("\x1b[2K");
+      // No cursor-hide / line-clear animation on any path
+      expect(out).not.toContain("\x1b[?25l");
+      expect(out).not.toContain("\x1b[2K");
       expect(stripAnsi(out)).toContain("Cloudflare Workers Platform");
     } finally {
       process.stdout.write = origWrite;

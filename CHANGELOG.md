@@ -13,6 +13,26 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-11-04
+
+Mechanical, terminal-native CLI pass: static chrome, no background fills, and a foreground-adaptive dotted mark.
+
+### Changed
+
+- Removed the animated banner (assemble/pulse) — the CLI banner is static on every path.
+- Replaced the travelling rule marker, shimmer text, and breathing/cycling dots with a static `Rule` and fixed-color `MechanicalSpinner`.
+- Launcher, sidebar, status bar and restore screen no longer paint background fills; the terminal background shows through.
+- `HooxMark` and the `HO`/`OX` wordmark inherit the terminal foreground and use a one-shot dim → normal reveal, so they work in light and dark terminals.
+- Launcher uses numbered sections, uppercase labels, hairline rules and static status glyphs.
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.19.1  |
+| `@hoox-sh/hoox-tui`    | 0.6.1   |
+| `@hoox-sh/hoox-shared` | 1.7.0   |
+
 ## [0.19.0] - 2026-11-04
 
 Frameless OpenTUI shell and compact CLI start screen: the official HOOX mark rendered as a braille dot matrix, Grok-style motion, and a tighter left-rail layout.

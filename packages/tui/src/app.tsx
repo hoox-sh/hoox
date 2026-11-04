@@ -64,7 +64,7 @@ import { QuitModal } from "./components/shared/quit-modal";
 import { StatusBar } from "./components/layout/statusbar";
 import { Sidebar } from "./components/layout/sidebar";
 import { HooxMark, HooxWordmark } from "./components/shared/hoox-mark";
-import { OrbitSpinner, ShimmerText } from "./components/shared/motion";
+import { MechanicalSpinner, Rule } from "./components/shared/motion";
 
 // ─── View keyboard shortcuts (derived from view-registry) ────────────────────
 
@@ -124,13 +124,6 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
 
   useEffect(() => {
     setActiveTheme(colorTheme);
-    try {
-      const renderer = getRendererRef() as
-        { backgroundColor?: string } | undefined;
-      if (renderer) renderer.backgroundColor = Colors.background;
-    } catch {
-      // renderer not ready yet
-    }
   }, [colorTheme]);
 
   const requestQuit = useCallback(() => {
@@ -533,13 +526,12 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
         height="100%"
         justifyContent="center"
         alignItems="center"
-        backgroundColor={Colors.background}
         gap={1}
       >
-        <HooxMark size="md" animated />
+        <HooxMark size="md" />
         <HooxWordmark tagline="edge ops" />
-        <OrbitSpinner label="" />
-        <ShimmerText text="Restoring session…" baseColor={Colors.muted} />
+        <Rule width={24} />
+        <MechanicalSpinner label="restoring session" />
       </box>
     );
   }
@@ -548,12 +540,7 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
   const renderView = getViewFactory(activeView);
 
   return (
-    <box
-      flexDirection="column"
-      width="100%"
-      height="100%"
-      backgroundColor={Colors.background}
-    >
+    <box flexDirection="column" width="100%" height="100%">
       {/* Main area: Sidebar + Content */}
       <box flexDirection="row" flexGrow={1}>
         {/* Sidebar (left) */}
@@ -567,12 +554,7 @@ function AppRootInner({ safeMode = false }: { safeMode?: boolean }) {
           paddingRight={1}
         >
           {safeMode ? (
-            <box
-              flexDirection="row"
-              paddingLeft={1}
-              paddingRight={1}
-              backgroundColor={Colors.card}
-            >
+            <box flexDirection="row" paddingLeft={1} paddingRight={1}>
               <text fg={Colors.warning} bold>
                 SAFE MODE
               </text>

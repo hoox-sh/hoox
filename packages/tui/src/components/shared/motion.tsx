@@ -6,12 +6,11 @@
 /** @jsxImportSource @opentui/react */
 
 /**
- * Motion primitives for the HOOX CLI shell.
+ * Mechanical motion primitives for the HOOX CLI.
  *
- * A tiny, dependency-free animation kit in the spirit of the Grok CLI:
- * orbiting dot spinners, shimmering labels, travelling rule markers and
- * breathing glyphs. Every animation degrades to a static frame under the
- * test renderer (`IS_REACT_ACT_ENVIRONMENT`) so component tests stay quiet.
+ * Deliberately restrained: a discrete four-frame index spinner and a static
+ * hairline rule. No colour cycling, no shimmer, no travelling markers. The
+ * only entrance animation lives in the logo itself (`HooxMark` gradient).
  */
 import { useEffect, useState } from "react";
 import { Colors } from "@hoox-sh/hoox-shared";
@@ -26,8 +25,8 @@ export function isMotionMuted(): boolean {
   );
 }
 
-/** Shared animation clock. Returns a monotonically increasing frame index. */
-export function useMotionTick(intervalMs = 90, enabled = true): number {
+/** Shared clock. Returns a monotonically increasing frame index. */
+export function useMotionTick(intervalMs = 160, enabled = true): number {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -39,203 +38,110 @@ export function useMotionTick(intervalMs = 90, enabled = true): number {
   return tick;
 }
 
-// ─── Orbit spinner ──────────────────────────────────────────────────────────
+/**
+ * Finite counter used for one-shot entrances. Counts to `max` then stops —
+ * no loop, no ambient motion.
+ */
+export function useCountUp(
+  max: number,
+  intervalMs = 55,
+  enabled = true
+): number {
+  const [value, setValue] = useState(enabled ? 0 : max);
 
-/** Single dot orbiting the 8 braille positions — a comet, not a wheel. */
-export const ORBIT_FRAMES = ["⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"] as const;
+  useEffect(() => {
+    if (!enabled || isMotionMuted()) {
+      setValue(max);
+      return;
+    }
+    setValue(0);
+    let current = 0;
+    const id = setInterval(() => {
+      current += 1;
+      setValue(current);
+      if (current >= max) clearInterval(id);
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [max, intervalMs, enabled]);
 
-/** Classic braille wheel, kept for callers that want a denser spinner. */
-export const WHEEL_FRAMES = [
-  "⠋",
-  "⠙",
-  "⠹",
-  "⠸",
-  "⠼",
-  "⠴",
-  "⠦",
-  "⠧",
-  "⠇",
-  "⠏",
-] as const;
+  return value;
+}
 
-/** Breathing dot — changes size as well as colour. */
-export const BREATHE_FRAMES = ["·", "•", "●", "•"] as const;
+// ─── Mechanical spinner ─────────────────────────────────────────────────────
 
-export type SpinnerVariant = "orbit" | "wheel" | "breathe";
+/**
+ * Four discrete quadrant blocks. Reads as an indexing mechanism, not a
+ * rainbow loader. Colour is fixed for the lifetime of the component.
+ */
+export const MECHANICAL_FRAMES = ["▖", "▘", "▝", "▗"] as const;
 
-export interface SpinnerProps {
+export interface MechanicalSpinnerProps {
+  /** Uppercase status label rendered after the glyph. */
   label?: string;
-  /** Override the cycling colour with a fixed one. */
+  /** Fixed colour (defaults to the theme accent). */
   color?: string;
-  variant?: SpinnerVariant;
-  /** Milliseconds per frame. */
+  /** Milliseconds per quadrant. */
   speedMs?: number;
   enabled?: boolean;
 }
 
-function framesFor(variant: SpinnerVariant): readonly string[] {
-  if (variant === "wheel") return WHEEL_FRAMES;
-  if (variant === "breathe") return BREATHE_FRAMES;
-  return ORBIT_FRAMES;
-}
-
-function spinnerColor(frame: number): string {
-  const palette = [
-    Colors.accent,
-    Colors.highlight,
-    Colors.warning,
-    Colors.accent,
-    Colors.info,
-    Colors.accent,
-    Colors.highlight,
-    Colors["accent-dim"],
-  ];
-  return palette[frame % palette.length] ?? Colors.accent;
-}
-
-/**
- * OrbitSpinner — compact animated loader.
- *
- * Frame, colour and (for `breathe`) glyph size change as it runs, which is
- * the little "alive" signal the shell uses while commands or data load.
- */
-export function OrbitSpinner({
+export function MechanicalSpinner({
   label,
-  color,
-  variant = "orbit",
-  speedMs = 90,
+  color = Colors.accent,
+  speedMs = 150,
   enabled = true,
-}: SpinnerProps) {
+}: MechanicalSpinnerProps) {
   const tick = useMotionTick(speedMs, enabled);
-  const frames = framesFor(variant);
-  const glyph = frames[tick % frames.length] ?? frames[0];
-  const fg = color ?? spinnerColor(tick);
+  const glyph = MECHANICAL_FRAMES[tick % MECHANICAL_FRAMES.length] ?? "▖";
 
   return (
     <box flexDirection="row" gap={1} alignItems="center">
-      <text fg={fg}>{glyph}</text>
+      <text fg={color}>{glyph}</text>
       {label ? (
         <text fg={Colors.muted} dim>
-          {label}
+          {label.toUpperCase()}
         </text>
       ) : null}
     </box>
   );
 }
 
-// ─── Shimmer text ───────────────────────────────────────────────────────────
+// ─── Static rule ────────────────────────────────────────────────────────────
 
-export interface ShimmerTextProps {
-  text: string;
-  baseColor?: string;
-  highlightColor?: string;
-  /** Width of the moving highlight window, in characters. */
-  window?: number;
-  speedMs?: number;
-  enabled?: boolean;
-  bold?: boolean;
-}
-
-/**
- * ShimmerText — a highlight sweeps across the label, Grok-style.
- * Character content is always preserved so tests can still match text.
- */
-export function ShimmerText({
-  text,
-  baseColor = Colors.muted,
-  highlightColor = Colors.accent,
-  window = 5,
-  speedMs = 80,
-  enabled = true,
-  bold = false,
-}: ShimmerTextProps) {
-  const tick = useMotionTick(speedMs, enabled);
-  const chars = Array.from(text);
-  const span = Math.max(1, Math.floor(window));
-  const head = chars.length > 0 ? (tick % (chars.length + span)) - span : -span;
-
-  return (
-    <text>
-      {chars.map((ch, i) => {
-        const hot = Math.abs(i - head) <= Math.floor(span / 2);
-        return (
-          <span
-            key={`${i}-${ch}`}
-            fg={hot ? highlightColor : baseColor}
-            bold={hot || bold}
-          >
-            {ch}
-          </span>
-        );
-      })}
-    </text>
-  );
-}
-
-// ─── Animated rule ──────────────────────────────────────────────────────────
-
-export interface AnimatedRuleProps {
+export interface RuleProps {
   width?: number;
   color?: string;
-  pulseColor?: string;
+  /** Leading heavy accent segment (default on). */
+  accent?: boolean;
+  accentColor?: string;
+  /** Width of the accent segment in cells. */
+  accentWidth?: number;
   char?: string;
-  pulse?: string;
-  speedMs?: number;
-  enabled?: boolean;
+  accentChar?: string;
 }
 
 /**
- * AnimatedRule — a thin divider with a marker travelling along it.
- * Doubles as the frameless separator between shell regions.
+ * Rule — a static hairline with a short heavy accent block at the left.
+ * This is the only divider in the shell; it never moves.
  */
-export function AnimatedRule({
+export function Rule({
   width = 24,
   color = Colors.border,
-  pulseColor = Colors.accent,
+  accent = true,
+  accentColor = Colors.accent,
+  accentWidth = 2,
   char = "─",
-  pulse = "◆",
-  speedMs = 110,
-  enabled = true,
-}: AnimatedRuleProps) {
-  const tick = useMotionTick(speedMs, enabled);
+  accentChar = "━",
+}: RuleProps) {
   const cells = Math.max(1, Math.floor(width));
-  const pos = tick % cells;
-  const prefix = char.repeat(pos);
-  const suffix = char.repeat(Math.max(0, cells - pos - 1));
+  const heavy = accent ? Math.min(cells, Math.max(0, accentWidth)) : 0;
 
   return (
     <text>
-      <span fg={color}>{prefix}</span>
-      <span fg={pulseColor}>{pulse}</span>
-      <span fg={color}>{suffix}</span>
+      {heavy > 0 ? (
+        <span fg={accentColor}>{accentChar.repeat(heavy)}</span>
+      ) : null}
+      <span fg={color}>{char.repeat(Math.max(0, cells - heavy))}</span>
     </text>
   );
-}
-
-// ─── Breathing glyph ────────────────────────────────────────────────────────
-
-export interface BreatheGlyphProps {
-  color?: string;
-  accentColor?: string;
-  speedMs?: number;
-  enabled?: boolean;
-}
-
-/**
- * BreatheGlyph — a dot that grows and shrinks (· → • → ● → •).
- * Used as the connection heartbeat in the status line.
- */
-export function BreatheGlyph({
-  color = Colors.accent,
-  accentColor = Colors.highlight,
-  speedMs = 420,
-  enabled = true,
-}: BreatheGlyphProps) {
-  const tick = useMotionTick(speedMs, enabled);
-  const glyph = BREATHE_FRAMES[tick % BREATHE_FRAMES.length] ?? "●";
-  const fg =
-    tick % (BREATHE_FRAMES.length * 2) < BREATHE_FRAMES.length
-      ? color
-      : accentColor;
-  return <text fg={fg}>{glyph}</text>;
 }

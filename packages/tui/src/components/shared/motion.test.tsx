@@ -8,13 +8,7 @@
 import { describe, it, expect } from "bun:test";
 import { testRender } from "@opentui/react/test-utils";
 import type { ReactNode } from "react";
-import {
-  AnimatedRule,
-  BreatheGlyph,
-  ORBIT_FRAMES,
-  OrbitSpinner,
-  ShimmerText,
-} from "./motion";
+import { MECHANICAL_FRAMES, MechanicalSpinner, Rule } from "./motion";
 import {
   HOOX_MARK_MEDIUM,
   HOOX_MARK_SMALL,
@@ -32,31 +26,27 @@ async function frame(node: ReactNode, width = 40, height = 6) {
   return setup.captureCharFrame();
 }
 
-describe("motion primitives", () => {
-  it("renders an orbit spinner frame", async () => {
-    const out = await frame(<OrbitSpinner />, 20, 3);
-    expect(ORBIT_FRAMES.some((f) => out.includes(f))).toBe(true);
+describe("mechanical motion", () => {
+  it("renders a fixed quadrant spinner", async () => {
+    const out = await frame(<MechanicalSpinner />, 20, 3);
+    expect(MECHANICAL_FRAMES.some((f) => out.includes(f))).toBe(true);
   });
 
-  it("renders a spinner label", async () => {
-    const out = await frame(<OrbitSpinner label="loading" />, 30, 3);
-    expect(out).toContain("loading");
+  it("uppercases the spinner label", async () => {
+    const out = await frame(<MechanicalSpinner label="loading" />, 30, 3);
+    expect(out).toContain("LOADING");
   });
 
-  it("preserves shimmer text content", async () => {
-    const out = await frame(<ShimmerText text="restoring session" />, 40, 3);
-    expect(out).toContain("restoring session");
-  });
-
-  it("draws a rule with a travelling marker", async () => {
-    const out = await frame(<AnimatedRule width={12} />, 20, 3);
-    expect(out).toContain("◆");
+  it("draws a static rule with a heavy accent block", async () => {
+    const out = await frame(<Rule width={12} />, 20, 3);
+    expect(out).toContain("━");
     expect(out).toContain("─");
   });
 
-  it("renders a breathing glyph", async () => {
-    const out = await frame(<BreatheGlyph />, 10, 3);
-    expect(out).toMatch(/[·•●]/);
+  it("can draw a plain hairline without the accent block", async () => {
+    const out = await frame(<Rule width={12} accent={false} />, 20, 3);
+    expect(out).not.toContain("━");
+    expect(out).toContain("─");
   });
 });
 
@@ -75,9 +65,9 @@ describe("dotted HOOX mark", () => {
     expect(out).toContain("⢀");
   });
 
-  it("renders the HO/OX wordmark", async () => {
+  it("renders the HO/OX wordmark with an uppercase tagline", async () => {
     const out = await frame(<HooxWordmark tagline="edge ops" />, 30, 3);
     expect(out).toContain("HOOX");
-    expect(out).toContain("edge ops");
+    expect(out).toContain("EDGE OPS");
   });
 });

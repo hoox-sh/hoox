@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-04T00:45:28Z
+  at: 2026-11-04T02:06:10Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/shared"
@@ -25,7 +25,7 @@ okf_lock: generated
 * `error-boundary.tsx` — ErrorBoundary, formatBoundaryErrorMessage
 * `hoox-mark.tsx` — HOOX_MARK_MEDIUM, HOOX_MARK_SMALL, HOOX_MARK_TINY, HooxMark, HooxMarkProps, HooxMarkSize, HooxWordmark, HooxWordmarkProps, hooxMarkHeight, hooxMarkRows, hooxMarkWidth
 * `motion.test.tsx`
-* `motion.tsx` — AnimatedRule, AnimatedRuleProps, BREATHE_FRAMES, BreatheGlyph, BreatheGlyphProps, ORBIT_FRAMES, OrbitSpinner, ShimmerText, ShimmerTextProps, SpinnerProps, SpinnerVariant, WHEEL_FRAMES
+* `motion.tsx` — MECHANICAL_FRAMES, MechanicalSpinner, MechanicalSpinnerProps, Rule, RuleProps, isMotionMuted, useCountUp, useMotionTick
 * `panel.tsx` — Panel, PanelProps
 * `quit-modal.tsx` — QuitModal, QuitModalProps
 * `shared.test.tsx`

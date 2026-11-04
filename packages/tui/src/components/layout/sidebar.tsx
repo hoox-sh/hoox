@@ -9,7 +9,7 @@ import { Colors, useUIStore } from "@hoox-sh/hoox-shared";
 import { useTerminalDimensions } from "@opentui/react";
 import { SIDEBAR_ITEMS } from "../../view-registry";
 import { HooxMark, HooxWordmark } from "../shared/hoox-mark";
-import { AnimatedRule, OrbitSpinner, ShimmerText } from "../shared/motion";
+import { Rule } from "../shared/motion";
 
 /** Fixed sidebar width (columns). */
 export const SIDEBAR_WIDTH = 24;
@@ -17,9 +17,9 @@ export const SIDEBAR_WIDTH = 24;
 /**
  * Sidebar — frameless left rail.
  *
- * The dotted HOOX mark anchors the top; the nav list sits directly on the
- * terminal background (no border, no card fill). Shortcut hints come from the
- * view registry so the rail can never drift from the keyboard map.
+ * Editorial stack: dotted mark, wordmark, hairline, numbered nav. No border,
+ * no card fill, no ambient animation. Shortcut hints come from the view
+ * registry so the rail can never drift from the keyboard map.
  */
 export function Sidebar() {
   const activeView = useUIStore((s) => s.activeView);
@@ -30,10 +30,10 @@ export function Sidebar() {
 
   if (!sidebarExpanded) return null;
 
-  // Very short terminals: drop the legend, then the wordmark, then shrink
-  // the mark so the navigation list stays usable.
+  // Tight terminals shed chrome before the nav list.
   const showLegend = height >= 27;
   const showWordmark = height >= 24;
+  const showMark = height >= 22;
 
   return (
     <box
@@ -42,17 +42,15 @@ export function Sidebar() {
       paddingLeft={1}
       paddingRight={1}
       gap={0}
-      backgroundColor={Colors.background}
     >
-      {/* Brand: dotted logo + live heartbeat */}
-      <HooxMark size="xs" animated />
-      {showWordmark ? (
-        <box flexDirection="row" gap={1} alignItems="center">
-          <OrbitSpinner variant="breathe" />
-          <HooxWordmark />
-        </box>
+      {showMark ? (
+        <>
+          <HooxMark size="xs" />
+          <text> </text>
+        </>
       ) : null}
-      <AnimatedRule width={SIDEBAR_WIDTH - 2} />
+      {showWordmark ? <HooxWordmark /> : null}
+      <Rule width={SIDEBAR_WIDTH - 2} />
 
       {/* Navigation items (registry order) — frameless rows */}
       {SIDEBAR_ITEMS.map((item) => {
@@ -66,7 +64,7 @@ export function Sidebar() {
           >
             <box flexDirection="row" gap={1} flexGrow={1}>
               <text fg={isActive ? Colors.accent : Colors.dim}>
-                {isActive ? "▸" : " "}
+                {isActive ? "▌" : " "}
               </text>
               {isActive ? (
                 <text
@@ -77,14 +75,12 @@ export function Sidebar() {
                   {item.label}
                 </text>
               ) : (
-                <text fg={Colors.muted} onMouseUp={() => setView(item.id)}>
+                <text dim onMouseUp={() => setView(item.id)}>
                   {item.label}
                 </text>
               )}
             </box>
-            <text fg={Colors.dim} dim>
-              {item.shortcut}
-            </text>
+            <text dim>{item.shortcut}</text>
           </box>
         );
       })}
@@ -93,8 +89,8 @@ export function Sidebar() {
       <box flexGrow={1} />
       {showLegend ? (
         <box flexDirection="column">
-          <AnimatedRule width={SIDEBAR_WIDTH - 2} />
-          <ShimmerText text="^B hide · ^P cmd" baseColor={Colors.dim} />
+          <Rule width={SIDEBAR_WIDTH - 2} accent={false} />
+          <text dim>^B HIDE ^P CMD</text>
         </box>
       ) : null}
     </box>

@@ -6,8 +6,8 @@
 /**
  * Hoox CLI top banner — Linear Rail default (◆ H · O · O · X).
  *
- * On a TTY, `animateBanner()` does assemble → pulse → settle.
- * Non-TTY / CI / NO_COLOR get a single static frame.
+ * Static on every path: non-TTY / CI / NO_COLOR and TTY all get the same
+ * single frame. No assemble/pulse animation.
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -310,80 +310,22 @@ export function renderCompactBanner(): string {
 
 // ── Animation ─────────────────────────────────────────────────────
 
-function canAnimate(): boolean {
-  if (!process.stdout.isTTY) return false;
-  if (process.env.NO_COLOR) return false;
-  if (process.env.TERM === "dumb") return false;
-  if (process.env.CI === "true" || process.env.CI === "1") return false;
-  return true;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
 /**
- * Play the banner animation on a TTY (assemble → pulse → settle).
- * Falls back to a single static print when animation is not available.
+ * Print the banner.
+ *
+ * Static by design: the shell is mechanical, so there is no assemble/pulse
+ * animation and no cursor-hide/clear sequence. Kept async for API
+ * compatibility with callers that previously awaited the animation.
  *
  * @returns number of lines written
  */
-export async function animateBanner(options?: {
-  /** Total animation budget in ms (default ~800). */
+export async function animateBanner(_options?: {
+  /** @deprecated Ignored — the banner is always static. */
   durationMs?: number;
-  /** Force static even on TTY. */
+  /** @deprecated Ignored — the banner is always static. */
   static?: boolean;
 }): Promise<number> {
-  const staticOnly = options?.static === true || !canAnimate();
-  const finalFrame = composeFrame(1, "static");
-  const lineCount = finalFrame.split("\n").length;
-
-  if (staticOnly) {
-    process.stdout.write(finalFrame + "\n");
-    return lineCount;
-  }
-
-  const durationMs = options?.durationMs ?? 800;
-  const assembleMs = Math.floor(durationMs * 0.55);
-  const pulseMs = durationMs - assembleMs;
-  const fps = 28;
-  const assembleFrames = Math.max(6, Math.round((assembleMs / 1000) * fps));
-  const pulseFrames = Math.max(4, Math.round((pulseMs / 1000) * fps));
-
-  let wroteLines = 0;
-  const writeFrame = (frame: string) => {
-    const lines = frame.split("\n");
-    if (wroteLines > 0) {
-      process.stdout.write(`\x1b[${wroteLines}A`);
-    }
-    for (let i = 0; i < lines.length; i++) {
-      process.stdout.write(`\x1b[2K${lines[i]}\n`);
-    }
-    for (let i = lines.length; i < wroteLines; i++) {
-      process.stdout.write(`\x1b[2K\n`);
-    }
-    if (wroteLines > lines.length) {
-      process.stdout.write(`\x1b[${wroteLines - lines.length}A`);
-    }
-    wroteLines = lines.length;
-  };
-
-  process.stdout.write("\x1b[?25l");
-  try {
-    for (let i = 0; i < assembleFrames; i++) {
-      const phase = i / Math.max(1, assembleFrames - 1);
-      writeFrame(composeFrame(phase, "assemble"));
-      await sleep(assembleMs / assembleFrames);
-    }
-    for (let i = 0; i < pulseFrames; i++) {
-      const phase = i / Math.max(1, pulseFrames - 1);
-      writeFrame(composeFrame(phase, "pulse"));
-      await sleep(pulseMs / pulseFrames);
-    }
-    writeFrame(finalFrame);
-  } finally {
-    process.stdout.write("\x1b[?25h");
-  }
-
-  return wroteLines;
+  const frame = composeFrame(1, "static");
+  process.stdout.write(frame + "\n");
+  return frame.split("\n").length;
 }

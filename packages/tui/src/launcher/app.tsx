@@ -8,16 +8,9 @@
 /**
  * Compact, frameless CLI start screen.
  *
- * Layout (from the HOOX scribble):
- *
- *   ⣶⣦⡀ ⢀⣴⣶   ● HOOX · Cloudflare Workers        v0.5.0
- *   ⣤⣤⣄⣀⣶⣀⣠⣤⣤   ────────────────◆───────────────
- *   ⣠⣾⡇ ⢸⣷⣄   * SETUP   SHIP   DEVELOP   OPERATE
- *                     ▸ search commands…
- *                     ▸ Onboard      init + setup end-to-end
- *                       Doctor       runtime, TUI paths, security
- *                     ────────────────◆───────────────
- *                     ↑↓ move  ↵ run  ? help  q quit    ~/Git/hoox
+ * Editorial layout: dotted mark rail on the left, a ruled status/menu/content
+ * column on the right, command legend at the foot. Static by design — the
+ * only entrance motion is the mark's one-shot gradient reveal.
  *
  * Keyboard-first: type to filter, ↑↓ to move, Enter to run, q/Esc to quit.
  */
@@ -44,12 +37,7 @@ import {
   hooxMarkWidth,
   type HooxMarkSize,
 } from "../components/shared/hoox-mark";
-import {
-  AnimatedRule,
-  BreatheGlyph,
-  isMotionMuted,
-  OrbitSpinner,
-} from "../components/shared/motion";
+import { isMotionMuted, Rule } from "../components/shared/motion";
 
 const LIST_MAX = 5;
 const PLACEHOLDERS = [
@@ -64,45 +52,39 @@ export interface LauncherAppProps {
   onResolve: (result: LauncherResult) => void;
 }
 
-function shortenPath(cwd: string, width: number): string {
-  if (cwd.length <= width) return cwd;
-  const home = process.env.HOME;
-  const tilde =
-    home && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd;
-  if (tilde.length <= width) return tilde;
-  return `…${tilde.slice(-(width - 1))}`;
-}
-
-function Hint({ keys, label }: { keys: string; label: string }) {
-  return (
-    <box flexDirection="row" gap={1}>
-      <text fg={Colors.foreground}>{keys}</text>
-      <text fg={Colors.muted}>{label}</text>
-    </box>
-  );
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
 }
 
 /**
- * Pick the groups that fit the menu budget, keeping the active group visible
- * (and first) so the highlighted command always has a home in the menu.
+ * Pick the groups that fit the menu budget in their natural order. If the
+ * active group falls outside the visible slice, swap it into the last slot so
+ * the highlighted command always has a visible home.
  */
 function fitGroups(
   groups: LauncherGroup[],
   activeId: string | undefined,
   budget: number
-): LauncherGroup[] {
-  const active = groups.find((g) => g.id === activeId);
-  const ordered = active
-    ? [active, ...groups.filter((g) => g.id !== active.id)]
-    : groups;
-  const out: LauncherGroup[] = [];
+): Array<{ group: LauncherGroup; index: number }> {
+  const out: Array<{ group: LauncherGroup; index: number }> = [];
   let used = 0;
-  for (const group of ordered) {
-    const cost = group.title.length + 2 + (out.length > 0 ? 2 : 0);
-    if (out.length > 0 && used + cost > budget) continue;
-    out.push(group);
+
+  groups.forEach((group, index) => {
+    const cost = group.title.length + 4 + (out.length > 0 ? 2 : 0);
+    if (out.length > 0 && used + cost > budget) return;
+    out.push({ group, index });
     used += cost;
+  });
+
+  const activeIndex = groups.findIndex((g) => g.id === activeId);
+  if (
+    activeIndex >= 0 &&
+    out.length > 0 &&
+    !out.some((entry) => entry.index === activeIndex)
+  ) {
+    out[out.length - 1] = { group: groups[activeIndex]!, index: activeIndex };
   }
+
   return out;
 }
 
@@ -125,7 +107,7 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
   const markWidth = hooxMarkWidth(markSize);
   const markHeight = hooxMarkHeight(markSize);
   const railWidth = markWidth + 2;
-  const rightWidth = Math.max(16, width - railWidth - 4);
+  const rightWidth = Math.max(16, width - railWidth - 5);
 
   const listLimit = Math.max(2, Math.min(LIST_MAX, height - 8));
   const visible = filtered.slice(0, listLimit);
@@ -133,8 +115,8 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
     visible.length === 0 ? 0 : Math.min(index, visible.length - 1);
 
   const footerRows = Math.max(
-    markHeight + 2,
-    6 + listLimit + (helpOpen ? 2 : 0)
+    markHeight + 3,
+    7 + listLimit + (helpOpen ? 2 : 0)
   );
 
   useEffect(() => {
@@ -149,7 +131,7 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
 
   useEffect(() => {
     if (isMotionMuted()) return;
-    const id = setInterval(() => setPhTick((n) => n + 1), 4000);
+    const id = setInterval(() => setPhTick((n) => n + 1), 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -159,7 +141,6 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
     rightWidth >= 36
       ? fullPlaceholder.slice(0, rightWidth - 2)
       : "search commands…";
-  const cwdLabel = shortenPath(catalog.cwd, Math.max(8, railWidth - 1));
 
   const activeItem = visible[safeIndex];
   const menuGroups = fitGroups(
@@ -170,9 +151,10 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
 
   const labelWidth = Math.max(
     10,
-    Math.min(18, rightWidth - (width >= 60 ? 22 : 14))
+    Math.min(18, rightWidth - (rightWidth >= 34 ? 20 : 10))
   );
-  const hintWidth = Math.max(8, rightWidth - labelWidth - 4);
+  const showIndex = rightWidth >= 34;
+  const hintWidth = Math.max(0, rightWidth - labelWidth - (showIndex ? 6 : 4));
   const commandPreview = activeItem
     ? `↵ hoox ${activeItem.argv.join(" ")}`
     : "";
@@ -290,97 +272,91 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
   });
 
   return (
-    <box
-      width="100%"
-      flexDirection="column"
-      backgroundColor={Colors.background}
-      paddingLeft={1}
-      paddingRight={1}
-    >
-      <box flexDirection="row" gap={2} flexGrow={1}>
-        {/* ── Left rail: dotted logo + wordmark + live heartbeat ─────────── */}
-        <box flexDirection="column" width={railWidth} gap={0}>
-          <HooxMark size={markSize} animated />
-          <HooxWordmark tagline={width >= 72 ? "edge ops" : undefined} />
-          <OrbitSpinner
-            label={width >= 72 ? "mesh online" : undefined}
-            variant="orbit"
-          />
-          {height >= 17 ? (
-            <text fg={Colors.dim} dim>
-              {cwdLabel}
-            </text>
+    <box width="100%" flexDirection="column" paddingLeft={1} paddingRight={1}>
+      <box flexDirection="row" flexGrow={1}>
+        {/* ── Left rail: dotted mark, no overlays ────────────────────────── */}
+        <box flexDirection="column" width={railWidth} paddingRight={1} gap={0}>
+          <HooxMark size={markSize} />
+          <text> </text>
+          <HooxWordmark tagline={railWidth >= 14 ? "edge ops" : undefined} />
+          {height >= 15 ? <text dim>{`v${catalog.version}`}</text> : null}
+          {height >= 15 ? <text> </text> : null}
+          {height >= 13 ? (
+            <box flexDirection="row">
+              <text fg={Colors.success}>■</text>
+              <text dim> ONLINE</text>
+            </box>
           ) : null}
         </box>
 
-        {/* ── Right column: status → menu → content → commands ──────────── */}
-        <box flexDirection="column" flexGrow={1} gap={0}>
-          {/* Status line */}
+        {/* ── Right column: status / menu / content / legend ─────────────── */}
+        <box
+          flexDirection="column"
+          flexGrow={1}
+          border={["left"]}
+          borderStyle="single"
+          borderColor={Colors.border}
+          paddingLeft={2}
+          gap={0}
+        >
+          {/* Status */}
           <box
             flexDirection="row"
             justifyContent="space-between"
             alignItems="center"
           >
-            <box flexDirection="row" gap={1} alignItems="center">
-              <BreatheGlyph />
-              <text fg={Colors.foreground} bold>
-                HOOX
+            <box flexDirection="row">
+              <text fg={Colors.accent} bold>
+                ■
               </text>
-              {width >= 52 ? (
-                <>
-                  <text fg={Colors.dim}>·</text>
-                  <text fg={Colors.muted}>Cloudflare Workers</text>
-                </>
-              ) : null}
+              <text bold> HOOX</text>
+              {width >= 52 ? <text dim>{` / Cloudflare Workers`}</text> : null}
             </box>
-            <text fg={Colors.dim}>{`v${catalog.version}`}</text>
+            <text dim>{`v${catalog.version}`}</text>
           </box>
 
-          <AnimatedRule width={rightWidth} />
+          <Rule width={rightWidth} />
 
-          {/* Menu — contextual group tabs, active group pinned first */}
+          {/* Menu — numbered sections, active section marked */}
           <box flexDirection="row" gap={2}>
-            {menuGroups.map((group) => {
+            {menuGroups.map(({ group, index: groupIndex }) => {
               const active = group.id === activeItem?.group;
               return (
                 <text
                   key={group.id}
-                  fg={active ? Colors.accent : Colors.muted}
+                  fg={active ? Colors.accent : undefined}
                   bold={active}
+                  dim={!active}
                 >
-                  {`${active ? "* " : "  "}${group.title.toUpperCase()}`}
+                  {`${active ? "▌" : " "}${pad2(groupIndex + 1)} ${group.title.toUpperCase()}`}
                 </text>
               );
             })}
           </box>
 
-          {/* Composer / filter */}
+          <Rule width={rightWidth} accent={false} />
+
+          {/* Search */}
           <box flexDirection="row" gap={1}>
-            <text fg={query ? Colors.accent : Colors.dim}>▸</text>
+            <text fg={Colors.accent}>›</text>
             {query ? (
-              <text fg={Colors.foreground}>{query}</text>
+              <text>
+                {query}
+                <span fg={Colors.accent}>▌</span>
+              </text>
             ) : (
-              <text fg={Colors.dim}>{placeholderLine}</text>
+              <text dim>{placeholderLine}</text>
             )}
           </box>
 
-          {/* Content — filtered commands */}
+          {/* Content */}
           {helpOpen ? (
             <box flexDirection="column">
-              <text fg={Colors.muted}>
-                {" "}
-                Type to filter. Enter runs the highlighted command.
-              </text>
-              <text fg={Colors.muted}>
-                {" "}
-                Esc clears the filter or quits. q also quits.
-              </text>
+              <text dim>TYPE TO FILTER · ENTER RUNS · ESC CLEARS</text>
+              <text dim>Q QUITS · ↑↓ MOVES THE SELECTION</text>
             </box>
           ) : visible.length === 0 ? (
-            <box flexDirection="row" gap={1}>
-              <text fg={Colors.dim}>·</text>
-              <text fg={Colors.muted}>no matches</text>
-            </box>
+            <text dim>NO MATCHES</text>
           ) : (
             visible.map((item, i) => {
               const selected = i === safeIndex;
@@ -389,21 +365,21 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
                   key={item.id}
                   flexDirection="row"
                   gap={1}
-                  backgroundColor={selected ? Colors.card : Colors.background}
                   onMouseUp={() => runItem(item)}
                 >
-                  <text fg={selected ? Colors.accent : Colors.dim}>
-                    {selected ? "▸" : " "}
-                  </text>
                   <text
-                    fg={selected ? Colors.foreground : Colors.muted}
-                    bold={selected}
+                    fg={selected ? Colors.accent : undefined}
+                    dim={!selected}
                   >
+                    {selected ? "▌" : " "}
+                  </text>
+                  {showIndex ? <text dim>{pad2(i + 1)}</text> : null}
+                  <text bold={selected} dim={!selected}>
                     {item.label.slice(0, labelWidth).padEnd(labelWidth, " ")}
                   </text>
-                  <text fg={selected ? Colors.muted : Colors.dim} dim>
-                    {item.hint.slice(0, hintWidth)}
-                  </text>
+                  {hintWidth >= 4 ? (
+                    <text dim>{item.hint.slice(0, hintWidth)}</text>
+                  ) : null}
                 </box>
               );
             })
@@ -412,26 +388,19 @@ export function LauncherApp({ catalog, onResolve }: LauncherAppProps) {
           <box flexGrow={1} />
 
           {/* Commands + legend */}
-          <AnimatedRule width={rightWidth} />
+          <Rule width={rightWidth} />
           <box
             flexDirection="row"
             justifyContent="space-between"
             alignItems="center"
           >
-            {width >= 56 ? (
-              <box flexDirection="row" gap={2}>
-                <Hint keys="↑↓" label="move" />
-                <Hint keys="↵" label="run" />
-                <Hint keys="?" label="help" />
-                <Hint keys="q" label="quit" />
-              </box>
+            {width >= 60 ? (
+              <text dim>↑↓ select ↵ run ? help q quit</text>
             ) : (
-              <text fg={Colors.muted}>↑↓ · ↵ · ? · q quit</text>
+              <text dim>↑↓ · ↵ · ? · q quit</text>
             )}
             {previewWidth >= 10 && commandPreview ? (
-              <text fg={Colors.dim} dim>
-                {commandPreview.slice(0, previewWidth)}
-              </text>
+              <text dim>{commandPreview.slice(0, previewWidth)}</text>
             ) : null}
           </box>
         </box>
