@@ -7,7 +7,7 @@ tags: [cli, code, packages, utils]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-02T12:22:43Z
+  at: 2026-11-08T15:00:10Z
 sources:
   - id: tree
     resource: "packages/cli/src/utils"
