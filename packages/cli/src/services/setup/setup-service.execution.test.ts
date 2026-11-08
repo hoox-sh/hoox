@@ -380,16 +380,16 @@ describe("SetupService.setSecrets — full path", () => {
     //             + 2 for AGENT_INTERNAL_KEY
     //             + 1 for SESSION_SECRET
     //             + 1 for WEBHOOK_API_KEY_BINDING
-    //             + 1 for TELEGRAM_INTERNAL_KEY_BINDING
+    //             + 2 for TELEGRAM_INTERNAL_KEY_BINDING (trade-worker, telegram-worker)
     //             + 2 for API_SERVICE_KEY_BINDING (trade-worker, dashboard)
     //             + 1 for TRADE_INTERNAL_KEY (dashboard)
     //             + 3 for WALLET_EXECUTE_KEY_BINDING (trade, wallet, hoox)
-    // = 20
-    expect(secretPutMock).toHaveBeenCalledTimes(20);
-    expect(results).toHaveLength(20);
+    // = 21
+    expect(secretPutMock).toHaveBeenCalledTimes(21);
+    expect(results).toHaveLength(21);
     expect(results.every((r) => r.ok)).toBe(true);
-    expect(events.filter((e) => e.type === "secret-start").length).toBe(20);
-    expect(events.filter((e) => e.type === "secret-done").length).toBe(20);
+    expect(events.filter((e) => e.type === "secret-start").length).toBe(21);
+    expect(events.filter((e) => e.type === "secret-done").length).toBe(21);
   });
 
   it("records failures when secretPut returns ok=false", async () => {
