@@ -1,3 +1,8 @@
 #!/usr/bin/env sh
 echo "🔍 Running pre-push typecheck (builds @hoox-sh/hoox-shared dist first)..."
 bun run typecheck
+
+# OpenOrchestrate gate: OKF validation + full test suite.
+# format+lint are skipped here — lint-staged enforces them on staged files at commit.
+echo "🔍 Running OpenOrchestrate verify (okf, tests)..."
+OO_SKIP="format,lint" bash scripts/verify.sh pre-push

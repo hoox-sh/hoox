@@ -27,6 +27,10 @@ FORMAT_CMD='bunx prettier --check .'
 LINT_CMD='bun run lint'
 TYPECHECK_CMD='bun run typecheck'
 TEST_CMD='bun run test'
+# Live suites need Cloudflare/AXIS credentials that a push gate cannot assume, so
+# pre-push runs the same unit suite with every live suite excluded. They stay
+# runnable with credentials via `bun run test:live`.
+TEST_CMD_PRE_PUSH='bun run scripts/test-with-table.ts --isolate --path-ignore-patterns "tests/live/**" --path-ignore-patterns "**/live.test.ts" --path-ignore-patterns "packages/tui/**" && bun run test:tui'
 OKF_CMD='okn --no-telemetry validate --spec 0.2 okf'
 # /oo:commands
 # All checks detected.
@@ -148,7 +152,12 @@ run_step typecheck "Typecheck" "$TYPECHECK_CMD"
 run_step okf "OKF" "$OKF_CMD"
 
 if [ "$MODE" = "all" ] || [ "$MODE" = "pre-push" ]; then
-  run_step test "Tests" "$TEST_CMD"
+  test_cmd="$TEST_CMD"
+  if [ "$MODE" = "pre-push" ]; then
+    test_cmd="$TEST_CMD_PRE_PUSH"
+    printf '%s %-10s %s\n' "${YELLOW}${SKIP}${RESET}" "Live" "skipped: live tests need credentials"
+  fi
+  run_step test "Tests" "$test_cmd"
 fi
 
 # A setup with no project checks looks green while proving nothing. Say so, and
