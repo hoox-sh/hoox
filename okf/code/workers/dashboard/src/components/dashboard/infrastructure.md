@@ -7,7 +7,7 @@ tags: [code, components, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/components/dashboard/infrastructure"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `infrastructure-config.ts` — INFRASTRUCTURE_SECTIONS, InfrastructureResource, InfrastructureSection, ResourceKind, ResourceStatus
-* `infrastructure-legend.tsx` — InfrastructureLegend
-* `infrastructure-row.tsx` — InfrastructureRow
+- `infrastructure-config.ts` — INFRASTRUCTURE_SECTIONS, InfrastructureResource, InfrastructureSection, ResourceKind, ResourceStatus
+- `infrastructure-legend.tsx` — InfrastructureLegend
+- `infrastructure-row.tsx` — InfrastructureRow
 
 # Packages
 
@@ -28,4 +28,4 @@ okf_lock: generated
 
 # Used by
 
-* [workers/dashboard/src/components/dashboard](/code/workers/dashboard/src/components/dashboard.md)
+- [workers/dashboard/src/components/dashboard](/code/workers/dashboard/src/components/dashboard.md)

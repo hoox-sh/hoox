@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-03T12:40:06Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/local-development.mdx"
@@ -22,15 +22,15 @@ Repo path `docs/enduser/guides/local-development.mdx`.
 
 # Outline
 
-* 🚀 Starting the Local Workspace
-  * Option A: Native Runtime (Recommended for speed)
-  * Option B: Docker Runtime (Recommended for isolation)
-* 🐳 Docker Compose Profiles
-* 📍 Local Port Mapping & Endpoint Access
-* 🛠️ Operating Individual Services
-* 🧪 Running the Verification CI Pipeline
-  * 🔗 Next Steps
+- 🚀 Starting the Local Workspace
+  - Option A: Native Runtime (Recommended for speed)
+  - Option B: Docker Runtime (Recommended for isolation)
+- 🐳 Docker Compose Profiles
+- 📍 Local Port Mapping & Endpoint Access
+- 🛠️ Operating Individual Services
+- 🧪 Running the Verification CI Pipeline
+  - 🔗 Next Steps
 
 # Mentions
 
-* [scripts](/code/scripts.md)
+- [scripts](/code/scripts.md)

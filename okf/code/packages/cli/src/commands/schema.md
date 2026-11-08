@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/schema"
@@ -18,8 +18,8 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — registerSchemaCommand
-* `schema-command.ts` — registerSchemaCommand
+- `index.ts` — registerSchemaCommand
+- `schema-command.ts` — registerSchemaCommand
 
 # Packages
 

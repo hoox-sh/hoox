@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/how-hoox-works.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/enduser/concepts/how-hoox-works.mdx`.
 
 # Outline
 
-* 🗺️ The Execution Pipeline
-* 🔍 Detailed Pipeline Phase Analysis
-  * 1. Signal Arrival & Ingestion
-  * 2. Edge Firewall & Gateway Validation
-  * 3. Service Binding Order Routing
-  * 4. Exchange Execution & Cryptographic Signing
-  * 5. Persistent D1 Logging & Telemetry
-  * 6. User Notifications & Alerts
-  * 🔗 Next Steps
+- 🗺️ The Execution Pipeline
+- 🔍 Detailed Pipeline Phase Analysis
+  - 1. Signal Arrival & Ingestion
+  - 2. Edge Firewall & Gateway Validation
+  - 3. Service Binding Order Routing
+  - 4. Exchange Execution & Cryptographic Signing
+  - 5. Persistent D1 Logging & Telemetry
+  - 6. User Notifications & Alerts
+  - 🔗 Next Steps

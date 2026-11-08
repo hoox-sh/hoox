@@ -7,7 +7,7 @@ tags: [code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `middleware.ts` — config, middleware
-* `next-env.d.ts`
-* `postcss.config.mjs`
+- `middleware.ts` — config, middleware
+- `next-env.d.ts`
+- `postcss.config.mjs`
 
 # Packages
 
@@ -28,11 +28,11 @@ okf_lock: generated
 
 # Depends on
 
-* [workers/dashboard/src/lib](/code/workers/dashboard/src/lib.md)
+- [workers/dashboard/src/lib](/code/workers/dashboard/src/lib.md)
 
 # Nested
 
-* [workers/dashboard/src/app](/code/workers/dashboard/src/app.md)
-* [workers/dashboard/src/components](/code/workers/dashboard/src/components.md)
-* [workers/dashboard/src/hooks](/code/workers/dashboard/src/hooks.md)
-* [workers/dashboard/src/lib](/code/workers/dashboard/src/lib.md)
+- [workers/dashboard/src/app](/code/workers/dashboard/src/app.md)
+- [workers/dashboard/src/components](/code/workers/dashboard/src/components.md)
+- [workers/dashboard/src/hooks](/code/workers/dashboard/src/hooks.md)
+- [workers/dashboard/src/lib](/code/workers/dashboard/src/lib.md)

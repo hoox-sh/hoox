@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, getting-started]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/getting-started/installation.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/enduser/getting-started/installation.mdx`.
 
 # Outline
 
-* 📋 System Prerequisites
-  * 1. 🧅 Bun JavaScript Runtime (Version ≥ 1.2)
-  * 2. ⚡ Cloudflare® Account
-  * 3. 🐳 Docker & Docker Compose (Optional)
-* 📦 Install the CLI (Recommended)
-* 🛠️ Clone the Workspace
-* 🪄 Bootstrap with hoox onboard
-* 📍 Run from any directory (monorepo remember)
-* 🔍 Verifying Local Prerequisites
-  * 🔗 Next Steps
+- 📋 System Prerequisites
+  - 1. 🧅 Bun JavaScript Runtime (Version ≥ 1.2)
+  - 2. ⚡ Cloudflare® Account
+  - 3. 🐳 Docker & Docker Compose (Optional)
+- 📦 Install the CLI (Recommended)
+- 🛠️ Clone the Workspace
+- 🪄 Bootstrap with hoox onboard
+- 📍 Run from any directory (monorepo remember)
+- 🔍 Verifying Local Prerequisites
+  - 🔗 Next Steps

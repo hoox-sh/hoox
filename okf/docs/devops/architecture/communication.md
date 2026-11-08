@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/communication.mdx"
@@ -22,9 +22,9 @@ Repo path `docs/devops/architecture/communication.mdx`.
 
 # Outline
 
-* ⚡ 1. Service Bindings: Zero-Overhead V8 Routing
-  * The Under-the-Hood V8 Mechanics
-* 💻 2. Complete Service Invocations Implementation
-* 🛅 3. Internal Authorization Middleware Standard
-* 🧪 4. Testing & Mocking Service Bindings
-  * 🔗 Next Steps
+- ⚡ 1. Service Bindings: Zero-Overhead V8 Routing
+  - The Under-the-Hood V8 Mechanics
+- 💻 2. Complete Service Invocations Implementation
+- 🛅 3. Internal Authorization Middleware Standard
+- 🧪 4. Testing & Mocking Service Bindings
+  - 🔗 Next Steps

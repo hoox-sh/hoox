@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, getting-started]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/getting-started/quick-start.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/enduser/getting-started/quick-start.mdx`.
 
 # Outline
 
-* 🏁 Step-by-Step Deployment Path
-  * Step 0: Install CLI & Clone
-  * Step 1: Onboard Your Workspace
-  * Step 2: Inject Encrypted Exchange API Keys
-  * Step 3: Deploy All Workers in Sequence
-  * Step 4: Verify the Deployment
-  * Step 5: Fire a Simulated Trade Webhook
-  * Step 6 (Optional): Measure Fast-Path Latency
-* 📥 Webhook Payload Parameters Spec
-* 📤 Expected Success Response
-  * 🔗 Next Steps
+- 🏁 Step-by-Step Deployment Path
+  - Step 0: Install CLI & Clone
+  - Step 1: Onboard Your Workspace
+  - Step 2: Inject Encrypted Exchange API Keys
+  - Step 3: Deploy All Workers in Sequence
+  - Step 4: Verify the Deployment
+  - Step 5: Fire a Simulated Trade Webhook
+  - Step 6 (Optional): Measure Fast-Path Latency
+- 📥 Webhook Payload Parameters Spec
+- 📤 Expected Success Response
+  - 🔗 Next Steps

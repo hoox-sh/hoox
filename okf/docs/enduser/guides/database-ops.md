@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/database-ops.mdx"
@@ -22,16 +22,16 @@ Repo path `docs/enduser/guides/database-ops.mdx`.
 
 # Outline
 
-* 🏗️ The Core Database Tables
-* ⚡ Applying Schemas & Tables
-* 🔄 Managing Database Migrations
-  * Migration Best Practices
-* 🔎 Querying Data from the CLI
-  * Useful Query Templates
-* 📥 Backup & Export Workflows
-  * Export Output & Structure
-  * Restoring from Backup
-* ⚠️ Database Reset (Destructive Operations)
-  * Soft Reset Alternative
-* 📋 D1 Free Tier Limits & Monitoring
-  * 🔗 Next Steps
+- 🏗️ The Core Database Tables
+- ⚡ Applying Schemas & Tables
+- 🔄 Managing Database Migrations
+  - Migration Best Practices
+- 🔎 Querying Data from the CLI
+  - Useful Query Templates
+- 📥 Backup & Export Workflows
+  - Export Output & Structure
+  - Restoring from Backup
+- ⚠️ Database Reset (Destructive Operations)
+  - Soft Reset Alternative
+- 📋 D1 Free Tier Limits & Monitoring
+  - 🔗 Next Steps

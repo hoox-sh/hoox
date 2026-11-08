@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/test-trading.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/guides/test-trading.mdx`.
 
 # Outline
 
-* Exchange support
-* Credentials (recommended setup)
-* End-to-end behavior
-* Closing a testnet position
-* Email and other ingress paths
-* Safety notes
-* Quick curl examples
-  * Related
+- Exchange support
+- Credentials (recommended setup)
+- End-to-end behavior
+- Closing a testnet position
+- Email and other ingress paths
+- Safety notes
+- Quick curl examples
+  - Related

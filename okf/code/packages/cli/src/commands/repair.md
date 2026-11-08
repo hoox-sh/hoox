@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-03T12:12:12Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/repair"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — RepairCheckResult, RepairStepResult, registerRepairCommand
-* `repair-command.test.ts`
-* `repair-command.ts` — registerRepairCommand
-* `repair-service.test.ts`
-* `repair-service.ts` — RepairService, RepairServiceDeps, RepairSystemCheckOptions
-* `types.ts` — RepairCheckResult, RepairStepResult
+- `index.ts` — RepairCheckResult, RepairStepResult, registerRepairCommand
+- `repair-command.test.ts`
+- `repair-command.ts` — registerRepairCommand
+- `repair-service.test.ts`
+- `repair-service.ts` — RepairService, RepairServiceDeps, RepairSystemCheckOptions
+- `types.ts` — RepairCheckResult, RepairStepResult
 
 # Packages
 

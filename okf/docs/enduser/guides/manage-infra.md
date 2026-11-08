@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/manage-infra.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/guides/manage-infra.mdx`.
 
 # Outline
 
-* ⚡ 1. One-Click Quick Provisioning
-* 🗄️ 2. D1 Database Administration
-* 🔑 3. KV Configuration Namespace Management
-* 📨 4. Asynchronous Queues Setup
-  * Queue Parameters & Throttling
-* 📦 5. R2 Object Storage Administration
-* 🧠 6. Vectorize RAG Index Management
-  * 🔗 Next Steps
+- ⚡ 1. One-Click Quick Provisioning
+- 🗄️ 2. D1 Database Administration
+- 🔑 3. KV Configuration Namespace Management
+- 📨 4. Asynchronous Queues Setup
+  - Queue Parameters & Throttling
+- 📦 5. R2 Object Storage Administration
+- 🧠 6. Vectorize RAG Index Management
+  - 🔗 Next Steps

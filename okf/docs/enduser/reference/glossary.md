@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/glossary.mdx"
@@ -22,8 +22,8 @@ Repo path `docs/enduser/reference/glossary.mdx`.
 
 # Outline
 
-* General Trading
-* Architecture & Infrastructure
-* Security
-* Development & Tooling
-* Exchange-Specific
+- General Trading
+- Architecture & Infrastructure
+- Security
+- Development & Tooling
+- Exchange-Specific

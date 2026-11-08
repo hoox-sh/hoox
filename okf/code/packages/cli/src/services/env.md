@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/env"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `env-service.test.ts`
-* `env-service.ts` — EnvFile, EnvService, EnvValidationResult, EnvVarDefinition
-* `index.ts` — EnvService
+- `env-service.test.ts`
+- `env-service.ts` — EnvFile, EnvService, EnvValidationResult, EnvVarDefinition
+- `index.ts` — EnvService
 
 # Packages
 

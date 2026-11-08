@@ -7,7 +7,7 @@ tags: [code, components, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/components"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `theme-provider.tsx` — ThemeProvider
+- `theme-provider.tsx` — ThemeProvider
 
 # Packages
 
@@ -26,6 +26,6 @@ okf_lock: generated
 
 # Nested
 
-* [workers/dashboard/src/components/agent](/code/workers/dashboard/src/components/agent.md)
-* [workers/dashboard/src/components/dashboard](/code/workers/dashboard/src/components/dashboard.md)
-* [workers/dashboard/src/components/ui](/code/workers/dashboard/src/components/ui.md)
+- [workers/dashboard/src/components/agent](/code/workers/dashboard/src/components/agent.md)
+- [workers/dashboard/src/components/dashboard](/code/workers/dashboard/src/components/dashboard.md)
+- [workers/dashboard/src/components/ui](/code/workers/dashboard/src/components/ui.md)

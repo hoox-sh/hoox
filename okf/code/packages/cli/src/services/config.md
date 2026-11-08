@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/config"
@@ -18,10 +18,10 @@ okf_lock: generated
 
 # Files
 
-* `config-service.test.ts`
-* `config-service.ts` — ConfigError, ConfigResult, ConfigService, WorkerStatusRow
-* `index.ts` — ConfigError, ConfigService, DevConfig, GlobalConfig, HooxConfig, WorkerConfig, WorkerSecret, WorkerStatusRow, WorkerVars
-* `types.ts` — DevConfig, GlobalConfig, HooxConfig, WorkerConfig, WorkerSecret, WorkerVars
+- `config-service.test.ts`
+- `config-service.ts` — ConfigError, ConfigResult, ConfigService, WorkerStatusRow
+- `index.ts` — ConfigError, ConfigService, DevConfig, GlobalConfig, HooxConfig, WorkerConfig, WorkerSecret, WorkerStatusRow, WorkerVars
+- `types.ts` — DevConfig, GlobalConfig, HooxConfig, WorkerConfig, WorkerSecret, WorkerVars
 
 # Packages
 

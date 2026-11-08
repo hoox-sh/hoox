@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app/dashboard"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-* `error.tsx` — DashboardError
-* `layout.tsx` — DashboardLayout, metadata
-* `loading.tsx` — DashboardLoading
-* `metadata.ts` — metadata
-* `page.client.tsx` — DashboardClient
-* `page.tsx` — DashboardPage, metadata
+- `error.tsx` — DashboardError
+- `layout.tsx` — DashboardLayout, metadata
+- `loading.tsx` — DashboardLoading
+- `metadata.ts` — metadata
+- `page.client.tsx` — DashboardClient
+- `page.tsx` — DashboardPage, metadata
 
 # Packages
 
@@ -31,14 +31,14 @@ okf_lock: generated
 
 # Nested
 
-* [workers/dashboard/src/app/dashboard/agent](/code/workers/dashboard/src/app/dashboard/agent.md)
-* [workers/dashboard/src/app/dashboard/analytics](/code/workers/dashboard/src/app/dashboard/analytics.md)
-* [workers/dashboard/src/app/dashboard/database](/code/workers/dashboard/src/app/dashboard/database.md)
-* [workers/dashboard/src/app/dashboard/logs](/code/workers/dashboard/src/app/dashboard/logs.md)
-* [workers/dashboard/src/app/dashboard/notifications](/code/workers/dashboard/src/app/dashboard/notifications.md)
-* [workers/dashboard/src/app/dashboard/positions](/code/workers/dashboard/src/app/dashboard/positions.md)
-* [workers/dashboard/src/app/dashboard/reports](/code/workers/dashboard/src/app/dashboard/reports.md)
-* [workers/dashboard/src/app/dashboard/settings](/code/workers/dashboard/src/app/dashboard/settings.md)
-* [workers/dashboard/src/app/dashboard/setup](/code/workers/dashboard/src/app/dashboard/setup.md)
-* [workers/dashboard/src/app/dashboard/signal-flow](/code/workers/dashboard/src/app/dashboard/signal-flow.md)
-* [workers/dashboard/src/app/dashboard/signals](/code/workers/dashboard/src/app/dashboard/signals.md)
+- [workers/dashboard/src/app/dashboard/agent](/code/workers/dashboard/src/app/dashboard/agent.md)
+- [workers/dashboard/src/app/dashboard/analytics](/code/workers/dashboard/src/app/dashboard/analytics.md)
+- [workers/dashboard/src/app/dashboard/database](/code/workers/dashboard/src/app/dashboard/database.md)
+- [workers/dashboard/src/app/dashboard/logs](/code/workers/dashboard/src/app/dashboard/logs.md)
+- [workers/dashboard/src/app/dashboard/notifications](/code/workers/dashboard/src/app/dashboard/notifications.md)
+- [workers/dashboard/src/app/dashboard/positions](/code/workers/dashboard/src/app/dashboard/positions.md)
+- [workers/dashboard/src/app/dashboard/reports](/code/workers/dashboard/src/app/dashboard/reports.md)
+- [workers/dashboard/src/app/dashboard/settings](/code/workers/dashboard/src/app/dashboard/settings.md)
+- [workers/dashboard/src/app/dashboard/setup](/code/workers/dashboard/src/app/dashboard/setup.md)
+- [workers/dashboard/src/app/dashboard/signal-flow](/code/workers/dashboard/src/app/dashboard/signal-flow.md)
+- [workers/dashboard/src/app/dashboard/signals](/code/workers/dashboard/src/app/dashboard/signals.md)

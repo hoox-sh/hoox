@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/api-endpoints.mdx"
@@ -22,16 +22,16 @@ Repo path `docs/enduser/reference/api-endpoints.mdx`.
 
 # Outline
 
-* 🔒 Request headers
-* 🎯 1. Ingest trade signal webhook
-  * Request payload
-  * Response models
-* 🟢 2. System health check
-* 🛡️ 3. Operator plane (/v1/)
-* 💱 4. Wallet proxy (/wallet/)
-* 🚨 5. Standard platform errors
-  * A. 400 Bad Request
-  * B. 403 Forbidden (invalid apiKey or IP)
-  * C. 409 Conflict (duplicate idempotency key)
-  * D. 503 Service Unavailable (kill switch or missing DO)
-  * 🔗 Next Steps
+- 🔒 Request headers
+- 🎯 1. Ingest trade signal webhook
+  - Request payload
+  - Response models
+- 🟢 2. System health check
+- 🛡️ 3. Operator plane (/v1/)
+- 💱 4. Wallet proxy (/wallet/)
+- 🚨 5. Standard platform errors
+  - A. 400 Bad Request
+  - B. 403 Forbidden (invalid apiKey or IP)
+  - C. 409 Conflict (duplicate idempotency key)
+  - D. 503 Service Unavailable (kill switch or missing DO)
+  - 🔗 Next Steps

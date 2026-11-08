@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/endpoints.mdx"
@@ -22,7 +22,7 @@ Repo path `docs/devops/architecture/endpoints.mdx`.
 
 # Outline
 
-* 🏗️ Interactive Compute & Routing Flow
-* 🔐 Internal Authorization Contract
-* 🛰️ Request-Trace Propagation
-  * 🔗 Next Steps
+- 🏗️ Interactive Compute & Routing Flow
+- 🔐 Internal Authorization Contract
+- 🛰️ Request-Trace Propagation
+  - 🔗 Next Steps

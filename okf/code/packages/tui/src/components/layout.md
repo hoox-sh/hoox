@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/layout"
@@ -18,10 +18,10 @@ okf_lock: generated
 
 # Files
 
-* `layout.test.tsx`
-* `sidebar.tsx` — SIDEBAR_WIDTH, Sidebar
-* `statusbar.test.tsx`
-* `statusbar.tsx` — ExpandedErrorPanel, StatusBar, resolveApiHostLabel
+- `layout.test.tsx`
+- `sidebar.tsx` — SIDEBAR_WIDTH, Sidebar
+- `statusbar.test.tsx`
+- `statusbar.tsx` — ExpandedErrorPanel, StatusBar, resolveApiHostLabel
 
 # Packages
 
@@ -29,11 +29,11 @@ okf_lock: generated
 
 # Depends on
 
-* [packages/tui/src](/code/packages/tui/src.md)
-* [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
-* [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
-* [packages/tui/src/services](/code/packages/tui/src/services.md)
+- [packages/tui/src](/code/packages/tui/src.md)
+- [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
+- [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+- [packages/tui/src/services](/code/packages/tui/src/services.md)
 
 # Used by
 
-* [packages/tui/src](/code/packages/tui/src.md)
+- [packages/tui/src](/code/packages/tui/src.md)

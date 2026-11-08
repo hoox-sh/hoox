@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app/api/agent/prompts"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `route.ts` — GET, dynamic, runtime
+- `route.ts` — GET, dynamic, runtime
 
 # Packages
 

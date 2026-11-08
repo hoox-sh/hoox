@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, tutorials]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-03T12:12:12Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/tutorials/email-signals.mdx"
@@ -22,9 +22,9 @@ Repo path `docs/enduser/tutorials/email-signals.mdx`.
 
 # Outline
 
-* 🔎 2. Configuring Regex Parsing Rules in KV
-  * The Parsing Mechanism
-  * JSON body with testnet mode
-* 🛡️ 3. What actually authenticates the message
-* 🧪 4. Testing the JSON path
-  * 🔗 Next Steps
+- 🔎 2. Configuring Regex Parsing Rules in KV
+  - The Parsing Mechanism
+  - JSON body with testnet mode
+- 🛡️ 3. What actually authenticates the message
+- 🧪 4. Testing the JSON path
+  - 🔗 Next Steps

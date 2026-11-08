@@ -7,7 +7,7 @@ tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-03T12:12:12Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/cicd.mdx"
@@ -22,8 +22,8 @@ Repo path `docs/devops/deployment/cicd.mdx`.
 
 # Outline
 
-* 🏗️ The Continuous Integration & Deployment Pipeline Flow
-* 📝 Complete GitHub Actions Workflow (deploy.yml)
-* 🔒 Managing Secrets & Variable Scopes
-* 🧪 Pipeline Caching & Concurrency Controls
-  * 🔗 Next Steps
+- 🏗️ The Continuous Integration & Deployment Pipeline Flow
+- 📝 Complete GitHub Actions Workflow (deploy.yml)
+- 🔒 Managing Secrets & Variable Scopes
+- 🧪 Pipeline Caching & Concurrency Controls
+  - 🔗 Next Steps

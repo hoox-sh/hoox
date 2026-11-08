@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/dex-spot-swaps.mdx"
@@ -22,8 +22,8 @@ Repo path `docs/enduser/guides/dex-spot-swaps.mdx`.
 
 # Outline
 
-* Venues
-* What hoox setup fills
-* Signal shape
-* Auth path
-* Related
+- Venues
+- What hoox setup fills
+- Signal shape
+- Auth path
+- Related

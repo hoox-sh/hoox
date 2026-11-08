@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T15:19:17Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/idempotency.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/enduser/concepts/idempotency.mdx`.
 
 # Outline
 
-* ⚠️ The Danger: How Webhook Retries Lead to Double-Ordering
-* 🛡️ The Hoox Solution: Durable Objects Mutex Locking
-  * The Idempotency Workflow (two-phase)
-* 🔍 The Dedup & Cleanup Algorithm
-  * 1. Key resolution
-  * 2. Atomic two-phase evaluation
-  * 3. Automatic TTL & Storage Alarms
-  * 4. Cold-Start Resilience
-* 📊 Performance Impact
-  * 🔗 Next Steps
+- ⚠️ The Danger: How Webhook Retries Lead to Double-Ordering
+- 🛡️ The Hoox Solution: Durable Objects Mutex Locking
+  - The Idempotency Workflow (two-phase)
+- 🔍 The Dedup & Cleanup Algorithm
+  - 1. Key resolution
+  - 2. Atomic two-phase evaluation
+  - 3. Automatic TTL & Storage Alarms
+  - 4. Cold-Start Resilience
+- 📊 Performance Impact
+  - 🔗 Next Steps

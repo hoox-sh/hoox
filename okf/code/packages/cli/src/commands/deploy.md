@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/deploy"
@@ -18,13 +18,13 @@ okf_lock: generated
 
 # Files
 
-* `deploy-command.test.ts`
-* `deploy-command.ts` — getDashboardBuildInfo, registerDeployCommand
-* `index.ts` — DeployOptions, DeployResult, register, registerDeployCommand
-* `register.ts` — register
-* `telegram-service.test.ts`
-* `telegram-service.ts` — TelegramService
-* `types.ts` — DeployOptions, DeployResult
+- `deploy-command.test.ts`
+- `deploy-command.ts` — getDashboardBuildInfo, registerDeployCommand
+- `index.ts` — DeployOptions, DeployResult, register, registerDeployCommand
+- `register.ts` — register
+- `telegram-service.test.ts`
+- `telegram-service.ts` — TelegramService
+- `types.ts` — DeployOptions, DeployResult
 
 # Packages
 

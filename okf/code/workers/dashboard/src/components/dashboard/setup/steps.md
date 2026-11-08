@@ -7,7 +7,7 @@ tags: [code, components, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T15:02:00Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/components/dashboard/setup/steps"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-* `done.tsx` — WizardDoneStep
-* `secrets.tsx` — WizardSecretsStep
-* `step-indicator.tsx` — WizardStepIndicator
-* `webhook.tsx` — WizardWebhookStep
-* `welcome.tsx` — WizardWelcomeStep
-* `workers.tsx` — WizardWorkersStep
+- `done.tsx` — WizardDoneStep
+- `secrets.tsx` — WizardSecretsStep
+- `step-indicator.tsx` — WizardStepIndicator
+- `webhook.tsx` — WizardWebhookStep
+- `welcome.tsx` — WizardWelcomeStep
+- `workers.tsx` — WizardWorkersStep
 
 # Packages
 
@@ -31,8 +31,8 @@ okf_lock: generated
 
 # Depends on
 
-* [workers/dashboard/src/components/dashboard/setup](/code/workers/dashboard/src/components/dashboard/setup.md)
+- [workers/dashboard/src/components/dashboard/setup](/code/workers/dashboard/src/components/dashboard/setup.md)
 
 # Used by
 
-* [workers/dashboard/src/components/dashboard/setup](/code/workers/dashboard/src/components/dashboard/setup.md)
+- [workers/dashboard/src/components/dashboard/setup](/code/workers/dashboard/src/components/dashboard/setup.md)

@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/pyne-live-trading.mdx"
@@ -22,16 +22,16 @@ Repo path `docs/enduser/guides/pyne-live-trading.mdx`.
 
 # Outline
 
-* Abstract
-* Conceptual model
-  * Event map (tradeforwarder.py)
-  * Alert path (not orders)
-* Interface surface
-  * Secrets
-  * Deploy and health
-  * Operator CLI
-* Internals
-* Invariants
-* Worked examples
-* Failure modes
-* See also
+- Abstract
+- Conceptual model
+  - Event map (tradeforwarder.py)
+  - Alert path (not orders)
+- Interface surface
+  - Secrets
+  - Deploy and health
+  - Operator CLI
+- Internals
+- Invariants
+- Worked examples
+- Failure modes
+- See also

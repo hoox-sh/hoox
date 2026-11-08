@@ -7,7 +7,7 @@ tags: [doc, docs, enterprise, observability-audit]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enterprise/observability-audit.mdx"
@@ -22,10 +22,10 @@ Repo path `docs/enterprise/observability-audit.mdx`.
 
 # Outline
 
-* Pillars
-* Example Logpush Job (R2)
-* Tail Worker Example (Tenant Enrichment + Redaction)
-* Compliance Use Cases
-* Retention & Cost
-* Integration Points
-* Related
+- Pillars
+- Example Logpush Job (R2)
+- Tail Worker Example (Tenant Enrichment + Redaction)
+- Compliance Use Cases
+- Retention & Cost
+- Integration Points
+- Related

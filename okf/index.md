@@ -6,16 +6,16 @@ okf_version: "0.2"
 
 # Playbooks
 
-* [playbooks](playbooks/) - How to read this bundle and where HOOX keeps its map.
+- [playbooks](playbooks/) - How to read this bundle and where HOOX keeps its map.
 
 # Code
 
-* [code](code/) - Compiled map of source modules, imports, and exports.
+- [code](code/) - Compiled map of source modules, imports, and exports.
 
 # Docs
 
-* [docs](docs/) - Outlines of the product documentation.
+- [docs](docs/) - Outlines of the product documentation.
 
 # Repository
 
-* [repository](repository/) - README, contributing, security, and package notes.
+- [repository](repository/) - README, contributing, security, and package notes.

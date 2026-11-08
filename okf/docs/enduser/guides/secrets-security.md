@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/secrets-security.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/guides/secrets-security.mdx`.
 
 # Outline
 
-* 🛡️ 1. Zero Trust Network Isolation
-* 🔑 2. Encrypted Secret Management via CLI
-  * Secret sync modes
-  * Live vs testnet exchange secrets
-  * Listing Edge Secrets
-* 🧱 3. Webhook Firewall & TradingView® IP Allow-listing
-* 📋 4. Security Best Practices Checklist
-  * 🔗 Next Steps
+- 🛡️ 1. Zero Trust Network Isolation
+- 🔑 2. Encrypted Secret Management via CLI
+  - Secret sync modes
+  - Live vs testnet exchange secrets
+  - Listing Edge Secrets
+- 🧱 3. Webhook Firewall & TradingView® IP Allow-listing
+- 📋 4. Security Best Practices Checklist
+  - 🔗 Next Steps

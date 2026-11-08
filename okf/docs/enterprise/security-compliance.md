@@ -7,7 +7,7 @@ tags: [doc, docs, enterprise, security-compliance]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-09-24T03:53:55Z
+  at: 2026-11-08T16:29:02Z
 sources:
   - id: tree
     resource: "docs/enterprise/security-compliance.mdx"
@@ -22,17 +22,17 @@ Repo path `docs/enterprise/security-compliance.mdx`.
 
 # Outline
 
-* Extended Layers
-  * Layer 0: Bot Management (Enterprise)
-  * Layer 1: Advanced WAF + API Shield
-  * Layer 2: Zero Trust / Access
-  * Layer 3: Internal + mTLS
-  * Layer 4: Durable Object + Cryptographic Controls
-  * Layer 5: AI Guardrails (new)
-* Immutable Audit (Compliance Core)
-* Data Residency & Sovereignty
-* Kill Switch & Fail-Closed Enhancements
-* Secrets & Key Management
-* Threat Model Updates (Enterprise)
-* Implementation Notes
-* Related Documents
+- Extended Layers
+  - Layer 0: Bot Management (Enterprise)
+  - Layer 1: Advanced WAF + API Shield
+  - Layer 2: Zero Trust / Access
+  - Layer 3: Internal + mTLS
+  - Layer 4: Durable Object + Cryptographic Controls
+  - Layer 5: AI Guardrails (new)
+- Immutable Audit (Compliance Core)
+- Data Residency & Sovereignty
+- Kill Switch & Fail-Closed Enhancements
+- Secrets & Key Management
+- Threat Model Updates (Enterprise)
+- Implementation Notes
+- Related Documents
