@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import ansis from "ansis";
 import { theme } from "../utils/theme.js";
+import { isRichMode } from "../utils/format-mode.js";
 
 // ── Brand palette ─────────────────────────────────────────────────
 
@@ -175,10 +176,26 @@ function composeFrame(phase: number, mode: PhaseMode): string {
   return [title, rule, meta].join("\n");
 }
 
+// ── Plain fallback ────────────────────────────────────────────────
+//
+// Every public banner entry point consults `isRichMode()` first. Piped,
+// redirected, CI, `NO_COLOR`, `TERM=dumb`, `--no-color`, `--json`, and
+// `--quiet` output gets this ASCII-only frame: no ANSI escapes and no
+// decorative glyphs.
+
+function composePlainFrame(): string {
+  return [
+    "  HOOX",
+    `  ${"-".repeat(RULE_W)}`,
+    `  ${TAGLINE} - v${VERSION}`,
+  ].join("\n");
+}
+
 // ── Public static API ─────────────────────────────────────────────
 
 /** Default static banner — Linear Rail (final frame). */
 export function renderBannerLogo(): string {
+  if (!isRichMode()) return composePlainFrame();
   return composeFrame(1, "static");
 }
 
@@ -200,6 +217,7 @@ const LEGACY_LINES = [
 ];
 
 export function renderLegacy(): string {
+  if (!isRichMode()) return composePlainFrame();
   const bw = 52;
   const line = ` ${theme.box.horizontal.repeat(bw - 2)}`;
   const top = ` ${theme.box.topLeft}${line.slice(2)}${theme.box.topRight}`;
@@ -222,6 +240,7 @@ const HORIZON_LINES = [
 ] as const;
 
 export function renderBannerHorizon(): string {
+  if (!isRichMode()) return composePlainFrame();
   const contentW = Math.max(...HORIZON_LINES.map((l) => l.length));
   const bw = Math.max(contentW + 4, TAGLINE.length + VERSION.length + 8);
   const inner = theme.box.horizontal.repeat(bw - 2);
@@ -251,6 +270,7 @@ export function renderBannerHorizon(): string {
  * Keeps the default diamond mark and adds a soft activity line.
  */
 export function renderBannerSignal(): string {
+  if (!isRichMode()) return composePlainFrame();
   const title =
     PAD +
     AMBER("◆") +
@@ -296,11 +316,13 @@ export type BannerVariant = keyof typeof BANNER_VARIANTS;
 
 /** Default banner — Linear Rail (static final frame). */
 export function renderBanner(variant?: BannerVariant): string {
+  if (!isRichMode()) return composePlainFrame();
   return variant ? BANNER_VARIANTS[variant]() : renderBannerLogo();
 }
 
 /** Compact one-line banner for inline display. */
 export function renderCompactBanner(): string {
+  if (!isRichMode()) return `Hoox - v${VERSION}`;
   return (
     `${AMBER("◆")} ${INDIGO.bold("Hoox")}` +
     `  ${ZINC_FAINT("·")}  ` +
@@ -325,7 +347,9 @@ export async function animateBanner(_options?: {
   /** @deprecated Ignored — the banner is always static. */
   static?: boolean;
 }): Promise<number> {
-  const frame = composeFrame(1, "static");
+  // `renderBannerLogo()` owns the rich-mode gate, so this path emits the
+  // plain ASCII frame when piped, in CI, or under NO_COLOR.
+  const frame = renderBannerLogo();
   process.stdout.write(frame + "\n");
   return frame.split("\n").length;
 }

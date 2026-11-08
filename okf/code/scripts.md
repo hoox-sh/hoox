@@ -7,7 +7,7 @@ tags: [code, scripts]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-10-25T22:51:08Z
+  at: 2026-11-08T02:33:28Z
 sources:
   - id: tree
     resource: "scripts"
@@ -35,8 +35,10 @@ okf_lock: generated
 
 * `docker-entrypoint-dev.sh`
 * `helpers.sh`
+* `install-hooks.sh`
 * `install.sh`
 * `migrate-tracking.sh`
+* `verify.sh`
 
 # Packages
 

@@ -200,3 +200,8 @@ TAGLINES.md
 
 # Local nested worker checkouts under the CLI package (not submodules)
 packages/cli/workers/
+
+# OpenOrchestrate runtime state
+.openorchestrate/state.db
+.openorchestrate/state.db-*
+.openorchestrate/logs/

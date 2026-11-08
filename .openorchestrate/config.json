@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 2,
+  "project": {
+    "name": "hoox",
+    "description": "HOOX \u2014 ultra-low-latency edge trading framework on Cloudflare Workers. Stack: hoox + pyne + axis (hoox.sh)",
+    "languages": [
+      "TypeScript",
+      "Python",
+      "JavaScript",
+      "Shell",
+      "SQL"
+    ],
+    "packageManager": "bun",
+    "git": true
+  },
+  "owner": {
+    "role": "the person running this project"
+  },
+  "seats": [
+    {
+      "id": "oo-chief",
+      "name": "Chief",
+      "title": "Chief of Staff",
+      "role": "chief",
+      "agentFile": ".opencode/agents/oo-chief.md"
+    },
+    {
+      "id": "oo-ops",
+      "name": "Ops",
+      "title": "Head of Operations",
+      "role": "ops",
+      "agentFile": ".opencode/agents/oo-ops.md"
+    },
+    {
+      "id": "oo-checker",
+      "name": "Checker",
+      "title": "Quality Gate",
+      "role": "checker",
+      "agentFile": ".opencode/agents/oo-checker.md"
+    },
+    {
+      "id": "oo-spec-1",
+      "name": "Docs",
+      "title": "Head of Docs",
+      "role": "specialist",
+      "domain": "docs",
+      "owns": "docs work and decisions",
+      "agentFile": ".opencode/agents/oo-spec-1.md"
+    },
+    {
+      "id": "oo-spec-2",
+      "name": "Engineering",
+      "title": "Head of Engineering",
+      "role": "specialist",
+      "domain": "engineering",
+      "owns": "engineering work and decisions",
+      "agentFile": ".opencode/agents/oo-spec-2.md"
+    },
+    {
+      "id": "oo-misc",
+      "name": "Misc",
+      "title": "General Desk",
+      "role": "misc",
+      "agentFile": ".opencode/agents/oo-misc.md"
+    }
+  ],
+  "autonomy": "draft",
+  "gates": [
+    "Ask first before spending money or buying anything.",
+    "Ask first before changing permissions or logins.",
+    "Ask first before running database migrations or destructive commands.",
+    "Ask first before deploying to production.",
+    "Ask first before deleting data.",
+    "Ask first before messaging people outside my team."
+  ],
+  "board": {
+    "file": "board.md",
+    "statuses": [
+      "Todo",
+      "Working",
+      "Blocked",
+      "Ready for Review",
+      "Done"
+    ],
+    "fields": [
+      "task",
+      "owner",
+      "status",
+      "priority",
+      "proof",
+      "blockedReason",
+      "source"
+    ]
+  },
+  "routines": {
+    "enabled": true,
+    "items": []
+  },
+  "memory": {
+    "playbook": "playbook.md",
+    "store": "sqlite",
+    "path": ".openorchestrate/state.db",
+    "defaultTtlDays": 90,
+    "requireSourceForFacts": true
+  },
+  "runtime": {
+    "scheduler": "manual",
+    "timezone": "UTC",
+    "statePath": ".openorchestrate/state.db",
+    "minIntervalMinutes": 5,
+    "maxRunsPerHour": 300,
+    "maxRunsPerRoutinePerHour": 200,
+    "runHistoryLimit": 20
+  },
+  "approvals": {
+    "backgroundExpiryMinutes": 30,
+    "maxAllowRules": 20,
+    "maxAskRules": 20,
+    "rules": [
+      {
+        "action": "send",
+        "resource": "external/*",
+        "effect": "ask"
+      },
+      {
+        "action": "deploy",
+        "resource": "production/*",
+        "effect": "ask"
+      },
+      {
+        "action": "delete",
+        "resource": "*",
+        "effect": "deny"
+      }
+    ]
+  },
+  "cost": {
+    "budgetUsdPerWeek": 25,
+    "warnAtPercent": 80,
+    "denyAtPercent": 100,
+    "ledgerPath": ".openorchestrate/state.db"
+  },
+  "projects": {
+    "registryPath": "~/.openorchestrate/projects.json"
+  },
+  "templates": {
+    "dir": ".openorchestrate/templates",
+    "includeSecrets": false
+  },
+  "setup": {
+    "createdAt": "2026-11-07T14:15:53.745Z",
+    "updatedAt": "2026-11-07T16:52:13.475Z",
+    "generator": "openorchestrate",
+    "version": "0.2.0"
+  }
+}

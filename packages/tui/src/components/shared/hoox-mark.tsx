@@ -17,34 +17,31 @@
  */
 import { isMotionMuted, useCountUp } from "./motion";
 
-/** 11 cols × 4 rows — sidebar rail / very tight layouts. */
+/** 10 cols × 4 rows — sidebar rail / very tight layouts. */
 export const HOOX_MARK_TINY = [
-  " ⢶⣶⡄   ⢠⣶⡶",
-  " ⣠⣭⣅⢀⣤⡀⣨⣭⣄",
-  " ⠙⣛⡋⠈⠛⠁⢙⣛⠋",
-  " ⠾⠿⠃   ⠘⠿⠷",
+  "⠸⣿⣶    ⣴⣿⠇",
+  "⢀⣬⣭⡀⣠⣄⢀⣭⣥⡀",
+  "⠈⢛⣛⠁⠙⠋⠈⣛⡛⠁",
+  "⢰⣿⠿    ⠿⣿⡆",
 ] as const;
 
-/** 10 cols × 6 rows — sidebar / narrow terminals. */
+/** 10 cols × 5 rows — sidebar / narrow terminals. */
 export const HOOX_MARK_SMALL = [
-  " ⣶⣦⡀   ⢀⣴⣶",
-  " ⠙⢿⡇   ⢸⡿⠋",
-  " ⣤⣤⣄⢀⣶⡀⣠⣤⣤",
-  " ⠛⠛⠋⠈⠿⠁⠙⠛⠛",
-  " ⣠⣾⡇   ⢸⣷⣄",
-  " ⠿⠟⠁   ⠈⠻⠿",
+  "⠸⣿⣦    ⣴⣿⡇",
+  " ⠙⠛    ⠛⠋ ",
+  "⢾⣿⣿⠆⢾⡷⠰⣿⣿⡷",
+  " ⣠⣤    ⣤⣄ ",
+  "⢰⣿⠟    ⠻⣿⡆",
 ] as const;
 
-/** 12 cols × 8 rows — launcher hero / wide terminals. */
+/** 12 cols × 6 rows — launcher hero / wide terminals. */
 export const HOOX_MARK_MEDIUM = [
-  " ⢠⣤⡀     ⢀⣤⡄",
-  " ⠸⣿⣿⡆   ⢰⣿⣿⠇",
-  "  ⠘⠛⠃   ⠘⠛⠋",
-  " ⣴⣶⣶⡄⣠⣿⣄⢠⣶⣶⣦",
-  " ⠻⠿⠿⠋⠙⣿⠋⠙⠿⠿⠟",
-  "  ⢠⣤⡄   ⢠⣤⡄",
-  " ⢰⣿⣿⠇   ⠸⣿⣿⣆",
-  " ⠘⠛⠁     ⠈⠛⠃",
+  "⢸⣿⣷⣄    ⢠⣾⣿⡇",
+  " ⠙⠿⠿    ⠿⠿⠋ ",
+  "⣠⣶⣶⣆⢀⣴⣦⡀⣰⣶⣶⣄",
+  "⠙⠿⠿⠏⠈⠻⠟⠁⠹⠿⠿⠋",
+  " ⣠⣶⣶    ⣶⣶⣄ ",
+  "⢸⣿⡿⠋    ⠙⢿⣿⡇",
 ] as const;
 
 export type HooxMarkSize = "xs" | "sm" | "md";

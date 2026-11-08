@@ -1,0 +1,7 @@
+# Open Knowledge bundle configuration.
+
+[release]
+outputs = []
+
+[rules]
+enabled = ["project", "writing"]
