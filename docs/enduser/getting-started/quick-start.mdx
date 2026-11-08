@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "5-Minute Quick Start"
 description: "Install the CLI, run hoox onboard, deploy the edge mesh, and fire a simulated trade webhook in under 5 minutes."
+
 ---
 
 This guide gets you from a blank console to a **fully active, edge-deployed algorithmic trading ecosystem** on the Cloudflare® network, processing simulated signals in under 5 minutes.
@@ -189,14 +191,14 @@ This reports per-hop latency for `hoox`, `trade-worker`, and `analytics-worker` 
 
 Every webhook payload fired to your Gateway must match the following JSON Schema:
 
-| Parameter  |   Type    | Required | Description                                                                                      |
-| :--------- | :-------: | :------: | :----------------------------------------------------------------------------------------------- |
-| `apiKey`   | `string`  | **Yes**  | Webhook passkey. Must match the `WEBHOOK_API_KEY_BINDING` secret on the hoox gateway.             |
-| `exchange` | `string`  | **Yes**  | CEX: `binance`, `bybit`, `mexc`. DEX: `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`.  |
-| `action`   | `string`  | **Yes**  | `LONG`, `SHORT`, `CLOSE_LONG`, or `CLOSE_SHORT`.                                                 |
-| `symbol`   | `string`  | **Yes**  | CEX ticker (e.g. `BTCUSDT`). DEX **must** be `BASE/QUOTE` (e.g. `ETH/USDC`).                     |
-| `quantity` | `number`  | **Yes**  | Position size / quantity.                                                                        |
-| `leverage` | `number`  |    No    | Leverage coefficient. Defaults to `1` (spot) if omitted. Ignored on DEX spots.                   |
+| Parameter  |   Type    | Required | Description                                                                                                                                                    |
+| :--------- | :-------: | :------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apiKey`   | `string`  | **Yes**  | Webhook passkey. Must match the `WEBHOOK_API_KEY_BINDING` secret on the hoox gateway.                                                                          |
+| `exchange` | `string`  | **Yes**  | CEX: `binance`, `bybit`, `mexc`. DEX: `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`.                                                                |
+| `action`   | `string`  | **Yes**  | `LONG`, `SHORT`, `CLOSE_LONG`, or `CLOSE_SHORT`.                                                                                                               |
+| `symbol`   | `string`  | **Yes**  | CEX ticker (e.g. `BTCUSDT`). DEX **must** be `BASE/QUOTE` (e.g. `ETH/USDC`).                                                                                   |
+| `quantity` | `number`  | **Yes**  | Position size / quantity.                                                                                                                                      |
+| `leverage` | `number`  |    No    | Leverage coefficient. Defaults to `1` (spot) if omitted. Ignored on DEX spots.                                                                                 |
 | `test`     | `boolean` |    No    | When `true`, use exchange testnet (Binance/Bybit). Rejected for MEXC and DEX (`TEST_TRADING_UNSUPPORTED`). Prefer `EXCHANGE_TESTNET_*` secrets. Default: live. |
 
 ---

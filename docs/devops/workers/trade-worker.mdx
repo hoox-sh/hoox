@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "trade-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers."
+
 ---
 
 The **`trade-worker`** is the execution engine of the Hoox trading platform. Deployed as a private compute isolate behind the edge firewall, this worker is responsible for calculating order parameters, executing leverage scaling, performing cryptographic HMAC-SHA256 signature calculations, placing **spot** trades on Bybit, Binance, and MEXC, routing **spot DEX** (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) through `WEB3_WALLET_SERVICE` `POST /swap`, and offloading transactional metrics. Perps are not supported.
@@ -70,26 +72,26 @@ Secrets (`INTERNAL_KEY_BINDING`, `EXCHANGE_KEY_BINDING`, `EXCHANGE_SECRET_BINDIN
 
 Fills write D1 positions via non-blocking `waitUntil` for latency. To recover ledger drift, **`POST /api/positions/reconcile`** (trade-execute internal auth) pulls open positions from each exchange with credentials and upserts D1 (`OPEN` / `CLOSED`). Agent housekeeping cron invokes this path automatically.
 
-| Body field | Effect |
-| ---------- | ------ |
+| Body field  | Effect                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
 | `exchanges` | Optional list (`binance` / `bybit` / `mexc` / `uniswap-ethereum` / `uniswap-arbitrum` / `jupiter-solana`) |
-| `testnet` | Reconcile testnet namespace + clients |
-| `dryRun` | Diff only — no D1 writes |
+| `testnet`   | Reconcile testnet namespace + clients                                                                     |
+| `dryRun`    | Diff only — no D1 writes                                                                                  |
 
 ---
 
 ## 🧪 Test trading (`test: true`)
 
-| Topic | Behavior |
-| ----- | -------- |
-| Schema | Optional `test?: boolean` on `WebhookPayload` and `TradeQueueMessage` |
-| Hosts | Binance Futures testnet · Bybit testnet · MEXC rejected |
-| Credentials | Prefer `*_TESTNET_*` secrets; fall back to live keys with a warn log |
-| Transport | Always REST; live WebSocket Durable Object is never used |
-| D1 trades | `status = 'TEST_EXECUTED'` |
-| D1 positions | id = `{exchange}-testnet-{symbol}-{side}` |
-| Telegram | Exchange label includes `[TEST]` (single notify — no queue double-send) |
-| Analytics | Exchange blob encoded as `{exchange}:test` |
+| Topic        | Behavior                                                                      |
+| ------------ | ----------------------------------------------------------------------------- |
+| Schema       | Optional `test?: boolean` on `WebhookPayload` and `TradeQueueMessage`         |
+| Hosts        | Binance Futures testnet · Bybit testnet · MEXC rejected                       |
+| Credentials  | Prefer `*_TESTNET_*` secrets; fall back to live keys with a warn log          |
+| Transport    | Always REST; live WebSocket Durable Object is never used                      |
+| D1 trades    | `status = 'TEST_EXECUTED'`                                                    |
+| D1 positions | id = `{exchange}-testnet-{symbol}-{side}`                                     |
+| Telegram     | Exchange label includes `[TEST]` (single notify — no queue double-send)       |
+| Analytics    | Exchange blob encoded as `{exchange}:test`                                    |
 | Live WS perf | When `use_websocket=true` and live, router **skips** REST client construction |
 
 Operator guide: [Test Trading](/docs/enduser/guides/test-trading).
@@ -100,11 +102,11 @@ Operator guide: [Test Trading](/docs/enduser/guides/test-trading).
 
 Spot swaps route through `WEB3_WALLET_SERVICE` (`web3-wallet-worker` `POST /swap`). **Spot only — perps are not supported.**
 
-| Name | Chain | Kind | Toggle | Quantity | Test flag |
-| ---- | ----- | ---- | ------ | -------- | --------- |
+| Name               | Chain    | Kind | Toggle                              | Quantity                                                      | Test flag                                            |
+| ------------------ | -------- | ---- | ----------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
 | `uniswap-ethereum` | ethereum | spot | `exchange:uniswap-ethereum:enabled` | `LONG` spends QUOTE (ExactIn) to buy BASE; `SHORT` sells BASE | Rejected (`TEST_TRADING_UNSUPPORTED`) — mainnet-only |
-| `uniswap-arbitrum` | arbitrum | spot | `exchange:uniswap-arbitrum:enabled` | same | Rejected — mainnet-only |
-| `jupiter-solana` | solana | spot | `exchange:jupiter-solana:enabled` | same | Rejected — mainnet-only |
+| `uniswap-arbitrum` | arbitrum | spot | `exchange:uniswap-arbitrum:enabled` | same                                                          | Rejected — mainnet-only                              |
+| `jupiter-solana`   | solana   | spot | `exchange:jupiter-solana:enabled`   | same                                                          | Rejected — mainnet-only                              |
 
 Uniswap venues send `dexVersion: "v3"` (ETH/USDC liquidity is V3; Arbitrum's V2 router in the wallet worker is SushiSwap). Native `ETH`/`SOL` map to the wrapped mint on contract paths. Credential source is `wallet-binding` (mesh key), not CEX API secrets. Symbols must be `BASE/QUOTE` (slash). Unset venue toggles mean enabled; `"false"` skips the venue.
 
@@ -147,15 +149,15 @@ The `ExchangeRouter` evaluates the incoming symbol and parses settings in `CONFI
 
 Internal routes (mesh auth; prefer `TRADE_EXECUTE_KEY_BINDING`, else `INTERNAL_KEY_BINDING`):
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `POST` | `/webhook` | Gateway / pyne / email dispatch |
-| `POST` | `/process` | Legacy / queue-shaped body |
-| `GET`/`POST` | `/api/signals` | Signal list / insert |
-| `GET` | `/api/system-logs` | Operator SSE log feed |
-| `POST` | `/api/positions/reconcile` | Exchange ↔ D1 position sync |
-| `GET` | `/report` | Report payload for report-worker |
-| `GET` | `/health` | Liveness |
+| Method       | Path                       | Purpose                          |
+| ------------ | -------------------------- | -------------------------------- |
+| `POST`       | `/webhook`                 | Gateway / pyne / email dispatch  |
+| `POST`       | `/process`                 | Legacy / queue-shaped body       |
+| `GET`/`POST` | `/api/signals`             | Signal list / insert             |
+| `GET`        | `/api/system-logs`         | Operator SSE log feed            |
+| `POST`       | `/api/positions/reconcile` | Exchange ↔ D1 position sync      |
+| `GET`        | `/report`                  | Report payload for report-worker |
+| `GET`        | `/health`                  | Liveness                         |
 
 ### A. Process Order Pipeline
 

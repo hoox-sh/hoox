@@ -4,18 +4,26 @@
 -->
 
 ---
+
 title: "CLI Commands Reference"
 description: "Command tree, flags, and examples for the hoox CLI (0.16.0)."
+
 ---
 
 The `@hoox-sh/hoox-cli` tool (**0.16.0**) manages workspace bootstrap, Cloudflare® provisioning, worker deploy, secrets, monitoring, and repair. The binary is also available as **`hx`**.
 
 <Frame caption="hoox deploy --help">
-  <img src="/docs/images/cli/help-deploy.png" alt="Terminal showing hoox deploy help" />
+  <img
+    src="/docs/images/cli/help-deploy.png"
+    alt="Terminal showing hoox deploy help"
+  />
 </Frame>
 
 <Frame caption="Help tour: version, logs, TUI, doctor">
-  <img src="/docs/images/gifs/cli-help-tour.gif" alt="Animated CLI help screens" />
+  <img
+    src="/docs/images/gifs/cli-help-tour.gif"
+    alt="Animated CLI help screens"
+  />
 </Frame>
 
 Per-group stills: [Interface gallery](/docs/enduser/guides/screenshots#cli).
@@ -52,12 +60,12 @@ cd ~/Git/hoox && hoox doctor
 cd ~/Videos && hx check health
 ```
 
-| Env / file | Role |
-| ---------- | ---- |
-| `HOOX_REPO` | Force monorepo root |
-| `HOOX_HOME` | Base for `~/.hoox` layout (config, data, global repo) |
-| `HOOX_CLI_SILENT=1` | Suppress “using monorepo at …” stderr line |
-| `~/.hoox/config/monorepo.json` | Persisted `{ "root", "updatedAt" }` |
+| Env / file                     | Role                                                  |
+| ------------------------------ | ----------------------------------------------------- |
+| `HOOX_REPO`                    | Force monorepo root                                   |
+| `HOOX_HOME`                    | Base for `~/.hoox` layout (config, data, global repo) |
+| `HOOX_CLI_SILENT=1`            | Suppress “using monorepo at …” stderr line            |
+| `~/.hoox/config/monorepo.json` | Persisted `{ "root", "updatedAt" }`                   |
 
 `hoox doctor` prints **Remembered**, **Runtime root**, and **Source**
 (`env` | `cwd` | `remembered` | `global` | `none`).
@@ -68,14 +76,14 @@ cd ~/Videos && hx check health
 
 These options are registered globally and can be appended to any command:
 
-| Flag         | Description                                                          | Example                         |
-| :----------- | :------------------------------------------------------------------- | :------------------------------ |
-| `--json`     | Machine-parseable JSON. Task-runner commands (`deploy all`, `check setup`, `check health`, …) write a **task-result array** (`title`, `ok`, `ms`, optional `value` / `error` / `details`). | `hoox deploy all --json`        |
-| `--quiet`    | Prints nothing (no headers, tables, or task summary).                | `hoox deploy all --quiet`       |
-| `--no-color` | Disable ANSI color output (also: `NO_COLOR=1` env var, `TERM=dumb`). | `hoox --no-color check health`  |
-| `--help`     | Prints complete parameter and option listings.                       | `hoox infra d1 --help`          |
-| `--version`  | Outputs active CLI package build version (`0.16.0`).                 | `hoox --version`                |
-| `-y, --yes`  | Skip confirmation prompts (where supported).                         | `hoox repair rebuild --yes`     |
+| Flag         | Description                                                                                                                                                                                | Example                        |
+| :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------- |
+| `--json`     | Machine-parseable JSON. Task-runner commands (`deploy all`, `check setup`, `check health`, …) write a **task-result array** (`title`, `ok`, `ms`, optional `value` / `error` / `details`). | `hoox deploy all --json`       |
+| `--quiet`    | Prints nothing (no headers, tables, or task summary).                                                                                                                                      | `hoox deploy all --quiet`      |
+| `--no-color` | Disable ANSI color output (also: `NO_COLOR=1` env var, `TERM=dumb`).                                                                                                                       | `hoox --no-color check health` |
+| `--help`     | Prints complete parameter and option listings.                                                                                                                                             | `hoox infra d1 --help`         |
+| `--version`  | Outputs active CLI package build version (`0.16.0`).                                                                                                                                       | `hoox --version`               |
+| `-y, --yes`  | Skip confirmation prompts (where supported).                                                                                                                                               | `hoox repair rebuild --yes`    |
 
 ---
 
@@ -452,8 +460,8 @@ Full notes: [`packages/cli/CHANGELOG.md`](https://github.com/hoox-sh/hoox/blob/m
 ---
 
 <Tip>
-  Every subcommand is documented locally. Append `--help` to any command
-  (e.g. `hoox config env --help`) to view positional arguments and flags.
+  Every subcommand is documented locally. Append `--help` to any command (e.g.
+  `hoox config env --help`) to view positional arguments and flags.
 </Tip>
 
 ### 🔗 Next Steps

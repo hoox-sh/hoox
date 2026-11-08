@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Enterprise Observability & Audit"
 description: "Full auditability using Logpush, Workers Traces, Tail Workers, R2 immutable storage, and integration with Workflows for compliance in HOOX Enterprise."
+
 ---
 
 # Enterprise Observability & Audit
@@ -69,12 +71,14 @@ export default {
   async tail(events: TraceItem[], env: Env) {
     for (const event of events) {
       // enrich
-      const tenant = event.scriptTags?.find(t => t.startsWith("tenant:"))?.slice(7) || "unknown";
-      
+      const tenant =
+        event.scriptTags?.find((t) => t.startsWith("tenant:"))?.slice(7) ||
+        "unknown";
+
       // redact secrets
-      const logs = (event.logs || []).map(l => ({
+      const logs = (event.logs || []).map((l) => ({
         ...l,
-        message: l.message?.replace(/secret:[a-z0-9]+/gi, "secret:[REDACTED]")
+        message: l.message?.replace(/secret:[a-z0-9]+/gi, "secret:[REDACTED]"),
       }));
 
       await env.AUDIT_QUEUE.send({
@@ -84,7 +88,7 @@ export default {
         // ...
       });
     }
-  }
+  },
 };
 ```
 

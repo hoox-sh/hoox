@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "d1-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox D1 SQLite Database Proxy Worker, covering SQL query interfaces, batch operations, and dashboard statistics aggregation."
+
 ---
 
 The **`d1-worker`** is the data routing hub of the Hoox trading platform. Deployed as an isolated, private micro-worker, it acts as a centralized SQL execution proxy. By encapsulating database interactions behind secure Service Bindings, it allows other lightweight compute workers to execute parameterized queries, trigger transactional batch operations, and retrieve structured dashboard telemetry without direct database driver overhead.
@@ -62,15 +64,15 @@ Every endpoint is secured via `requireInternalAuth` and expects the `X-Internal-
 
 Prefer fixed-template RPCs over free-form SQL. All require internal **read** or **write** auth as indicated.
 
-| Method | Path | Auth | Notes |
-| ------ | ---- | ---- | ----- |
-| `GET`/`POST` | `/rpc/list-signals` | Read | `limit` (default 10, max 100), `offset` |
-| `GET`/`POST` | `/rpc/list-system-logs` | Read | `limit` (default 20, max 100), `offset` |
-| `GET`/`POST` | `/rpc/list-open-positions` | Read | Optional `exchange` filter (sanitized id) |
-| `POST` | `/rpc/insert-trade` | Write | Bound insert |
-| `POST` | `/rpc/upsert-position` | Write | REPLACE positions row |
-| `POST` | `/rpc/insert-signal` | Write | trade_signals |
-| `POST` | `/rpc/insert-system-log` | Write | system_logs |
+| Method       | Path                       | Auth  | Notes                                     |
+| ------------ | -------------------------- | ----- | ----------------------------------------- |
+| `GET`/`POST` | `/rpc/list-signals`        | Read  | `limit` (default 10, max 100), `offset`   |
+| `GET`/`POST` | `/rpc/list-system-logs`    | Read  | `limit` (default 20, max 100), `offset`   |
+| `GET`/`POST` | `/rpc/list-open-positions` | Read  | Optional `exchange` filter (sanitized id) |
+| `POST`       | `/rpc/insert-trade`        | Write | Bound insert                              |
+| `POST`       | `/rpc/upsert-position`     | Write | REPLACE positions row                     |
+| `POST`       | `/rpc/insert-signal`       | Write | trade_signals                             |
+| `POST`       | `/rpc/insert-system-log`   | Write | system_logs                               |
 
 Example open positions:
 
@@ -194,9 +196,9 @@ To protect financial transaction ledgers and portfolios against SQL injection at
 ---
 
 <Tip>
-  Canonical DDL is `workers/trade-worker/schema.sql`. Apply it with
-  `hoox db apply --remote`. `hoox db migrate --remote` runs tracking-column
-  SQL from `scripts/migrate-tracking.sh`.
+  Canonical DDL is `workers/trade-worker/schema.sql`. Apply it with `hoox db
+  apply --remote`. `hoox db migrate --remote` runs tracking-column SQL from
+  `scripts/migrate-tracking.sh`.
 </Tip>
 
 ### 🔗 Next Steps

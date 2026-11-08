@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "report-worker Isolate Profile"
 description: "Engineering specification for the Hoox PDF report worker: BROWSER.quickAction pdf, cron at 08:00 and 18:00 UTC, and R2."
+
 ---
 
 The **`report-worker`** is the automated document compiler of the Hoox trading platform. Deployed as a scheduled cron isolate, this worker runs twice daily (at 08:00 and 18:00 UTC) to pull D1 transactional stats, construct a highly styled HTML5 portfolio report, call the **`BROWSER`** binding (`quickAction("pdf")`) to compile the page into a PDF buffer, offload the file to R2, and push a private download link to your Telegram.

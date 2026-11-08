@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Request Payload Schemas"
 description: "High-integrity JSON request payload specifications, TypeScript interfaces, and validation rules across Hoox microservices."
+
 ---
 
 To maintain robust data routing and prevent runtime failures, Hoox enforces a strict **payload contract** across all internal and public service boundaries. All incoming requests are validated by active JSON Schema or Zod middleware before entering V8 execution loops.
@@ -80,26 +82,26 @@ export interface CexOrderPayload {
 }
 ```
 
-| Field    | Type      | Required | Notes                                                                 |
-| -------- | --------- | :------: | --------------------------------------------------------------------- |
+| Field    | Type      | Required | Notes                                                                   |
+| -------- | --------- | :------: | ----------------------------------------------------------------------- |
 | `test`   | `boolean` |    No    | `true` → testnet host for Binance/Bybit; rejected for MEXC and spot DEX |
-| `symbol` | `string`  | **Yes**  | CEX compact ticker or DEX `BASE/QUOTE` (`ETH/USDC`)                   |
+| `symbol` | `string`  | **Yes**  | CEX compact ticker or DEX `BASE/QUOTE` (`ETH/USDC`)                     |
 
 DEX venues (`uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`) are ExactIn spots through `web3-wallet-worker`. See [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
 
 **Side effects when `test: true`:**
 
-| System | Effect |
-| ------ | ------ |
-| REST host | Binance `testnet.binancefuture.com` · Bybit `api-testnet.bybit.com` |
-| Secrets | Prefer `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*`; fall back to live bindings |
-| D1 trades | `status = 'TEST_EXECUTED'` |
-| D1 positions | id namespaced `{exchange}-testnet-{symbol}-{side}` |
-| Telegram | Label includes `[TEST]` |
-| Analytics | AE blob exchange = `{exchange}:test` |
-| Queue | `test` is preserved on `TradeQueueMessage`; success notify is not duplicated |
-| Agent | Skips `*-testnet-*` OPEN rows |
-| Dashboard stats | Test fills/positions excluded from headline counts |
+| System          | Effect                                                                       |
+| --------------- | ---------------------------------------------------------------------------- |
+| REST host       | Binance `testnet.binancefuture.com` · Bybit `api-testnet.bybit.com`          |
+| Secrets         | Prefer `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*`; fall back to live bindings   |
+| D1 trades       | `status = 'TEST_EXECUTED'`                                                   |
+| D1 positions    | id namespaced `{exchange}-testnet-{symbol}-{side}`                           |
+| Telegram        | Label includes `[TEST]`                                                      |
+| Analytics       | AE blob exchange = `{exchange}:test`                                         |
+| Queue           | `test` is preserved on `TradeQueueMessage`; success notify is not duplicated |
+| Agent           | Skips `*-testnet-*` OPEN rows                                                |
+| Dashboard stats | Test fills/positions excluded from headline counts                           |
 
 See [Test Trading](/docs/enduser/guides/test-trading) for operator setup.
 
@@ -119,10 +121,10 @@ DEX venues use the CEX intent vocabulary. Pair syntax is `BASE/QUOTE`. `test: tr
 }
 ```
 
-| Action | Swap |
-| ------ | ---- |
+| Action                 | Swap                              |
+| ---------------------- | --------------------------------- |
 | `LONG` / `CLOSE_SHORT` | Spend QUOTE to buy BASE (ExactIn) |
-| `SHORT` / `CLOSE_LONG` | Sell BASE for QUOTE |
+| `SHORT` / `CLOSE_LONG` | Sell BASE for QUOTE               |
 
 Operator-driven swaps (not webhook) go through the gateway [wallet proxy](/docs/devops/api/endpoints) (`POST /wallet/swap`) with Bearer `OPERATOR_API_KEY`.
 
@@ -174,8 +176,8 @@ export interface TelegramAlertPayload {
 
 <Tip>
   Adding new fields to a payload schema? Remember to update the corresponding
-  type interfaces in `@hoox-sh/hoox-shared/types` to ensure complete
-  type safety across all workers!
+  type interfaces in `@hoox-sh/hoox-shared/types` to ensure complete type safety
+  across all workers!
 </Tip>
 
 ### 🔗 Next Steps

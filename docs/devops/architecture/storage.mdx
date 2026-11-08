@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Storage & Data Engineering Spec"
 description: "High-integrity architecture specifications for edge SQLite D1 databases, zero-egress R2 object stores, and eventually consistent KV cache namespaces."
+
 ---
 
 Hoox operates a **multi-tier edge storage topology** to balance high-speed read/write performance, relational transactional safety, and long-term analytical capacity. By separating high-frequency dynamic states from static parameters and verbose event logs, Hoox ensures that latency remains in the single-digit milliseconds while keeping storage costs at $0/month.
@@ -105,8 +107,8 @@ Cloudflare KV is a highly distributed key-value store optimized for high-read/lo
 ---
 
 <Warning>
-  Back up production D1 before applying schema changes (`hoox db export --remote`).
-  Then run `hoox db apply --remote` and `hoox db migrate --remote`.
+  Back up production D1 before applying schema changes (`hoox db export
+  --remote`). Then run `hoox db apply --remote` and `hoox db migrate --remote`.
 </Warning>
 
 ### Next steps

@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Signals and trade spec"
 description: "Webhook JSON schema, CEX/DEX venue names, test trading, and D1 ledger columns."
+
 ---
 
 # 📊 Signals & Trade Spec
@@ -45,37 +47,37 @@ export interface WebhookSignal {
 
 ### Parameter Rules & Type Constraints
 
-| Parameter        | Type      | Required | Constraints                                                                           |
-| ---------------- | --------- | :------: | ------------------------------------------------------------------------------------- |
-| `apiKey`         | `string`  | **Yes**  | Must match `WEBHOOK_API_KEY_BINDING` on the hoox gateway                              |
+| Parameter        | Type      | Required | Constraints                                                                                    |
+| ---------------- | --------- | :------: | ---------------------------------------------------------------------------------------------- |
+| `apiKey`         | `string`  | **Yes**  | Must match `WEBHOOK_API_KEY_BINDING` on the hoox gateway                                       |
 | `exchange`       | `string`  | **Yes**  | CEX: `binance`, `bybit`, `mexc`. DEX: `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana` |
-| `action`         | `string`  | **Yes**  | One of: `LONG`, `SHORT`, `CLOSE_LONG`, `CLOSE_SHORT`                                  |
-| `symbol`         | `string`  | **Yes**  | CEX: `BTCUSDT` (dashes/slashes stripped). DEX: **`BASE/QUOTE`** required (`ETH/USDC`) |
-| `quantity`       | `number`  | **Yes**  | Must be greater than zero; checked against exchange minimum order size                |
-| `leverage`       | `number`  |    No    | Range: `1` to `125` depending on exchange margin profiles; defaults to `1` (spot)     |
-| `idempotencyKey` | `string`  |    No    | If omitted, auto-generated including live/test mode so modes do not dedupe each other |
-| `price`          | `number`  |    No    | Limit price; defaults to current market price if omitted                              |
-| `test`           | `boolean` |    No    | `true` → testnet for Binance/Bybit; MEXC and DEX venues return `TEST_TRADING_UNSUPPORTED` |
+| `action`         | `string`  | **Yes**  | One of: `LONG`, `SHORT`, `CLOSE_LONG`, `CLOSE_SHORT`                                           |
+| `symbol`         | `string`  | **Yes**  | CEX: `BTCUSDT` (dashes/slashes stripped). DEX: **`BASE/QUOTE`** required (`ETH/USDC`)          |
+| `quantity`       | `number`  | **Yes**  | Must be greater than zero; checked against exchange minimum order size                         |
+| `leverage`       | `number`  |    No    | Range: `1` to `125` depending on exchange margin profiles; defaults to `1` (spot)              |
+| `idempotencyKey` | `string`  |    No    | If omitted, auto-generated including live/test mode so modes do not dedupe each other          |
+| `price`          | `number`  |    No    | Limit price; defaults to current market price if omitted                                       |
+| `test`           | `boolean` |    No    | `true` → testnet for Binance/Bybit; MEXC and DEX venues return `TEST_TRADING_UNSUPPORTED`      |
 
 ### Test trading
 
-| Exchange | Supports `test: true` | API host when enabled              |
-| -------- | :-------------------: | ---------------------------------- |
-| Binance  |          Yes          | `testnet.binancefuture.com`        |
-| Bybit    |          Yes          | `api-testnet.bybit.com`            |
-| MEXC     |           No          | Rejected (no public REST sandbox)  |
-| Uniswap Ethereum / Arbitrum | No | Rejected (mainnet-only) |
-| Jupiter Solana | No | Rejected (mainnet-only) |
+| Exchange                    | Supports `test: true` | API host when enabled             |
+| --------------------------- | :-------------------: | --------------------------------- |
+| Binance                     |          Yes          | `testnet.binancefuture.com`       |
+| Bybit                       |          Yes          | `api-testnet.bybit.com`           |
+| MEXC                        |          No           | Rejected (no public REST sandbox) |
+| Uniswap Ethereum / Arbitrum |          No           | Rejected (mainnet-only)           |
+| Jupiter Solana              |          No           | Rejected (mainnet-only)           |
 
-| Side effect | Live | Test (`test: true`) |
-| ----------- | ---- | ------------------- |
-| D1 trade status | `EXECUTED` | `TEST_EXECUTED` |
-| D1 position id | `{ex}-{sym}-{side}` | `{ex}-testnet-{sym}-{side}` |
-| Telegram label | exchange name | `{exchange} [TEST]` |
-| Analytics exchange blob | `bybit` | `bybit:test` |
-| WebSocket DO | optional | always REST testnet |
-| Agent risk loop | manages OPEN | skips `*-testnet-*` ids |
-| Dashboard stats | counted | excluded from headlines |
+| Side effect             | Live                | Test (`test: true`)         |
+| ----------------------- | ------------------- | --------------------------- |
+| D1 trade status         | `EXECUTED`          | `TEST_EXECUTED`             |
+| D1 position id          | `{ex}-{sym}-{side}` | `{ex}-testnet-{sym}-{side}` |
+| Telegram label          | exchange name       | `{exchange} [TEST]`         |
+| Analytics exchange blob | `bybit`             | `bybit:test`                |
+| WebSocket DO            | optional            | always REST testnet         |
+| Agent risk loop         | manages OPEN        | skips `*-testnet-*` ids     |
+| Dashboard stats         | counted             | excluded from headlines     |
 
 **Credentials:** prefer `EXCHANGE_TESTNET_KEY_BINDING` / `EXCHANGE_TESTNET_SECRET_BINDING`. If unset, the live `EXCHANGE_*` pair is used (warning logged). Deprecated per-venue `BINANCE_TESTNET_*` / `BYBIT_TESTNET_*` still resolve as fallbacks.
 

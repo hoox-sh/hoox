@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Database operations"
 description: "Apply the D1 schema, run tracking migrations, query the ledger, and export backups with hoox db."
+
 ---
 
 # 🗄️ Database Operations
@@ -118,7 +120,8 @@ There is no `migrate status` or `migrate rollback` subcommand. Export first (`ho
     <code>--remote</code> to verify.
   </li>
   <li>
-    <strong>Backup before migrating</strong> — <code>hoox db export --remote</code>.
+    <strong>Backup before migrating</strong> —{" "}
+    <code>hoox db export --remote</code>.
   </li>
   <li>
     <strong>Prefer additive DDL</strong> — the shipped schema uses{" "}

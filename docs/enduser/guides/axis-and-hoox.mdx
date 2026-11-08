@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "AXIS and HOOX"
 description: "AXIS evaluates Pine on a chart. HOOX executes orders. Connecting them is optional and goes through pyne-worker, not the PWA."
+
 ---
 
 # AXIS and HOOX
@@ -13,7 +15,8 @@ description: "AXIS evaluates Pine on a chart. HOOX executes orders. Connecting t
 AXIS is the **chart**. HOOX is the **mesh**. They share a language (PYNE) and a website tab pattern. They do not share an order router.
 
 <Tip>
-  If a strategy looks correct on [axis.hoox.sh](https://axis.hoox.sh) and nothing hits the exchange, that is working as designed.
+  If a strategy looks correct on [axis.hoox.sh](https://axis.hoox.sh) and
+  nothing hits the exchange, that is working as designed.
 </Tip>
 
 ## Abstract
@@ -41,14 +44,14 @@ flowchart TB
 
 ## Interface surface
 
-| AXIS action | HOOX effect |
-| --- | --- |
-| Engine `pyodide` | None |
-| Engine `server` → Flask `:5002` | None (unless you built a custom forwarder) |
-| Engine `server` → AXIS Worker | Proxy / 503 — still no trade-worker |
+| AXIS action                          | HOOX effect                                           |
+| ------------------------------------ | ----------------------------------------------------- |
+| Engine `pyodide`                     | None                                                  |
+| Engine `server` → Flask `:5002`      | None (unless you built a custom forwarder)            |
+| Engine `server` → AXIS Worker        | Proxy / 503 — still no trade-worker                   |
 | Engine `server` → pyne-worker origin | Evaluate. Orders **only** if isolate forwarding is on |
-| Local Alerts panel webhook | Your URL. Not certified as a trade path |
-| PYNE Agent plugin | Writes scripts; optional validate via `/run` |
+| Local Alerts panel webhook           | Your URL. Not certified as a trade path               |
+| PYNE Agent plugin                    | Writes scripts; optional validate via `/run`          |
 
 The AXIS Worker (`worker-axis`, `https://worker.axis.hoox.sh`) is **not** the HOOX `pyne-worker` isolate.
 
@@ -56,11 +59,11 @@ Full engine table: [AXIS evaluation map](https://hoox.sh/axis/docs/architecture/
 
 ## Internals
 
-| Product | Default evaluate host |
-| --- | --- |
-| AXIS desk | Flask `http://localhost:5002` |
-| AXIS offline | Pyodide + vendored `pynescript` wheel |
-| HOOX live Pine | `workers/pyne-worker` |
+| Product        | Default evaluate host                 |
+| -------------- | ------------------------------------- |
+| AXIS desk      | Flask `http://localhost:5002`         |
+| AXIS offline   | Pyodide + vendored `pynescript` wheel |
+| HOOX live Pine | `workers/pyne-worker`                 |
 
 PyneTS (`@hoox-sh/pynets`) is a TypeScript **library**. AXIS does not load it. You can build your own host with it; that host is still not HOOX until you implement the trade hop.
 
@@ -87,12 +90,12 @@ Install the PYNE Agent component plugin, generate a script, evaluate on Flask, t
 
 ## Failure modes
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| Great backtest, flat account | No trade hop | Deploy pyne-worker forwarding |
-| 503 `NO_BACKEND` in AXIS | AXIS Worker has no `EXTERNAL_BACKEND` | Set it, or use Pyodide / Flask |
-| Confused two Worker URLs | `worker.axis.hoox.sh` vs `pyne-worker` | Check the hostname |
-| Discord alert, no fill | Alert webhook ≠ `TRADE_SERVICE` | Expected |
+| Symptom                      | Cause                                  | Fix                            |
+| ---------------------------- | -------------------------------------- | ------------------------------ |
+| Great backtest, flat account | No trade hop                           | Deploy pyne-worker forwarding  |
+| 503 `NO_BACKEND` in AXIS     | AXIS Worker has no `EXTERNAL_BACKEND`  | Set it, or use Pyodide / Flask |
+| Confused two Worker URLs     | `worker.axis.hoox.sh` vs `pyne-worker` | Check the hostname             |
+| Discord alert, no fill       | Alert webhook ≠ `TRADE_SERVICE`        | Expected                       |
 
 ## See also
 

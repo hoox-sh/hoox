@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "analytics-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Analytics Observability Worker, covering Analytics Engine datasets, latency metrics, and dashboard API queries."
+
 ---
 
 The **`analytics-worker`** is the observability engine of the Hoox trading platform. Deployed as a private internal microservice, it aggregates time-series metrics, database query latencies, execution performance ratios, and API status codes across all V8 isolates. By translating incoming events and writing them to **Cloudflare Analytics Engine**, it provides the backend telemetry used to draw live charts in the Next.js Dashboard.

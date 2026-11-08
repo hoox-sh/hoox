@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Security Testing & Hardening"
 description: "Comprehensive security testing infrastructure, auth hardening, and CI/CD security scanning for the Hoox trading platform."
+
 ---
 
 ## Overview
@@ -20,16 +22,16 @@ Security work spans three layers:
 
 Applied on the public webhook path **before** exchange dispatch:
 
-| Control | Behavior |
-| ------- | -------- |
-| **Two-phase idempotency** | `IdempotencyStore`: **reserve** (pending) → dispatch → **commit** on true success / **release** on soft-fail or error. Missing DO → **fail-closed** `503`. |
-| **Atomic rate limit** | `RateLimiterStore` DO (`RATE_LIMITER`, migration `v2`); KV/memory fallback. Default 10 req / 60s → `429`. |
-| **Body cap** | **64 KiB** hard limit on webhook bodies. |
-| **Timing-safe webhook auth** | `timingSafeEqual` / async variant for `apiKey`. |
-| **Notify chat allowlist** | `TELEGRAM_ALLOWED_CHAT_IDS` / `AUTHORIZED_CHAT_IDS` — unlisted `chatId` rejected (fail-closed when configured). |
-| **Named D1 RPCs** | Hot paths use fixed SQL templates (`list-signals`, `list-system-logs`, `list-open-positions`, insert/upsert RPCs) instead of free-form `/query`. |
-| **safeWaitUntil** | Mesh-wide helper so background D1/analytics/notify work is not dropped on isolate exit (including DO lifecycle on trade-worker). |
-| **REST-only orders** | Exchange order placement stays REST; WS DO is not the order path. |
+| Control                      | Behavior                                                                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Two-phase idempotency**    | `IdempotencyStore`: **reserve** (pending) → dispatch → **commit** on true success / **release** on soft-fail or error. Missing DO → **fail-closed** `503`. |
+| **Atomic rate limit**        | `RateLimiterStore` DO (`RATE_LIMITER`, migration `v2`); KV/memory fallback. Default 10 req / 60s → `429`.                                                  |
+| **Body cap**                 | **64 KiB** hard limit on webhook bodies.                                                                                                                   |
+| **Timing-safe webhook auth** | `timingSafeEqual` / async variant for `apiKey`.                                                                                                            |
+| **Notify chat allowlist**    | `TELEGRAM_ALLOWED_CHAT_IDS` / `AUTHORIZED_CHAT_IDS` — unlisted `chatId` rejected (fail-closed when configured).                                            |
+| **Named D1 RPCs**            | Hot paths use fixed SQL templates (`list-signals`, `list-system-logs`, `list-open-positions`, insert/upsert RPCs) instead of free-form `/query`.           |
+| **safeWaitUntil**            | Mesh-wide helper so background D1/analytics/notify work is not dropped on isolate exit (including DO lifecycle on trade-worker).                           |
+| **REST-only orders**         | Exchange order placement stays REST; WS DO is not the order path.                                                                                          |
 
 Deploy notes (DO migrations `v1`/`v2`, allowlist secrets): `workers/hoox-worker/DEPLOY.md`. Concepts: [Idempotency](/docs/enduser/concepts/idempotency) · worker profile: [hoox gateway](/docs/devops/workers/hoox).
 
@@ -87,21 +89,21 @@ const isValid = timingSafeEqual(apiKey, expectedKey);
 
 All workers now have authentication on their internal endpoints:
 
-| Worker                 | Auth Method                                  | Protected Endpoints                                              | Unprotected                                      |
-| ---------------------- | -------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------ |
-| **hoox**               | API key in body (timing-safe) + IP allowlist + kill switch + DO rate limit + notify chat allowlist (`TELEGRAM_ALLOWED_CHAT_IDS`) | `POST /`, `POST /webhook` | `GET /health` |
-| **hoox operator plane** | Bearer `OPERATOR_API_KEY` (`requireOperatorAuth`) | `GET /v1/health`, `/v1/workers`, SSE `/v1/trades|logs/stream`, `/wallet/*` | Prefer Access on a mgmt hostname               |
-| **CLI/TUI operator**   | `HOOX_API_TOKEN` + optional Access service-token headers | Client transport profile (`HOOX_TRANSPORT`)                  | Fail-closed remote launch without credentials |
-| **d1-worker**          | `X-Internal-Auth-Key` (scoped read/write)    | `POST /query`, `POST /batch`, `GET /api/*`                       | `GET /health`                                    |
-| **trade-worker**       | `X-Internal-Auth-Key`                        | `POST /webhook`, `POST /process`, `GET /api/signals`, `GET /report` | `GET /health`                                 |
-| **agent-worker**       | `X-Internal-Auth-Key`                        | All `/agent/*` (including chat, vision, risk-override)           | `GET /`, `GET /health`                           |
-| **analytics-worker**   | `X-Internal-Auth-Key`                        | All `POST /track/*`                                              | `GET /health`                                    |
-| **telegram-worker**    | `X-Internal-Auth-Key` + outbound chat allowlist (`AUTHORIZED_CHAT_IDS` / `TG_CHAT_ID_BINDING`) | `POST /alert`, `POST /process` | `GET /health`, `POST /webhook` (Telegram secret + inbound chat allowlist) |
-| **email-worker**       | Mailgun HMAC + timestamp window              | —                                                                | `GET /health`, `POST /webhook` (HMAC + ±15m replay window) |
-| **report-worker**      | `X-Internal-Auth-Key`                        | `GET /report`, generate/delivery paths                           | `GET /health`                                    |
-| **web3-wallet-worker** | `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` preferred on privileged routes) | `/`, `/status`, `/config`, `/balance`, `/transfer`, `/approve`, `/quote`, `/swap`, `/transactions` | `GET /health` |
-| **pyne-worker**        | `X-API-Key` (`API_KEY`, not mesh internal key) | `/run`, `/ingest`, scripts, cron, feed when key set            | `GET /health`; open if `API_KEY` unset (dev only) |
-| **dashboard**          | Session cookie                               | All routes                                                       | `/login`, `/api/auth`, `/_next/*`                |
+| Worker                  | Auth Method                                                                                                                      | Protected Endpoints                                                                                | Unprotected                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------- |
+| **hoox**                | API key in body (timing-safe) + IP allowlist + kill switch + DO rate limit + notify chat allowlist (`TELEGRAM_ALLOWED_CHAT_IDS`) | `POST /`, `POST /webhook`                                                                          | `GET /health`                                                             |
+| **hoox operator plane** | Bearer `OPERATOR_API_KEY` (`requireOperatorAuth`)                                                                                | `GET /v1/health`, `/v1/workers`, SSE `/v1/trades                                                   | logs/stream`, `/wallet/\*`                                                | Prefer Access on a mgmt hostname |
+| **CLI/TUI operator**    | `HOOX_API_TOKEN` + optional Access service-token headers                                                                         | Client transport profile (`HOOX_TRANSPORT`)                                                        | Fail-closed remote launch without credentials                             |
+| **d1-worker**           | `X-Internal-Auth-Key` (scoped read/write)                                                                                        | `POST /query`, `POST /batch`, `GET /api/*`                                                         | `GET /health`                                                             |
+| **trade-worker**        | `X-Internal-Auth-Key`                                                                                                            | `POST /webhook`, `POST /process`, `GET /api/signals`, `GET /report`                                | `GET /health`                                                             |
+| **agent-worker**        | `X-Internal-Auth-Key`                                                                                                            | All `/agent/*` (including chat, vision, risk-override)                                             | `GET /`, `GET /health`                                                    |
+| **analytics-worker**    | `X-Internal-Auth-Key`                                                                                                            | All `POST /track/*`                                                                                | `GET /health`                                                             |
+| **telegram-worker**     | `X-Internal-Auth-Key` + outbound chat allowlist (`AUTHORIZED_CHAT_IDS` / `TG_CHAT_ID_BINDING`)                                   | `POST /alert`, `POST /process`                                                                     | `GET /health`, `POST /webhook` (Telegram secret + inbound chat allowlist) |
+| **email-worker**        | Mailgun HMAC + timestamp window                                                                                                  | —                                                                                                  | `GET /health`, `POST /webhook` (HMAC + ±15m replay window)                |
+| **report-worker**       | `X-Internal-Auth-Key`                                                                                                            | `GET /report`, generate/delivery paths                                                             | `GET /health`                                                             |
+| **web3-wallet-worker**  | `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` preferred on privileged routes)                                              | `/`, `/status`, `/config`, `/balance`, `/transfer`, `/approve`, `/quote`, `/swap`, `/transactions` | `GET /health`                                                             |
+| **pyne-worker**         | `X-API-Key` (`API_KEY`, not mesh internal key)                                                                                   | `/run`, `/ingest`, scripts, cron, feed when key set                                                | `GET /health`; open if `API_KEY` unset (dev only)                         |
+| **dashboard**           | Session cookie                                                                                                                   | All routes                                                                                         | `/login`, `/api/auth`, `/_next/*`                                         |
 
 <Note>
   Health check endpoints (`GET /health`) are intentionally left unauthenticated
@@ -275,12 +277,12 @@ graph LR
 
 See the `tests/load/` directory for full documentation.
 
-| Script              | Target                        | Description                    |
-| ------------------- | ----------------------------- | ------------------------------ |
-| `webhook-flow.js`   | hoox `POST /webhook`          | TradingView alert simulation   |
-| `d1-query-load.js`  | d1-worker `POST /query+batch` | Concurrent D1 query patterns   |
+| Script              | Target                        | Description                                       |
+| ------------------- | ----------------------------- | ------------------------------------------------- |
+| `webhook-flow.js`   | hoox `POST /webhook`          | TradingView alert simulation                      |
+| `d1-query-load.js`  | d1-worker `POST /query+batch` | Concurrent D1 query patterns                      |
 | `agent-cron-sim.js` | agent-worker                  | Agent cron cycle simulation (1–1440 min schedule) |
-| `system-mixed.js`   | All combined                  | 70/20/10 traffic distribution  |
+| `system-mixed.js`   | All combined                  | 70/20/10 traffic distribution                     |
 
 **CI:** Nightly via `.github/workflows/load-test.yml` (informational thresholds).
 

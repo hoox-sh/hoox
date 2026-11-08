@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "HOOX Enterprise Architecture"
 description: "Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leveraging Workers for Platforms, Workflows, Logpush, AI Gateway, advanced security, and more for institutional-grade algorithmic trading."
+
 ---
 
 # HOOX Enterprise Architecture
@@ -15,6 +17,7 @@ description: "Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leve
 > This document describes the **commercial Enterprise extension layer**.
 >
 > HOOX follows an **Open Core** model:
+>
 > - The core architecture, most workers, `packages/shared`, CLI, TUI, and the majority of documentation are **open source**.
 > - Advanced multi-tenancy (Workers for Platforms), proprietary features, full compliance stacks, hosted SaaS, and certain advanced implementations live in a **separate closed-source commercial repository**.
 >
@@ -38,7 +41,7 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
 
 ## Core Levers (Enterprise / Paid Unlocks)
 
-1. **Workers for Platforms (WfP)**  
+1. **Workers for Platforms (WfP)**
    - Dynamic Dispatch Worker routes to isolated "User Workers" (per tenant, per strategy, per fund).
    - Namespaces, tags for metering/billing/isolation.
    - User Workers can have their own bindings, DOs, Queues (isolated).
@@ -46,7 +49,7 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
    - Perfect for "bring your own strategy" or multi-fund platforms.
    - Enterprise: higher scale, custom limits, better support for customer code execution.
 
-2. **Workflows (Durable Execution)**  
+2. **Workflows (Durable Execution)**
    - Long-running (hours/days), stateful, automatically retrying, pause-for-external-events.
    - Step-level persistence, input/output gates.
    - Integrates with Agents (real-time) and existing DOs.
@@ -58,7 +61,7 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
    - Recent enhancements: step context (retry count), dynamic workflows, AgentWorkflow integration.
    - Enterprise: higher execution volume, longer durations, more steps.
 
-3. **Observability & Audit (Logpush + Traces + Observability suite)**  
+3. **Observability & Audit (Logpush + Traces + Observability suite)**
    - Full Workers Trace Events, HTTP, WAF, Queue, DO, etc. pushed to R2 (or external SIEM like SentinelOne).
    - One-click R2 setup, custom fields (raw/transformed headers), daily partitions.
    - Workers Logs (dashboard), Real-time logs, Tail Workers for sampling/filtering/enrichment.
@@ -66,7 +69,7 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
    - Analytics Engine remains for high-cardinality metrics; Logpush for compliance/audit.
    - Enterprise: higher log volume, longer retention, dedicated support, integration options.
 
-4. **Enterprise Security Stack**  
+4. **Enterprise Security Stack**
    - **Bot Management** (Enterprise): bot scores, verified bots, corporate proxy detection, JA4/JA3, JS detection. Protect signal sources (TradingView webhooks, Telegram, email).
    - **API Shield**: schema validation, JWT validation, mTLS for clients (dashboard or partner APIs), sequence mitigation.
    - **Advanced WAF + Rulesets**: 100+ rate limit rules, custom high-cardinality rules, managed rules for trading threats.
@@ -75,13 +78,13 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
    - **Data Loss Prevention / Gateway** if needed for sensitive configs.
    - Existing 5-layer model (WAF → Gateway auth → Service Bindings → Internal key → DO mutex) is extended with Ent controls.
 
-5. **Real-time & Persistent Connections**  
+5. **Real-time & Persistent Connections**
    - Hibernatable WebSockets in Durable Objects (keep connections alive cheaply while DO sleeps).
    - Evolve `ExchangeConnectionManager` DO to maintain persistent WS to Binance/Bybit/etc. for live fills, partials, order books.
    - Drive risk management, notifications, and analytics from real events instead of (or alongside) cron-only polling.
    - Combined with Workflows for durable handling of streams.
 
-6. **Scale, Limits & Performance (Enterprise Unlocks)**  
+6. **Scale, Limits & Performance (Enterprise Unlocks)**
    - Significantly higher CPU time, memory, subrequests, concurrent connections, Worker size, # of Workers/crons per account.
    - Custom limit increases via account team.
    - Higher D1 storage/reads/writes, R2 operations, Queue throughput, Vectorize dimensions/index size.
@@ -89,19 +92,19 @@ Open-core Hoox already uses Service Bindings, SQLite Durable Objects for idempot
    - Smart Placement + Enterprise routing hints for even lower jitter to exchange regions.
    - Hyperdrive for accelerating any external data sources (if hybrid Postgres/etc. used for large historical data).
 
-7. **AI at Institutional Scale**  
+7. **AI at Institutional Scale**
    - **AI Gateway**: logging, caching, rate limiting, fallbacks, cost control, prompt sanitization in front of Workers AI or external providers (OpenAI, etc.).
    - Workers AI + Vectorize at Enterprise volumes (large strategy corpus, market embeddings, RAG for compliance docs or historical trades).
    - Integration with Workflows/Agents for sophisticated risk agents, anomaly detection, natural language strategy config.
    - Existing simple RAG in telegram-worker becomes production-grade with Gateway + fallbacks.
 
-8. **Storage & Data Sovereignty**  
+8. **Storage & Data Sovereignty**
    - R2: Event Notifications (trigger Workflows on new trade logs/reports), jurisdiction controls (data residency), larger scale, lifecycle policies for immutable audit logs.
    - D1: Enterprise storage/throughput, point-in-time recovery, read replicas (if/when available), larger DBs per tenant.
    - KV + DO SQLite for low-latency config/state.
    - Immutable audit: Logpush + R2 WORM-like + cryptographic hashes/signatures in D1.
 
-9. **Other Bleeding Edge**  
+9. **Other Bleeding Edge**
    - Browser Rendering at scale (more concurrent renders for compliance reports).
    - Builds (CI/CD for User Workers in WfP).
    - Email Workers / advanced routing for signal ingestion.
@@ -153,13 +156,16 @@ Existing workers (trade-worker, agent-worker, hoox, etc.) become templates or ar
 ## Key New / Evolved Components
 
 ### 1. Dispatch + User Workers (WfP)
+
 - Central Dispatch Worker inspects request (tenant id from subdomain, header, or JWT), looks up namespace, dispatches to User Worker.
 - Each User Worker can contain strategy-specific logic or a full lightweight HOOX instance.
 - Static assets support for per-tenant dashboards/UI if needed.
 - Tagging for billing/quotas.
 
 ### 2. Workflows Definitions
+
 Examples:
+
 - `TradeLifecycleWorkflow`: validate → pre-risk → execute (with retries) → persist → post-risk → notify → reconcile.
 - `ReconciliationWorkflow`: runs daily, compares D1 vs exchange reports (via Browser Rendering or API), flags discrepancies.
 - `ComplianceReportWorkflow`: gathers logs (from R2), generates PDF (Browser), signs, uploads, notifies.
@@ -167,18 +173,21 @@ Examples:
 Workflows can call existing services via Service Bindings and pause for external events (e.g., manual approval).
 
 ### 3. Enhanced DOs
+
 - `IdempotencyStore` generalized with tenant/strategy prefix.
 - `ExchangeConnectionManager` uses `hibernatableWebSockets` + alarms for cleanup.
 - New DOs for per-tenant risk engines, session state, etc.
 - RPC methods + SQLite for best DX/performance.
 
 ### 4. Observability Pipeline
+
 - Every Worker/Workflow/DO emits structured events.
 - Logpush jobs (one-click or API) to R2 with `output_options` for relevant fields.
 - Tail Worker example for redacting secrets or adding tenant context.
 - Full traces for root-causing a missed fill across 5+ Workers.
 
 ### 5. Security Hardening
+
 - Bot score checks early in gateway/dispatch.
 - API Shield schemas for all public + internal-ish endpoints.
 - Zero Trust policies for dashboard + mgmt APIs.

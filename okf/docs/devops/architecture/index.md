@@ -2,7 +2,7 @@
 
 # Concepts
 
-* [📐 Architecture Decision Records (ADRs)](adrs.md) - This directory contains the Architecture Decision Records for the Hoox trading platform. Each ADR documents a significant architectural choice, its context, the decision made,…
+* [adrs](adrs.md) - This directory contains the Architecture Decision Records for the Hoox trading platform. Each ADR documents a significant architectural choice, its context, the decision made,…
 * [bindings.mdx](bindings.md) - description: "Stub — the canonical Cloudflare Workers bindings registry lives at /docs/devops/bindings.".
 * [communication.mdx](communication.md) - description: "Detailed specification of Cloudflare Service Bindings, zero-overhead V8 isolate routing, and standard cross-worker auth middleware.".
 * [data-flow.mdx](data-flow.md) - description: "Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.".

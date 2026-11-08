@@ -4,23 +4,25 @@
 -->
 
 ---
+
 title: "agent-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Agent Cron Worker, covering multi-provider AI Gateway configurations, vision analysis, and risk protection loops."
+
 ---
 
 The `agent-worker` serves as the proactive intelligence layer of the Hoox trading ecosystem. Rather than waiting for webhooks, it runs on a **configurable Cloudflare Cron schedule (1–1440 minutes)** to monitor portfolio health, enforce risk limits, and optimize position exits. The default in this repo is every **15 minutes** (`*/15 * * * *`).
 
 ## Core Capabilities
 
-| Feature                        | Description                                                                                                                                   |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Feature                        | Description                                                                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ⏱️ **Cron-Driven Observation** | Runs on a configurable interval (1–1440 minutes via `triggers.crons`; default `*/15 * * * *`) to fetch live market data from Binance, Bybit, and MEXC. |
-| 🛡️ **Global Kill Switch**      | Calculates total account PnL and instantly locks out the `hoox` gateway from new entries if the `max_daily_drawdown_percent` is breached.     |
-| 🎯 **Dynamic Trailing Stops**  | Stores watermark prices in `CONFIG_KV` and automatically triggers `CLOSE` payloads if the market reverses.                                    |
-| 💸 **Scale-Out Take Profits**  | Detects when a position reaches a specific profit target and automatically sends partial close commands to secure gains.                      |
-| 🤖 **AI System Summarization** | Periodically fetches `system_logs` from the `d1-worker`, analyzes them via LLAMA 3 8B, and sends natural language health reports to Telegram. |
-| 🌐 **Multi-Provider AI**       | Seamlessly switches between Workers AI, OpenAI, Anthropic, Google AI, and Azure OpenAI with automatic fallbacks.                              |
-| 🧠 **Advanced Models**         | Vision, embeddings, and code models on the isolate. Dashboard Reasoning/Usage pages call dashboard `/api/agent/*` routes (not this worker). |
+| 🛡️ **Global Kill Switch**      | Calculates total account PnL and instantly locks out the `hoox` gateway from new entries if the `max_daily_drawdown_percent` is breached.              |
+| 🎯 **Dynamic Trailing Stops**  | Stores watermark prices in `CONFIG_KV` and automatically triggers `CLOSE` payloads if the market reverses.                                             |
+| 💸 **Scale-Out Take Profits**  | Detects when a position reaches a specific profit target and automatically sends partial close commands to secure gains.                               |
+| 🤖 **AI System Summarization** | Periodically fetches `system_logs` from the `d1-worker`, analyzes them via LLAMA 3 8B, and sends natural language health reports to Telegram.          |
+| 🌐 **Multi-Provider AI**       | Seamlessly switches between Workers AI, OpenAI, Anthropic, Google AI, and Azure OpenAI with automatic fallbacks.                                       |
+| 🧠 **Advanced Models**         | Vision, embeddings, and code models on the isolate. Dashboard Reasoning/Usage pages call dashboard `/api/agent/*` routes (not this worker).            |
 
 ## Architecture & Flow
 
@@ -195,11 +197,11 @@ Chat, vision, embedding, risk-override, status, config, models, health, and hous
 
 The dashboard Agent **Reasoning** and **Usage** pages call dashboard Next.js routes, not this isolate:
 
-| Dashboard route | Behavior |
-| --------------- | -------- |
+| Dashboard route             | Behavior                                                                                                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `POST /api/agent/reasoning` | Uses the dashboard `AI` binding when the model id includes `deepseek`; otherwise returns a mock reasoning/answer plus a note to configure provider keys in `CONFIG_KV`. |
-| `GET /api/agent/usage` | Reads `CONFIG_KV` key `agent:usage`. Empty object when unset (`"No usage data yet"`). |
-| `GET /api/agent/prompts` | Returns a static template-name list (`trading-analyst`, `risk-assessor`, …). Not stored on the isolate. |
+| `GET /api/agent/usage`      | Reads `CONFIG_KV` key `agent:usage`. Empty object when unset (`"No usage data yet"`).                                                                                   |
+| `GET /api/agent/prompts`    | Returns a static template-name list (`trading-analyst`, `risk-assessor`, …). Not stored on the isolate.                                                                 |
 
 ## Configuration
 
@@ -207,12 +209,12 @@ The dashboard Agent **Reasoning** and **Usage** pages call dashboard Next.js rou
 
 The schedule is **not** hard-coded to 5 minutes. Set `triggers.crons` in `workers/agent-worker/wrangler.jsonc` (or the example file) to any interval from 1 to 1440 minutes:
 
-| Minutes | Example cron        |
-| ------- | ------------------- |
-| 1       | `* * * * *`         |
+| Minutes | Example cron             |
+| ------- | ------------------------ |
+| 1       | `* * * * *`              |
 | 15      | `*/15 * * * *` (default) |
-| 60      | `0 * * * *`         |
-| 1440    | `0 0 * * *`         |
+| 60      | `0 * * * *`              |
+| 1440    | `0 0 * * *`              |
 
 - Align the dashboard isolate profile cron interval (1–1440 minutes) with your wrangler expression.
 - Disable scheduled runs with `"crons": []`; manual `POST /agent/housekeeping` still works.
@@ -263,7 +265,7 @@ All configuration is stored in `CONFIG_KV` for real-time adjustments.
 
 | Task          | Workers AI Model                               |
 | ------------- | ---------------------------------------------- |
-| Chat          | `@cf/meta/llama-3.1-8b-instruct-fp8`               |
+| Chat          | `@cf/meta/llama-3.1-8b-instruct-fp8`           |
 | Vision        | `@cf/meta/llama-3.2-11b-vision-instruct`       |
 | Reasoning     | `@cf/deepseek-ai/deepseek-r1-distill-qwen-32b` |
 | Code          | `@cf/qwen/qwen2.5-coder-32b-instruct`          |

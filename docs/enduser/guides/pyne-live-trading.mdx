@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "PYNE live trading"
 description: "Bar-close cron: PYNE strategy events become HOOX WebhookPayloads on trade-worker. Alerts are a separate webhook path."
+
 ---
 
 # PYNE live trading
@@ -13,7 +15,8 @@ description: "Bar-close cron: PYNE strategy events become HOOX WebhookPayloads o
 Deploy **pyne-worker**, register a strategy, give it R2 bars, and let the 1-minute cron re-run on new closes. `StrategyEvent` rows map to HOOX actions and hop to **trade-worker** over `TRADE_SERVICE`. This is the supported Pine → order path.
 
 <Warning>
-  Test with `test: true` / testnet keys first. `close_all` becomes **two** payloads (`CLOSE_LONG` and `CLOSE_SHORT`).
+  Test with `test: true` / testnet keys first. `close_all` becomes **two**
+  payloads (`CLOSE_LONG` and `CLOSE_SHORT`).
 </Warning>
 
 ## Abstract
@@ -43,14 +46,14 @@ sequenceDiagram
 
 ### Event map (`trade_forwarder.py`)
 
-| `StrategyEvent.kind` | HOOX `action` |
-| --- | --- |
-| `entry` + long | `LONG` |
-| `entry` + short | `SHORT` |
-| `close` / `exit` + long | `CLOSE_LONG` |
-| `close` / `exit` + short | `CLOSE_SHORT` |
-| `close_all` | `CLOSE_LONG` **and** `CLOSE_SHORT` |
-| `order` | mapped from direction |
+| `StrategyEvent.kind`     | HOOX `action`                      |
+| ------------------------ | ---------------------------------- |
+| `entry` + long           | `LONG`                             |
+| `entry` + short          | `SHORT`                            |
+| `close` / `exit` + long  | `CLOSE_LONG`                       |
+| `close` / `exit` + short | `CLOSE_SHORT`                      |
+| `close_all`              | `CLOSE_LONG` **and** `CLOSE_SHORT` |
+| `order`                  | mapped from direction              |
 
 Idempotency: `pyne:{script}:{symbol}:{kind}:{direction}:{bar}:{time}:{action}`.
 
@@ -86,13 +89,13 @@ Caps (isolate): 5 MB body, 100 KB script, 100 K bars, `/run` wall 30 s. Rate lim
 
 ## Internals
 
-| Piece | Path / binding |
-| --- | --- |
-| Worker | `workers/pyne-worker` (submodule) |
-| R2 | `OHLCV_DATA` |
+| Piece     | Path / binding                                 |
+| --------- | ---------------------------------------------- |
+| Worker    | `workers/pyne-worker` (submodule)              |
+| R2        | `OHLCV_DATA`                                   |
 | Trade hop | `TRADE_SERVICE` → trade-worker `POST /webhook` |
-| Cron | `* * * * *` — skip if R2 has no newer bar |
-| Language | vendored `pynescript.runtime` |
+| Cron      | `* * * * *` — skip if R2 has no newer bar      |
+| Language  | vendored `pynescript.runtime`                  |
 
 KV: pyne `dashboard.jsonc` is **secrets only** (`API_KEY`, `ALERT_WEBHOOK_URL`). Cron and `TRADE_SERVICE` are wrangler, not CONFIG_KV.
 
@@ -115,13 +118,13 @@ Language-level event fields: [PYNE strategy events](https://hoox.sh/pyne/docs/ru
 
 ## Failure modes
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| `/run` 401 | Bad `X-API-Key` | Match `API_KEY` |
+| Symptom                         | Cause                                  | Fix                        |
+| ------------------------------- | -------------------------------------- | -------------------------- |
+| `/run` 401                      | Bad `X-API-Key`                        | Match `API_KEY`            |
 | Events in `/run` JSON, no order | Missing `TRADE_SERVICE` / internal key | Set `INTERNAL_KEY_BINDING` |
-| Cron idle | R2 has no new bar | `hoox pyne feed` / ingest |
-| Alert fired, no fill | Alert path ≠ trade path | Expected |
-| AXIS showed the same script | AXIS does not execute | This page, not the PWA |
+| Cron idle                       | R2 has no new bar                      | `hoox pyne feed` / ingest  |
+| Alert fired, no fill            | Alert path ≠ trade path                | Expected                   |
+| AXIS showed the same script     | AXIS does not execute                  | This page, not the PWA     |
 
 ## See also
 

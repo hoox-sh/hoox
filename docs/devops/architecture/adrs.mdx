@@ -1,11 +1,11 @@
+---
+title: "adrs"
+---
+
 <!--
   Copyright (c) 2026 HOOX · jango-blockchained (hoox-sh)
   SPDX-License-Identifier: CC-BY-4.0
 -->
-
----
-title: "adrs"
----
 
 # 📐 Architecture Decision Records (ADRs)
 
@@ -67,19 +67,19 @@ This directory contains the Architecture Decision Records for the Hoox trading p
 
 **Decision:** Split the platform into specialized Workers, each with a single responsibility. The original nine isolates remain; **pyne-worker** (Python Pine evaluate) and the **dashboard** (Next.js 16 / OpenNext) bring the mesh to 11 compute surfaces.
 
-| Worker               | Responsibility                                  |
-| -------------------- | ----------------------------------------------- |
+| Worker               | Responsibility                                                            |
+| -------------------- | ------------------------------------------------------------------------- |
 | `hoox`               | Gateway, validation, rate limiting, idempotency, operator `/wallet` proxy |
-| `trade-worker`       | CEX REST (Binance / Bybit / MEXC) + spot DEX via `WEB3_WALLET_SERVICE` |
-| `agent-worker`       | AI risk management, trailing stops, cron jobs   |
-| `d1-worker`          | All SQLite read/write operations                |
-| `telegram-worker`    | Push notifications, chat command handling       |
-| `web3-wallet-worker` | On-chain signing; Uniswap V3 + Jupiter Swap V2  |
-| `email-worker`       | Email signal parsing (Mailgun / Email Routing)  |
-| `analytics-worker`   | Metrics collection (Analytics Engine writes)    |
-| `report-worker`      | PDF portfolio report generation                 |
-| `pyne-worker`        | Pine Script™ edge evaluate (Python tooling isolate) |
-| `dashboard`          | Next.js ops console (public)                    |
+| `trade-worker`       | CEX REST (Binance / Bybit / MEXC) + spot DEX via `WEB3_WALLET_SERVICE`    |
+| `agent-worker`       | AI risk management, trailing stops, cron jobs                             |
+| `d1-worker`          | All SQLite read/write operations                                          |
+| `telegram-worker`    | Push notifications, chat command handling                                 |
+| `web3-wallet-worker` | On-chain signing; Uniswap V3 + Jupiter Swap V2                            |
+| `email-worker`       | Email signal parsing (Mailgun / Email Routing)                            |
+| `analytics-worker`   | Metrics collection (Analytics Engine writes)                              |
+| `report-worker`      | PDF portfolio report generation                                           |
+| `pyne-worker`        | Pine Script™ edge evaluate (Python tooling isolate)                       |
+| `dashboard`          | Next.js ops console (public)                                              |
 
 **Consequences:**
 

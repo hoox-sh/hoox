@@ -4,19 +4,21 @@
 -->
 
 ---
+
 title: "Email Signal Routing"
 description: "Route trade signals into email-worker via Mailgun, Cloudflare® Email Routing, or an authenticated JSON post. There is no IMAP inbox poll."
+
 ---
 
 The **`email-worker`** turns an inbound email or a JSON body into a trade signal and forwards it to `trade-worker`. It does **not** log into a mailbox. Cloudflare® Workers cannot open IMAP sockets, and `EMAIL_HOST`, `EMAIL_USER`, and `EMAIL_PASS` are reserved names that this worker does not read.
 
 Three ingress paths:
 
-| Path | Route | Auth |
-| --- | --- | --- |
-| Mailgun | `POST /webhook` | HMAC-SHA256. Headers `Mailgun-Signature`, `Mailgun-Timestamp`, `Mailgun-Token`. Secret `MAILGUN_API_KEY`. |
-| Cloudflare® Email Routing | the worker `email` handler | Cloudflare® delivers the message to the binding. |
-| Internal JSON | `POST /email-signal` | `X-Internal-Auth-Key` only. This route does **not** check a Mailgun signature. |
+| Path                      | Route                      | Auth                                                                                                      |
+| ------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Mailgun                   | `POST /webhook`            | HMAC-SHA256. Headers `Mailgun-Signature`, `Mailgun-Timestamp`, `Mailgun-Token`. Secret `MAILGUN_API_KEY`. |
+| Cloudflare® Email Routing | the worker `email` handler | Cloudflare® delivers the message to the binding.                                                          |
+| Internal JSON             | `POST /email-signal`       | `X-Internal-Auth-Key` only. This route does **not** check a Mailgun signature.                            |
 
 ```bash
 hoox secrets set email-worker MAILGUN_API_KEY

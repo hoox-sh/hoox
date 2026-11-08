@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "pyne-worker Isolate Profile"
 description: "Python Cloudflare Worker for PYNE Pine Script edge evaluation — /run, script registry, bar-close cron, R2 OHLCV, alert webhooks, trade-worker forwarding."
+
 ---
 
 The **`pyne-worker`** is the Python edge host for **[PYNE](https://hoox.sh/pyne)** — evaluate TradingView® Pine Script™ on Cloudflare Workers with the same evaluate contract as the Pro API. It is a **tooling isolate** outside the mesh `INTERNAL_KEY_BINDING` graph: callers authenticate with `X-API-Key` / Worker secret `API_KEY`.
@@ -18,10 +20,10 @@ This isolate vendors **Python** `pynescript.runtime`. It is not [PyneTS](https:/
 
 ## Bindings
 
-| Binding | Type | Purpose |
-| ------- | ---- | ------- |
-| `TRADE_SERVICE` | Service | Forward strategy trade events to `trade-worker` |
-| `OHLCV_DATA` | R2 | Kline / OHLCV storage and script registry (`pyne-worker-ohlcv`) |
+| Binding         | Type    | Purpose                                                         |
+| --------------- | ------- | --------------------------------------------------------------- |
+| `TRADE_SERVICE` | Service | Forward strategy trade events to `trade-worker`                 |
+| `OHLCV_DATA`    | R2      | Kline / OHLCV storage and script registry (`pyne-worker-ohlcv`) |
 
 Cron: `* * * * *` (bar-close scheduler; only re-runs when R2 has a newer bar). Smart Placement is on. `account_id` in wrangler is `"<CLOUDFLARE_ACCOUNT_ID>"` — use yours.
 
@@ -29,12 +31,12 @@ Cron: `* * * * *` (bar-close scheduler; only re-runs when R2 has a newer bar). S
 
 ## Secrets
 
-| Secret | Required | Purpose |
-| ------ | -------- | ------- |
-| `API_KEY` | **Yes** (production) | HTTP auth for `/run` and management APIs (`X-API-Key`). Unset = open dev mode — do not ship that way. |
+| Secret                 | Required                     | Purpose                                                                                                                                                                                                                                                                                                        |
+| ---------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `API_KEY`              | **Yes** (production)         | HTTP auth for `/run` and management APIs (`X-API-Key`). Unset = open dev mode — do not ship that way.                                                                                                                                                                                                          |
 | `INTERNAL_KEY_BINDING` | **Yes** (live trade forward) | Mesh internal key sent as `X-Internal-Auth-Key` when forwarding strategy events to `trade-worker` via `TRADE_SERVICE`. Same secret family as the rest of the mesh (or a dedicated trade-execute key bound for that hop). Without it, live strategy → trade-worker calls are rejected by `requireInternalAuth`. |
-| `ALERT_WEBHOOK_URL` | No | Default **HTTPS** destination for `alert()` / `alertcondition()` (public hosts only; private/loopback IPs rejected) |
-| `DEFAULT_EXCHANGE` | No | Default exchange id on forwarded WebhookPayloads when the strategy event does not specify one (e.g. `binance`, `bybit`, `mexc`) |
+| `ALERT_WEBHOOK_URL`    | No                           | Default **HTTPS** destination for `alert()` / `alertcondition()` (public hosts only; private/loopback IPs rejected)                                                                                                                                                                                            |
+| `DEFAULT_EXCHANGE`     | No                           | Default exchange id on forwarded WebhookPayloads when the strategy event does not specify one (e.g. `binance`, `bybit`, `mexc`)                                                                                                                                                                                |
 
 Dashboard callers that use the public URL or binding should set **`PYNE_API_KEY`** to the same value as `API_KEY`.
 
@@ -58,15 +60,15 @@ hoox secrets set dashboard PYNE_API_KEY            # optional, match API_KEY
 
 ## Endpoints
 
-| Method | Path | Auth | Description |
-| ------ | ---- | ---- | ----------- |
-| GET | `/health` | No | Health + feature flags |
-| POST | `/run` | Yes | Evaluate Pine (`mode` interpret \| compile \| auto; `realtime_*` last-bar / `varip` ticks, engine ≥ 0.6.22) |
-| POST | `/ingest` | Yes | Upload OHLCV to R2 |
-| POST/GET/DELETE | `/scripts`… | Yes | Deployed script registry |
-| GET/PUT | `/cron/jobs` | Yes | Bar-close job config |
-| POST | `/cron/run` | Yes | Manual scheduler trigger |
-| POST | `/feed/refresh` | Yes | Pull klines into R2 |
+| Method          | Path            | Auth | Description                                                                                                 |
+| --------------- | --------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| GET             | `/health`       | No   | Health + feature flags                                                                                      |
+| POST            | `/run`          | Yes  | Evaluate Pine (`mode` interpret \| compile \| auto; `realtime_*` last-bar / `varip` ticks, engine ≥ 0.6.22) |
+| POST            | `/ingest`       | Yes  | Upload OHLCV to R2                                                                                          |
+| POST/GET/DELETE | `/scripts`…     | Yes  | Deployed script registry                                                                                    |
+| GET/PUT         | `/cron/jobs`    | Yes  | Bar-close job config                                                                                        |
+| POST            | `/cron/run`     | Yes  | Manual scheduler trigger                                                                                    |
+| POST            | `/feed/refresh` | Yes  | Pull klines into R2                                                                                         |
 
 ---
 

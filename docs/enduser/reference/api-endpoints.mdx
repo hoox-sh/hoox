@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "API Endpoint Specification"
 description: "Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway."
+
 ---
 
 This document details the HTTP routes on the **hoox gateway** (`workers/hoox-worker`). TradingView® and other signal sources hit `/webhook`. Operator tools (TUI, dashboard, CLI health) use Bearer `OPERATOR_API_KEY` on `/v1/*` and `/wallet/*`.
@@ -68,12 +70,12 @@ DEX example (`BASE/QUOTE` required; `"test": true` is rejected):
 }
 ```
 
-| Field | Live | Test (`"test": true`) |
-| ----- | ---- | --------------------- |
-| Host | Production REST | Testnet REST (Binance / Bybit only) |
+| Field   | Live                                               | Test (`"test": true`)                           |
+| ------- | -------------------------------------------------- | ----------------------------------------------- |
+| Host    | Production REST                                    | Testnet REST (Binance / Bybit only)             |
 | Secrets | `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING` | Prefer `EXCHANGE_TESTNET_*`, else live fallback |
-| D1 | `EXECUTED` · normal position id | `TEST_EXECUTED` · `*-testnet-*` id |
-| DEX | ExactIn swap via `web3-wallet-worker` | `400 TEST_TRADING_UNSUPPORTED` |
+| D1      | `EXECUTED` · normal position id                    | `TEST_EXECUTED` · `*-testnet-*` id              |
+| DEX     | ExactIn swap via `web3-wallet-worker`              | `400 TEST_TRADING_UNSUPPORTED`                  |
 
 `exchange`: `binance`, `bybit`, `mexc`, `uniswap-ethereum`, `uniswap-arbitrum`, `jupiter-solana`. Full field table: [Signals & trades](/docs/enduser/concepts/signals-and-trades). Testnet: [Test Trading](/docs/enduser/guides/test-trading). DEX: [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps).
 
@@ -147,13 +149,13 @@ CLI: `hoox check health`.
 
 Bearer `OPERATOR_API_KEY`. Fail-closed if the secret is missing.
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `GET` | `/v1/health` | Operator liveness (`plane: "operator"`) |
-| `GET` | `/v1/workers` | Minimal gateway self-view |
-| `GET` | `/v1/trades/stream` | SSE trade stream (TUI) |
-| `GET` | `/v1/logs/stream` | SSE log stream (TUI) |
-| `GET` | `/workers` | Legacy alias of `/v1/workers` |
+| Method | Path                | Purpose                                 |
+| ------ | ------------------- | --------------------------------------- |
+| `GET`  | `/v1/health`        | Operator liveness (`plane: "operator"`) |
+| `GET`  | `/v1/workers`       | Minimal gateway self-view               |
+| `GET`  | `/v1/trades/stream` | SSE trade stream (TUI)                  |
+| `GET`  | `/v1/logs/stream`   | SSE log stream (TUI)                    |
+| `GET`  | `/workers`          | Legacy alias of `/v1/workers`           |
 
 ---
 
@@ -161,16 +163,16 @@ Bearer `OPERATOR_API_KEY`. Fail-closed if the secret is missing.
 
 Forwards allowlisted paths to `web3-wallet-worker` with operator Bearer auth. The gateway injects mesh `X-Internal-Auth-Key` (`WALLET_EXECUTE_KEY_BINDING` / `INTERNAL_KEY_BINDING`). `Idempotency-Key` is passed through. Unknown paths are not forwarded.
 
-| Method | Gateway path | Upstream |
-| ------ | ------------ | -------- |
-| GET/POST/PUT | `/wallet` | `/` |
-| GET/POST/PUT | `/wallet/status` | `/status` |
-| GET/POST/PUT | `/wallet/config` | `/config` |
-| GET/POST/PUT | `/wallet/balance` | `/balance` |
-| GET/POST/PUT | `/wallet/quote` | `/quote` |
-| GET/POST/PUT | `/wallet/swap` | `/swap` |
-| GET/POST/PUT | `/wallet/transfer` | `/transfer` |
-| GET/POST/PUT | `/wallet/approve` | `/approve` |
+| Method       | Gateway path           | Upstream        |
+| ------------ | ---------------------- | --------------- |
+| GET/POST/PUT | `/wallet`              | `/`             |
+| GET/POST/PUT | `/wallet/status`       | `/status`       |
+| GET/POST/PUT | `/wallet/config`       | `/config`       |
+| GET/POST/PUT | `/wallet/balance`      | `/balance`      |
+| GET/POST/PUT | `/wallet/quote`        | `/quote`        |
+| GET/POST/PUT | `/wallet/swap`         | `/swap`         |
+| GET/POST/PUT | `/wallet/transfer`     | `/transfer`     |
+| GET/POST/PUT | `/wallet/approve`      | `/approve`      |
 | GET/POST/PUT | `/wallet/transactions` | `/transactions` |
 
 Signal-driven DEX swaps still go `POST /webhook` → trade-worker → `WEB3_WALLET_SERVICE` `/swap`. The `/wallet` proxy is the operator surface.
@@ -238,8 +240,8 @@ Missing `IDEMPOTENCY_STORE` binding is fail-closed (`503`).
 ---
 
 <Tip>
-  Probe the mesh with `hoox check health`. Tail the gateway with
-  `hoox logs worker hoox`.
+  Probe the mesh with `hoox check health`. Tail the gateway with `hoox logs
+  worker hoox`.
 </Tip>
 
 ### 🔗 Next Steps

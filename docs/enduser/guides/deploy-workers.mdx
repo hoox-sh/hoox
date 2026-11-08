@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Deploying to production"
 description: "Deploy the worker mesh and dashboard with hoox deploy all --auto, then bind Telegram and KV."
+
 ---
 
 # 🚀 Deploying to Production
@@ -35,14 +37,14 @@ The Hoox CLI automates this dependency hierarchy:
 
 ### Deployment Order Explained
 
-| Step | Worker                          | Why First?                                                  |
-| :--: | ------------------------------- | ----------------------------------------------------------- |
-|  1   | D1 Schema                       | Database tables must exist before workers try to read/write |
-|  2   | d1-worker                       | SQL hub must be available for other workers' DB operations  |
-|  3   | trade-worker                    | Core execution engine — other workers depend on it          |
-|  4   | hoox Gateway                    | Public-facing router — needs all internal workers live      |
-|  5   | agent-worker, telegram-worker, pyne-worker | Background / tooling isolates — deploy after core path |
-|  6   | Dashboard (OpenNext)            | Frontend — depends on gateway and all APIs                  |
+| Step | Worker                                     | Why First?                                                  |
+| :--: | ------------------------------------------ | ----------------------------------------------------------- |
+|  1   | D1 Schema                                  | Database tables must exist before workers try to read/write |
+|  2   | d1-worker                                  | SQL hub must be available for other workers' DB operations  |
+|  3   | trade-worker                               | Core execution engine — other workers depend on it          |
+|  4   | hoox Gateway                               | Public-facing router — needs all internal workers live      |
+|  5   | agent-worker, telegram-worker, pyne-worker | Background / tooling isolates — deploy after core path      |
+|  6   | Dashboard (OpenNext)                       | Frontend — depends on gateway and all APIs                  |
 
 ---
 
@@ -62,13 +64,13 @@ hoox deploy dashboard
 
 ### Deploy All Flags
 
-| Flag        | Description                                                       | Example                          |
-| ----------- | ----------------------------------------------------------------- | -------------------------------- |
-| `--auto`    | Skip dashboard rebuild prompt; use existing OpenNext build if any | `hoox deploy all --auto`         |
-| `--rebuild` | Force rebuild the dashboard before deploying                      | `hoox deploy all --rebuild`      |
-| `--dry-run` | Preview the worker order without uploading                        | `hoox deploy all --dry-run`      |
-| `--env`     | Cloudflare® environment name                                       | `hoox deploy all --env production` |
-| `--json`    | Print the task-result array (since 0.15.0)                        | `hoox deploy all --json`         |
+| Flag        | Description                                                       | Example                            |
+| ----------- | ----------------------------------------------------------------- | ---------------------------------- |
+| `--auto`    | Skip dashboard rebuild prompt; use existing OpenNext build if any | `hoox deploy all --auto`           |
+| `--rebuild` | Force rebuild the dashboard before deploying                      | `hoox deploy all --rebuild`        |
+| `--dry-run` | Preview the worker order without uploading                        | `hoox deploy all --dry-run`        |
+| `--env`     | Cloudflare® environment name                                      | `hoox deploy all --env production` |
+| `--json`    | Print the task-result array (since 0.15.0)                        | `hoox deploy all --json`           |
 
 Workers only (skip dashboard): `hoox deploy workers`.
 
@@ -201,8 +203,8 @@ hoox deploy history trade-worker
 | **`503 Service Unavailable`** | The Global Kill Switch is active in KV.           | Verify switch state: `hoox monitor kill-switch show`. If safe, restore trading: `hoox monitor kill-switch off`.                   |
 | **`403 Forbidden`**           | Webhook request failed passkey check.             | Body `apiKey` must match `WEBHOOK_API_KEY_BINDING` on the hoox gateway (`hoox secrets list hoox`).                                |
 | **`409 Conflict`**            | Durable Object intercepted a duplicate trace ID.  | Verify TV alert settings. Do not configure rapid-fire duplicate alerts within the same minute unless idempotency keys are unique. |
-| **Dashboard shows 500**       | Next.js build failed or D1 schema mismatch.       | Re-run `hoox deploy dashboard` and check logs: `hoox logs worker dashboard`.                                                        |
-| **Telegram bot unresponsive** | Webhook URL expired or token rotated.             | Re-register: `hoox deploy telegram-webhook` and verify token: `hoox secrets list telegram-worker`.                                 |
+| **Dashboard shows 500**       | Next.js build failed or D1 schema mismatch.       | Re-run `hoox deploy dashboard` and check logs: `hoox logs worker dashboard`.                                                      |
+| **Telegram bot unresponsive** | Webhook URL expired or token rotated.             | Re-register: `hoox deploy telegram-webhook` and verify token: `hoox secrets list telegram-worker`.                                |
 
 ---
 

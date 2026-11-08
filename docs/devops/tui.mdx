@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "TUI Code Architecture"
 description: "High-integrity architecture specifications, Zustand store configurations, and connection state machines of the Hoox Terminal UI."
+
 ---
 
 The **Hoox Terminal UI (TUI)** is a full-screen, keyboard-driven operations center built with **OpenTUI**, React 19, and Zustand. This document covers package layout, state, data flows, and crash recovery for engineers.
@@ -49,11 +51,11 @@ packages/tui/src/
 
 Stores are **not** under `packages/tui/src/stores` for production code — they live in `@hoox-sh/hoox-shared`:
 
-| Store | Path | Responsibility |
-| ----- | ---- | -------------- |
-| UI | `packages/shared/src/stores/ui-store.ts` | activeView, sidebar, modal, palette |
-| Service | `packages/shared/src/stores/service-store.ts` | workers, trades, logs, alerts, connection, SSE |
-| Config | `packages/shared/src/stores/config-store.ts` | theme (dark-only in TUI), refresh interval, notifications, shortcuts |
+| Store   | Path                                          | Responsibility                                                       |
+| ------- | --------------------------------------------- | -------------------------------------------------------------------- |
+| UI      | `packages/shared/src/stores/ui-store.ts`      | activeView, sidebar, modal, palette                                  |
+| Service | `packages/shared/src/stores/service-store.ts` | workers, trades, logs, alerts, connection, SSE                       |
+| Config  | `packages/shared/src/stores/config-store.ts`  | theme (dark-only in TUI), refresh interval, notifications, shortcuts |
 
 Session persistence: `$HOME/.hoox/.tui-state/session.json` via shared `restoreSession` / `saveSession`. All **16** `ViewId` values are valid for restore; unknown IDs fall back to `dashboard`.
 
@@ -67,10 +69,10 @@ Session persistence: `$HOME/.hoox/.tui-state/session.json` via shared `restoreSe
 
 Installed once from `packages/tui/src/test-setup.ts` (preload):
 
-| Double | Module | Control |
-| ------ | ------ | ------- |
-| CLI | `cli-bridge-test-double.ts` | `cliBridgeDouble` / `resetCliBridgeDouble()` (includes `pyneHealthCheck`) |
-| HTTP + SSE | `network-test-double.ts` | `setMockApiData` / `setMockApiFailure` / `emitSseEvent` |
+| Double     | Module                      | Control                                                                   |
+| ---------- | --------------------------- | ------------------------------------------------------------------------- |
+| CLI        | `cli-bridge-test-double.ts` | `cliBridgeDouble` / `resetCliBridgeDouble()` (includes `pyneHealthCheck`) |
+| HTTP + SSE | `network-test-double.ts`    | `setMockApiData` / `setMockApiFailure` / `emitSseEvent`                   |
 
 View tests must **not** call `mock.module` for `cli-bridge`, shared stores, `api-client`, or `sse`. Override methods on the doubles instead. Edge topology fixtures use `HOOX_GRAPH_METADATA_PATH` (temp file) rather than mocking `fs`.
 
@@ -80,24 +82,24 @@ View tests must **not** call `mock.module` for `cli-bridge`, shared stores, `api
 
 Must stay aligned with `ViewId` in `packages/shared/src/types.ts`, sidebar items, `view-registry.tsx`, and command palette entries:
 
-| ViewId | Component | Primary data source |
-| ------ | --------- | ------------------- |
-| `dashboard` | `DashboardView` | `fetchWorkers`, `monitorStatus`, `checkFix`, `agentHealthCheck`, `pyneHealthCheck`, kill-switch |
-| `workers` | `WorkersOverview` | store workers + CLI deploy/logs/repair |
-| `worker-detail` | `WorkerDetail` | `selectedWorkerId`, `configShow`, `workerLogs` |
-| `trade-monitor` | `TradeMonitor` | `tradeStream` (SSE `streamTrades`) |
-| `logs-viewer` | `LogsViewer` | `logs` (SSE `streamLogs` + CLI fetch) |
-| `service-manager` | `ServiceManager` | deploy/repair/rebuild/kill-switch |
-| `config-editor` | `ConfigEditor` | filesystem + `configValidate` |
-| `setup-wizard` | `SetupWizard` | wizard steps + `deployAll` |
-| `settings` | `SettingsView` | config store + connection snapshot + `checkSetup` / `checkFix` |
-| `queue-depth` | `QueueDepthView` | `monitorQueueDepth` |
-| `kv-viewer` | `KvViewer` | `configKvList` / `configKvGet` |
-| `secrets-viewer` | `SecretsViewer` | `configSecretsList` (names only) |
-| `ai-chat` | `AiChatView` | `agentChatStream` SSE |
-| `db-query` | `DbQueryView` | `validateReadOnlySql` + `dbQuery` |
-| `edge-topology` | `EdgeTopology` | monorepo `graph-metadata.json` |
-| `worker-settings` | `WorkerSettingsView` | dashboard.jsonc / worker settings via CLI |
+| ViewId            | Component            | Primary data source                                                                             |
+| ----------------- | -------------------- | ----------------------------------------------------------------------------------------------- |
+| `dashboard`       | `DashboardView`      | `fetchWorkers`, `monitorStatus`, `checkFix`, `agentHealthCheck`, `pyneHealthCheck`, kill-switch |
+| `workers`         | `WorkersOverview`    | store workers + CLI deploy/logs/repair                                                          |
+| `worker-detail`   | `WorkerDetail`       | `selectedWorkerId`, `configShow`, `workerLogs`                                                  |
+| `trade-monitor`   | `TradeMonitor`       | `tradeStream` (SSE `streamTrades`)                                                              |
+| `logs-viewer`     | `LogsViewer`         | `logs` (SSE `streamLogs` + CLI fetch)                                                           |
+| `service-manager` | `ServiceManager`     | deploy/repair/rebuild/kill-switch                                                               |
+| `config-editor`   | `ConfigEditor`       | filesystem + `configValidate`                                                                   |
+| `setup-wizard`    | `SetupWizard`        | wizard steps + `deployAll`                                                                      |
+| `settings`        | `SettingsView`       | config store + connection snapshot + `checkSetup` / `checkFix`                                  |
+| `queue-depth`     | `QueueDepthView`     | `monitorQueueDepth`                                                                             |
+| `kv-viewer`       | `KvViewer`           | `configKvList` / `configKvGet`                                                                  |
+| `secrets-viewer`  | `SecretsViewer`      | `configSecretsList` (names only)                                                                |
+| `ai-chat`         | `AiChatView`         | `agentChatStream` SSE                                                                           |
+| `db-query`        | `DbQueryView`        | `validateReadOnlySql` + `dbQuery`                                                               |
+| `edge-topology`   | `EdgeTopology`       | monorepo `graph-metadata.json`                                                                  |
+| `worker-settings` | `WorkerSettingsView` | dashboard.jsonc / worker settings via CLI                                                       |
 
 ---
 
@@ -105,26 +107,26 @@ Must stay aligned with `ViewId` in `packages/shared/src/types.ts`, sidebar items
 
 `hoox tui` resolves an API base URL and forwards it to the child process:
 
-| Launch | Mode | `HOOX_API_URL` | Status bar |
-| ------ | ---- | -------------- | ---------- |
-| `hoox tui` | `local` | `HOOX_API_URL` env or `http://localhost:8787` | `[LOCAL] localhost:8787` |
-| `hoox tui --remote` | `remote` | `resolveGatewayUrl()` (`HOOX_GATEWAY_URL` / CF account + wrangler subdomain) | `[REMOTE] <gateway-host>` |
-| `hoox tui --api-url <url>` | `remote` | explicit URL (strips trailing `/`; overrides `--remote`) | `[REMOTE] <host>` |
+| Launch                     | Mode     | `HOOX_API_URL`                                                               | Status bar                |
+| -------------------------- | -------- | ---------------------------------------------------------------------------- | ------------------------- |
+| `hoox tui`                 | `local`  | `HOOX_API_URL` env or `http://localhost:8787`                                | `[LOCAL] localhost:8787`  |
+| `hoox tui --remote`        | `remote` | `resolveGatewayUrl()` (`HOOX_GATEWAY_URL` / CF account + wrangler subdomain) | `[REMOTE] <gateway-host>` |
+| `hoox tui --api-url <url>` | `remote` | explicit URL (strips trailing `/`; overrides `--remote`)                     | `[REMOTE] <host>`         |
 
 Env vars set on the TUI process: `HOOX_API_URL`, `HOOX_TUI_MODE` (`local` \| `remote`), optional `HOOX_API_TOKEN`.  
 Shared `api-client` / `sse` read `HOOX_API_URL` + `HOOX_API_TOKEN` at import time.
 
 ### Security posture (operator plane)
 
-| Layer | Status |
-| ----- | ------ |
-| Client Bearer (`HOOX_API_TOKEN`) | Sent as `Authorization: Bearer …` by TUI HTTP/SSE via operator transport profile |
-| Access service token headers | Auto-attached when `CF_ACCESS_CLIENT_ID` + `CF_ACCESS_CLIENT_SECRET` are set |
-| Transport profile | `HOOX_TRANSPORT=public\|access\|mtls\|tunnel` (mtls/tunnel reserved; headers like public until certs land) |
-| Fail-closed remote launch | **Yes** — remote requires Bearer, Access env, or `--allow-insecure` |
-| Server management routes | **`/v1/*` on gateway** with `requireOperatorAuth` (`OPERATOR_API_KEY` preferred, else `INTERNAL_API_KEY`) |
-| Public liveness | `GET /health` remains unauthenticated (no secrets) |
-| Cloudflare Access / mTLS / tunnel edge | Put **Access** on a mgmt hostname; mTLS + tunnel are Enterprise / private-ingress follow-ups |
+| Layer                                  | Status                                                                                                     |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Client Bearer (`HOOX_API_TOKEN`)       | Sent as `Authorization: Bearer …` by TUI HTTP/SSE via operator transport profile                           |
+| Access service token headers           | Auto-attached when `CF_ACCESS_CLIENT_ID` + `CF_ACCESS_CLIENT_SECRET` are set                               |
+| Transport profile                      | `HOOX_TRANSPORT=public\|access\|mtls\|tunnel` (mtls/tunnel reserved; headers like public until certs land) |
+| Fail-closed remote launch              | **Yes** — remote requires Bearer, Access env, or `--allow-insecure`                                        |
+| Server management routes               | **`/v1/*` on gateway** with `requireOperatorAuth` (`OPERATOR_API_KEY` preferred, else `INTERNAL_API_KEY`)  |
+| Public liveness                        | `GET /health` remains unauthenticated (no secrets)                                                         |
+| Cloudflare Access / mTLS / tunnel edge | Put **Access** on a mgmt hostname; mTLS + tunnel are Enterprise / private-ingress follow-ups               |
 
 **Server secret:** `wrangler secret put OPERATOR_API_KEY` (value must match client `HOOX_API_TOKEN`).
 
@@ -134,16 +136,16 @@ Prefer a **dedicated management hostname** (e.g. `mgmt.example.com`) separate fr
 
 ### Auth token UX (remote)
 
-| Surface | Behavior |
-| ------- | -------- |
-| CLI launch | **Fails closed** without Bearer or Access env (unless `--allow-insecure`) |
-| CLI flags | `--token <value>` sets `HOOX_API_TOKEN` for the child only (never logged) |
-| Access env | `CF_ACCESS_CLIENT_ID` + `CF_ACCESS_CLIENT_SECRET` satisfy the launch gate |
-| Escape hatch | `--allow-insecure` remote without credentials (not recommended) |
-| Status bar | Remote without token → compact `AUTH?`; 401/403 → `AUTH!` |
-| Toasts | Mode-aware connect / lost / reconnect; auth missing & auth failed messages |
-| Startup | **REMOTE never uses CLI fallback** (gateway HTTP only); LOCAL may fall back to `cliBridge.monitorStatus()` |
-| Config file | `~/.hoox/config.json` written `0600` (may hold `apiToken`) |
+| Surface      | Behavior                                                                                                   |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| CLI launch   | **Fails closed** without Bearer or Access env (unless `--allow-insecure`)                                  |
+| CLI flags    | `--token <value>` sets `HOOX_API_TOKEN` for the child only (never logged)                                  |
+| Access env   | `CF_ACCESS_CLIENT_ID` + `CF_ACCESS_CLIENT_SECRET` satisfy the launch gate                                  |
+| Escape hatch | `--allow-insecure` remote without credentials (not recommended)                                            |
+| Status bar   | Remote without token → compact `AUTH?`; 401/403 → `AUTH!`                                                  |
+| Toasts       | Mode-aware connect / lost / reconnect; auth missing & auth failed messages                                 |
+| Startup      | **REMOTE never uses CLI fallback** (gateway HTTP only); LOCAL may fall back to `cliBridge.monitorStatus()` |
+| Config file  | `~/.hoox/config.json` written `0600` (may hold `apiToken`)                                                 |
 
 ### Dev logging
 
@@ -163,8 +165,8 @@ Wired at startup (`main.tsx`), connection path (`app.tsx`), and CLI bridge execs
 
 ### Startup sequence (`AppRoot`)
 
-1. Restore session → set view / sidebar  
-2. `fetchWorkers()` (HTTP) → on failure only, `cliBridge.monitorStatus()` (CLI fallback)  
+1. Restore session → set view / sidebar
+2. `fetchWorkers()` (HTTP) → on failure only, `cliBridge.monitorStatus()` (CLI fallback)
 3. Fire-and-forget `streamTrades()` + `streamLogs()` (SSE; silent if API down). Store retains abort handles; `stopStreams()` tears them down (re-subscribe replaces prior subscriptions).
 
 ### CLI bridge (`src/services/cli-bridge`)
@@ -188,9 +190,9 @@ Every primary view is wrapped. Render failures show Retry without killing sideba
 
 Process `uncaughtException` / `unhandledRejection` → CrashScreen:
 
-- **Restart** — remount AppRoot  
-- **Safe Mode** — remount with `safeMode`  
-- **Report Bug** — write `$HOME/.hoox/.tui-state/crash.log`  
+- **Restart** — remount AppRoot
+- **Safe Mode** — remount with `safeMode`
+- **Report Bug** — write `$HOME/.hoox/.tui-state/crash.log`
 
 ---
 
@@ -210,23 +212,23 @@ E2E smoke (`test/e2e/smoke.test.ts`) requires an interactive TTY; otherwise it s
 
 ## 📊 Graph integration
 
-- **Runtime topology view** reads `graph-metadata.json` (repo root), resolved from CWD walk-up or package-relative path.  
-- **Code graph** (`graph.json` / `graph.dot`) is produced by `bun run graph` (`scripts/extract-graph.ts`).  
-- All **16** view exports are present as function nodes under `packages/tui:…/views/…` (plus dashboard subpanels).  
+- **Runtime topology view** reads `graph-metadata.json` (repo root), resolved from CWD walk-up or package-relative path.
+- **Code graph** (`graph.json` / `graph.dot`) is produced by `bun run graph` (`scripts/extract-graph.ts`).
+- All **16** view exports are present as function nodes under `packages/tui:…/views/…` (plus dashboard subpanels).
 - Regenerate after large refactors: `bun run graph` (~25s). Metadata should include every worker under `workers/*`.
 
 ---
 
 ## Known limitations (honest)
 
-| Area | Limitation |
-| ---- | ---------- |
-| Worker Detail DOs | Names inferred from `durableObjectCount` + worker name; no DO listing API |
-| Worker Detail config | Falls back to demo-ish keys when `configShow` empty |
-| Trade/log live feed | Requires HTTP API + SSE endpoints; offline TUI uses CLI snapshots only |
-| `usePolling` hook | Exported but unused — views poll via effects / intervals |
-| CLI flags | `--fps` / `--no-mouse` set `TUI_FPS` / `TUI_MOUSE`; renderer reads them in `main.tsx` |
-| Graph freshness | Full `graph.json` can lag submodules until `bun run graph` is re-run |
+| Area                 | Limitation                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| Worker Detail DOs    | Names inferred from `durableObjectCount` + worker name; no DO listing API             |
+| Worker Detail config | Falls back to demo-ish keys when `configShow` empty                                   |
+| Trade/log live feed  | Requires HTTP API + SSE endpoints; offline TUI uses CLI snapshots only                |
+| `usePolling` hook    | Exported but unused — views poll via effects / intervals                              |
+| CLI flags            | `--fps` / `--no-mouse` set `TUI_FPS` / `TUI_MOUSE`; renderer reads them in `main.tsx` |
+| Graph freshness      | Full `graph.json` can lag submodules until `bun run graph` is re-run                  |
 
 <Tip>
 OpenTUI `<text>` children must be strings (or text nodes) — never nest `<text>` inside `<text>`. Prefer sibling `<text>` inside a row `<box>`.
@@ -234,6 +236,6 @@ OpenTUI `<text>` children must be strings (or text nodes) — never nest `<text>
 
 ### Next steps
 
-- **[Setup & Operations](/docs/devops/setup-and-operations)**  
-- **[Architecture overview](/docs/devops/architecture/overview)**  
-- **[End-user TUI guide](/docs/enduser/guides/tui)**  
+- **[Setup & Operations](/docs/devops/setup-and-operations)**
+- **[Architecture overview](/docs/devops/architecture/overview)**
+- **[End-user TUI guide](/docs/enduser/guides/tui)**

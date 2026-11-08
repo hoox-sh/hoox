@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "API Endpoint Directory"
 description: "Exhaustive HTTP REST API directory for the Hoox edge gateway, webhooks, analytics telemetry, and database queries."
+
 ---
 
 This directory provides the complete HTTP REST API specification for all public and internal endpoints exposed across the Hoox edge microservices stack.
@@ -102,12 +104,12 @@ Receives TradingView® alerts or automated cURL signals.
 
 Bearer `OPERATOR_API_KEY` via `requireOperatorAuth`. Prefer a dedicated management hostname (see [Zero Trust](/docs/devops/deployment/zero-trust)).
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `GET` | `/v1/health` | Operator auth + plane probe (`{ plane: "operator", … }`) |
-| `GET` | `/v1/workers` | Minimal worker list |
-| `GET` | `/v1/trades/stream` | SSE trades |
-| `GET` | `/v1/logs/stream` | SSE logs |
+| Method | Path                | Purpose                                                  |
+| ------ | ------------------- | -------------------------------------------------------- |
+| `GET`  | `/v1/health`        | Operator auth + plane probe (`{ plane: "operator", … }`) |
+| `GET`  | `/v1/workers`       | Minimal worker list                                      |
+| `GET`  | `/v1/trades/stream` | SSE trades                                               |
+| `GET`  | `/v1/logs/stream`   | SSE logs                                                 |
 
 Do **not** put operator Bearer on TradingView® `/webhook`.
 
@@ -119,17 +121,17 @@ The hoox gateway proxies allowlisted wallet paths to `web3-wallet-worker` (`WEB3
 
 Allowlisted upstream paths (GET, POST, and PUT on each gateway path):
 
-| Gateway path | Upstream | Typical use |
-| ------------ | -------- | ----------- |
-| `/wallet` | `/` | Wallet init / address |
-| `/wallet/status` | `/status` | Address, enabled flag, chains |
-| `/wallet/config` | `/config` | Read or update wallet config |
-| `/wallet/balance` | `/balance` | Native or token balance |
-| `/wallet/transfer` | `/transfer` | Token transfer |
-| `/wallet/approve` | `/approve` | ERC-20 approve |
-| `/wallet/quote` | `/quote` | DEX quote |
-| `/wallet/swap` | `/swap` | DEX swap (Uniswap V3 / Jupiter) |
-| `/wallet/transactions` | `/transactions` | Recent wallet txs |
+| Gateway path           | Upstream        | Typical use                     |
+| ---------------------- | --------------- | ------------------------------- |
+| `/wallet`              | `/`             | Wallet init / address           |
+| `/wallet/status`       | `/status`       | Address, enabled flag, chains   |
+| `/wallet/config`       | `/config`       | Read or update wallet config    |
+| `/wallet/balance`      | `/balance`      | Native or token balance         |
+| `/wallet/transfer`     | `/transfer`     | Token transfer                  |
+| `/wallet/approve`      | `/approve`      | ERC-20 approve                  |
+| `/wallet/quote`        | `/quote`        | DEX quote                       |
+| `/wallet/swap`         | `/swap`         | DEX swap (Uniswap V3 / Jupiter) |
+| `/wallet/transactions` | `/transactions` | Recent wallet txs               |
 
 Any other `/wallet/...` path is not forwarded.
 

@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "TradingView® Webhook Integration"
 description: "How to configure TradingView® alerts, write copy-paste Pine Script™ v6 indicators, and link webhook signals to your edge gateway."
+
 ---
 
 Connecting **TradingView® Alerts** directly to your Hoox edge gateway is the most common way to automate your trading strategies. By combining TradingView® charting with Hoox's low-latency edge execution, you can trigger orders instantly based on mathematical indicators, chart patterns, or custom Pine Script™ v6 logic.
@@ -60,9 +62,9 @@ if (shortCondition)
   `WEBHOOK_API_KEY_BINDING` on the hoox gateway (`hoox setup` writes it). A
   mismatch is rejected (`403 Forbidden`). For exchange testnet rehearsal, add
   `"test": true` to the JSON and configure `EXCHANGE_TESTNET_*` secrets — see
-  [Test Trading](/docs/enduser/guides/test-trading). DEX spots use
-  `exchange: "uniswap-ethereum"` (or `uniswap-arbitrum` / `jupiter-solana`) and
-  `symbol: "ETH/USDC"` — they reject `"test": true`.
+  [Test Trading](/docs/enduser/guides/test-trading). DEX spots use `exchange:
+  "uniswap-ethereum"` (or `uniswap-arbitrum` / `jupiter-solana`) and `symbol:
+  "ETH/USDC"` — they reject `"test": true`.
 </Tip>
 
 ---

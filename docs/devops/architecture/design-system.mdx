@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Visual Tokens & Design System"
 description: "Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI."
+
 ---
 
 The **dashboard** (Next.js 16) is the visual source of truth. Tokens live in `workers/dashboard/src/app/globals.css`. Landing pages and docs follow the same accent and type language.
@@ -41,11 +43,11 @@ Hoox uses OKLCH for perceptually uniform brightness. Dark is the primary theme; 
 
 ## 🔤 3. Typography
 
-| Aesthetic Layer      | Font Family                            | CSS Utility    | Use Case                                          |
-| :------------------- | :------------------------------------- | :------------- | :------------------------------------------------ |
-| **Primary Titles**   | `"Bebas Neue", sans-serif`             | `font-heading` | Card headers, page titles.                        |
-| **Prose & Body**     | `"IBM Plex Sans", sans-serif`          | `font-sans`    | Explanatory text, paragraphs, tables.             |
-| **Technical Chrome** | `"IBM Plex Mono", monospace`           | `font-mono`    | Inputs, SQL, code, navigation chrome.             |
+| Aesthetic Layer      | Font Family                   | CSS Utility    | Use Case                              |
+| :------------------- | :---------------------------- | :------------- | :------------------------------------ |
+| **Primary Titles**   | `"Bebas Neue", sans-serif`    | `font-heading` | Card headers, page titles.            |
+| **Prose & Body**     | `"IBM Plex Sans", sans-serif` | `font-sans`    | Explanatory text, paragraphs, tables. |
+| **Technical Chrome** | `"IBM Plex Mono", monospace`  | `font-mono`    | Inputs, SQL, code, navigation chrome. |
 
 Loaded via `next/font/google` in the dashboard layout (`--font-bebas`, `--font-ibm-plex-sans`, `--font-ibm-plex-mono`).
 

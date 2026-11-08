@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "telegram-worker Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox Telegram Notification & Command Worker, covering RAG vectorized indexes, R2 uploads, and alert payloads."
+
 ---
 
 The **`telegram-worker`** serves as the dynamic communicator of the Hoox trading ecosystem. Running as an isolated edge microservice, it parses incoming chat commands forwarded from Telegram's webhooks, executes retrieval-augmented generation (RAG) queries via Vectorize, analyzes screenshots using AI vision models, and dispatches real-time HTML/Markdown formatting order alerts to your mobile.
@@ -139,17 +141,17 @@ The bot does not just return static responses. When you send `/ask <question>` (
 
 ### Bot commands (authorized chats only)
 
-| Command | Behavior |
-| ------- | -------- |
-| `/start` | Help text |
-| `/status` | Kill-switch state from `CONFIG_KV` |
-| `/latest` / `/trades` | Latest trade signal from R2 (`latest_trade_signal.json` or `signals/*`) |
-| `/positions` | Points operators to the dashboard |
-| `/search <query>` | Vectorize semantic search over indexed messages |
-| `/ask <question>` | RAG answer over Vectorize context |
-| `/kill_on` / `/kill_off` | Engage / release global kill switch in KV |
-| (photo) | Download → R2 → vision caption (path validated, AI timeout) |
-| (other text) | Index into Vectorize for future search |
+| Command                  | Behavior                                                                |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `/start`                 | Help text                                                               |
+| `/status`                | Kill-switch state from `CONFIG_KV`                                      |
+| `/latest` / `/trades`    | Latest trade signal from R2 (`latest_trade_signal.json` or `signals/*`) |
+| `/positions`             | Points operators to the dashboard                                       |
+| `/search <query>`        | Vectorize semantic search over indexed messages                         |
+| `/ask <question>`        | RAG answer over Vectorize context                                       |
+| `/kill_on` / `/kill_off` | Engage / release global kill switch in KV                               |
+| (photo)                  | Download → R2 → vision caption (path validated, AI timeout)             |
+| (other text)             | Index into Vectorize for future search                                  |
 
 ---
 

@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Idempotency"
 description: "Two-phase Durable Object reserve/commit/release so webhook retries cannot double-dispatch orders."
+
 ---
 
 # 🔒 Idempotency & Durable Objects
@@ -90,22 +92,23 @@ Before any queue or service dispatch:
 
 <ol>
   <li>
-    The gateway shards to an <code>IdempotencyStore</code> instance from the key.
-    Missing <code>IDEMPOTENCY_STORE</code> binding → <strong>fail-closed</strong>{" "}
-    (<code>503</code> / <code>IDEMPOTENCY_UNAVAILABLE</code>).
+    The gateway shards to an <code>IdempotencyStore</code> instance from the
+    key. Missing <code>IDEMPOTENCY_STORE</code> binding →{" "}
+    <strong>fail-closed</strong> (<code>503</code> /{" "}
+    <code>IDEMPOTENCY_UNAVAILABLE</code>).
   </li>
   <li>
     <strong>reserve</strong>: under single-threaded DO execution, pending or
-    committed keys in TTL return duplicate; new keys become{" "}
-    <code>pending</code> so concurrent retries cannot double-dispatch.
+    committed keys in TTL return duplicate; new keys become <code>pending</code>{" "}
+    so concurrent retries cannot double-dispatch.
   </li>
   <li>
     On pipeline <strong>success</strong>: <strong>commit</strong> so further
     retries stay blocked for the TTL.
   </li>
   <li>
-    On soft-fail (<code>success: false</code> even with HTTP 2xx) or hard
-    error: <strong>release</strong> so a later retry can reserve again.
+    On soft-fail (<code>success: false</code> even with HTTP 2xx) or hard error:{" "}
+    <strong>release</strong> so a later retry can reserve again.
   </li>
 </ol>
 

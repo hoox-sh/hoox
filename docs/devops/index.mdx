@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "⚙️ DevOps Manual"
 description: "Infrastructure provisioning, deployment sequences, secret management, and edge operations reference for Hoox administrators."
+
 ---
 
 <Tip>
@@ -13,10 +15,10 @@ description: "Infrastructure provisioning, deployment sequences, secret manageme
   administrators, security engineers, and platform operators responsible for
   provisioning edge databases, orchestrating secure V8 service bindings,
   deploying multi-exchange execution workers, auditing secrets, and monitoring
-  system health. Day-to-day ops are **CLI-first**: `hoox` / `hx` for
-  `onboard`, `init`, `setup`, `deploy all --auto`, `secrets set`, `workers
-  list`, `check health`, `doctor`, `tui`, `tunnel check`, `pyne`, `perf
-  fastpath`, and `trace`.
+  system health. Day-to-day ops are **CLI-first**: `hoox` / `hx` for `onboard`,
+  `init`, `setup`, `deploy all --auto`, `secrets set`, `workers list`, `check
+  health`, `doctor`, `tui`, `tunnel check`, `pyne`, `perf fastpath`, and
+  `trace`.
 </Tip>
 
 ```mermaid
@@ -53,14 +55,14 @@ graph TD
 
 HOOX docs use the same **multi-tab** layout as AXIS / PYNE. This **DevOps** tab is for install, local development, deploy, security, and tooling. Sibling tabs hold the rest of the platform:
 
-| Tab | Contents |
-| --- | -------- |
-| [End User](/docs/enduser) | Getting started, concepts, guides, tutorials |
-| [Architecture](/docs/devops/architecture) | Topology, data flow, storage, ADRs |
-| [Workers](/docs/devops/workers) | Per-isolate profiles |
-| **DevOps** (this page) | Setup, development, deployment, security, CLI/TUI |
-| [API](/docs/devops/api) | HTTP endpoints, payloads, responses |
-| [Enterprise](/docs/enterprise) | Multi-tenancy, compliance (commercial notes) |
+| Tab                                       | Contents                                          |
+| ----------------------------------------- | ------------------------------------------------- |
+| [End User](/docs/enduser)                 | Getting started, concepts, guides, tutorials      |
+| [Architecture](/docs/devops/architecture) | Topology, data flow, storage, ADRs                |
+| [Workers](/docs/devops/workers)           | Per-isolate profiles                              |
+| **DevOps** (this page)                    | Setup, development, deployment, security, CLI/TUI |
+| [API](/docs/devops/api)                   | HTTP endpoints, payloads, responses               |
+| [Enterprise](/docs/enterprise)            | Multi-tenancy, compliance (commercial notes)      |
 
 ---
 
@@ -96,8 +98,8 @@ HOOX docs use the same **multi-tab** layout as AXIS / PYNE. This **DevOps** tab 
 ---
 
 <Tip>
-  First production deploy? Start with
-  **[Production Deployment](/docs/devops/deployment/production)** to verify Cloudflare
+  First production deploy? Start with **[Production
+  Deployment](/docs/devops/deployment/production)** to verify Cloudflare
   permissions and sequential worker rollout.
 </Tip>
 

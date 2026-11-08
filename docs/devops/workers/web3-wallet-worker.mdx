@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "web3-wallet-worker Isolate Profile"
 description: "On-chain wallet isolate: EVM transfers, Uniswap V3 swaps (Ethereum/Arbitrum), Jupiter Swap V2 (Solana), and fail-closed security policy."
+
 ---
 
 The **`web3-wallet-worker`** is the on-chain gateway of the Hoox trading ecosystem. It holds EVM and Solana signing material as Workers Secrets, prices mutating txs server-side, and executes Uniswap V3 (Ethereum, Arbitrum) plus Jupiter Swap V2 (Solana). `trade-worker` calls `POST /swap` over the `WEB3_WALLET_SERVICE` binding.
@@ -88,18 +90,18 @@ WALLET_EXECUTE_KEY_BINDING=dev_shared_internal_security_key
 
 All endpoints except `GET /health` require `X-Internal-Auth-Key` (fail-closed via `createInternalAuthMiddleware`).
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `GET` | `/` | Derive wallet address from secrets (identity init) |
-| `GET` | `/health` | Liveness (unauthenticated) |
-| `GET` | `/status` | Address + config summary |
-| `GET` / `PUT` | `/config` | Read / deep-merge wallet security + DEX config |
-| `GET` | `/balance?chain=&address=&token=` | Native or ERC-20 balance |
-| `POST` | `/transfer` | ERC-20 transfer (server-side USD pricing + policy) |
-| `POST` | `/approve` | ERC-20 approve (spender whitelist + maxApprovalAmount) |
-| `GET` | `/quote` | DEX quote (read-only) |
-| `POST` | `/swap` | DEX swap: Uniswap V2/V3 (ethereum, arbitrum) or Jupiter Swap V2 (solana) |
-| `GET` | `/transactions` | List stored tx records (D1) |
+| Method        | Path                              | Purpose                                                                  |
+| ------------- | --------------------------------- | ------------------------------------------------------------------------ |
+| `GET`         | `/`                               | Derive wallet address from secrets (identity init)                       |
+| `GET`         | `/health`                         | Liveness (unauthenticated)                                               |
+| `GET`         | `/status`                         | Address + config summary                                                 |
+| `GET` / `PUT` | `/config`                         | Read / deep-merge wallet security + DEX config                           |
+| `GET`         | `/balance?chain=&address=&token=` | Native or ERC-20 balance                                                 |
+| `POST`        | `/transfer`                       | ERC-20 transfer (server-side USD pricing + policy)                       |
+| `POST`        | `/approve`                        | ERC-20 approve (spender whitelist + maxApprovalAmount)                   |
+| `GET`         | `/quote`                          | DEX quote (read-only)                                                    |
+| `POST`        | `/swap`                           | DEX swap: Uniswap V2/V3 (ethereum, arbitrum) or Jupiter Swap V2 (solana) |
+| `GET`         | `/transactions`                   | List stored tx records (D1)                                              |
 
 ### Swap (`POST /swap`)
 

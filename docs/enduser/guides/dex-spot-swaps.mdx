@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "DEX spot swaps"
 description: "Route Uniswap V3 (Ethereum, Arbitrum) and Jupiter Swap V2 (Solana) through trade-worker signals. Setup, secrets, pair syntax, and test-flag limits."
+
 ---
 
 Spot DEX venues use the same webhook vocabulary as CEX (`LONG` / `SHORT` / `CLOSE_*`) but execute as ExactIn swaps in `web3-wallet-worker`. Signing never leaves that isolate. Perpetual DEX venues are **not supported**.
@@ -14,11 +16,11 @@ Spot DEX venues use the same webhook vocabulary as CEX (`LONG` / `SHORT` / `CLOS
 
 ## Venues
 
-| `exchange` | Chain | Router | Pair syntax | `test: true` |
-| ---------- | ----- | ------ | ----------- | ------------ |
-| `uniswap-ethereum` | Ethereum | Uniswap V3 (`SwapRouter02`) | `BASE/QUOTE` (e.g. `ETH/USDC`) | Rejected |
-| `uniswap-arbitrum` | Arbitrum | Uniswap V3 (`SwapRouter02`) | `BASE/QUOTE` | Rejected |
-| `jupiter-solana` | Solana | Jupiter Swap V2 (`/order` + `/execute`) | `BASE/QUOTE` (e.g. `SOL/USDC`) | Rejected |
+| `exchange`         | Chain    | Router                                  | Pair syntax                    | `test: true` |
+| ------------------ | -------- | --------------------------------------- | ------------------------------ | ------------ |
+| `uniswap-ethereum` | Ethereum | Uniswap V3 (`SwapRouter02`)             | `BASE/QUOTE` (e.g. `ETH/USDC`) | Rejected     |
+| `uniswap-arbitrum` | Arbitrum | Uniswap V3 (`SwapRouter02`)             | `BASE/QUOTE`                   | Rejected     |
+| `jupiter-solana`   | Solana   | Jupiter Swap V2 (`/order` + `/execute`) | `BASE/QUOTE` (e.g. `SOL/USDC`) | Rejected     |
 
 KV toggles (dashboard **Exchanges** section, or CLI):
 
@@ -34,14 +36,14 @@ Unset means enabled. `"false"` skips the venue.
 
 ## What `hoox setup` fills
 
-| Secret / var | Automatic? |
-| ------------ | ---------- |
-| `WALLET_EXECUTE_KEY_BINDING` | Yes — mesh key, same value as `INTERNAL_KEY_BINDING` |
-| `SOLANA_PRIVATE_KEY` | Yes if missing — 32-byte base58 seed. Existing Phantom exports are kept |
-| `RPC_URL_ARBITRUM` / `RPC_URL_SOLANA` | Yes if empty — public RPCs |
-| `WEB3_WALLET_SERVICE` binding on trade-worker | Yes — wrangler materialize |
-| `JUPITER_API_KEY` | **No** — [Jupiter portal](https://developers.jup.ag/portal) |
-| `WALLET_PK_SECRET` / `WALLET_MNEMONIC_SECRET` | **No** — EVM signing material |
+| Secret / var                                  | Automatic?                                                              |
+| --------------------------------------------- | ----------------------------------------------------------------------- |
+| `WALLET_EXECUTE_KEY_BINDING`                  | Yes — mesh key, same value as `INTERNAL_KEY_BINDING`                    |
+| `SOLANA_PRIVATE_KEY`                          | Yes if missing — 32-byte base58 seed. Existing Phantom exports are kept |
+| `RPC_URL_ARBITRUM` / `RPC_URL_SOLANA`         | Yes if empty — public RPCs                                              |
+| `WEB3_WALLET_SERVICE` binding on trade-worker | Yes — wrangler materialize                                              |
+| `JUPITER_API_KEY`                             | **No** — [Jupiter portal](https://developers.jup.ag/portal)             |
+| `WALLET_PK_SECRET` / `WALLET_MNEMONIC_SECRET` | **No** — EVM signing material                                           |
 
 ```bash
 hoox setup
@@ -66,10 +68,10 @@ DEX venues require **`BASE/QUOTE`** (slash). Compact CEX tickers like `ETHUSDC` 
 }
 ```
 
-| Action | Swap |
-| ------ | ---- |
+| Action                 | Swap                              |
+| ---------------------- | --------------------------------- |
 | `LONG` / `CLOSE_SHORT` | Spend QUOTE to buy BASE (ExactIn) |
-| `SHORT` / `CLOSE_LONG` | Sell BASE for QUOTE |
+| `SHORT` / `CLOSE_LONG` | Sell BASE for QUOTE               |
 
 `quantity` is in **quote units** on buy (`LONG` of `ETH/USDC` with `100` spends 100 USDC) and **base units** on sell. Curated symbols: ETH, WETH, USDC, USDT, DAI, WBTC, SOL.
 

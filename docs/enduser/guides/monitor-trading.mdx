@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Monitoring operations"
 description: "Probe worker health, toggle the kill switch, inspect trades and queues, and tail edge logs."
+
 ---
 
 # 📈 Monitoring Operations
@@ -52,12 +54,12 @@ The CLI runs asynchronous concurrent health probes, displaying green indicators 
 
 ### Interpreting Health States
 
-| Indicator   | Meaning                               | Action Required                            |
-| ----------- | ------------------------------------- | ------------------------------------------ |
-| ✅ OK       | All bindings active, D1 responsive    | None — operating normally                  |
+| Indicator   | Meaning                               | Action Required                              |
+| ----------- | ------------------------------------- | -------------------------------------------- |
+| ✅ OK       | All bindings active, D1 responsive    | None — operating normally                    |
 | ⚠️ DEGRADED | Some bindings unavailable             | Check `hoox logs worker <worker>` for errors |
-| ❌ FAILED   | Worker unreachable or D1 disconnected | Run `hoox repair check` immediately        |
-| 🔄 STARTING | Worker is still booting after deploy  | Wait 30–60 seconds and retry               |
+| ❌ FAILED   | Worker unreachable or D1 disconnected | Run `hoox repair check` immediately          |
+| 🔄 STARTING | Worker is still booting after deploy  | Wait 30–60 seconds and retry                 |
 
 ---
 
@@ -123,15 +125,15 @@ This aggregates entries from your production D1 database and prints a formatted 
 
 ### Trade Status Codes
 
-| Status          | Meaning                                                                 |
-| --------------- | ----------------------------------------------------------------------- |
-| `EXECUTED`      | Live order filled; written by trade-worker to D1                        |
-| `TEST_EXECUTED` | Testnet (`"test": true`) fill; excluded from dashboard headline stats   |
-| `Filled`        | Exchange-side full fill (report/CLI display)                            |
-| `Partial`       | Only portion filled; remainder queued                                   |
-| `Rejected`      | Exchange returned a business logic error                                |
-| `Failed`        | Max queue retries exhausted; logged for review                          |
-| `Enqueued`      | Submitted to Cloudflare® Queues for async retry                         |
+| Status          | Meaning                                                               |
+| --------------- | --------------------------------------------------------------------- |
+| `EXECUTED`      | Live order filled; written by trade-worker to D1                      |
+| `TEST_EXECUTED` | Testnet (`"test": true`) fill; excluded from dashboard headline stats |
+| `Filled`        | Exchange-side full fill (report/CLI display)                          |
+| `Partial`       | Only portion filled; remainder queued                                 |
+| `Rejected`      | Exchange returned a business logic error                              |
+| `Failed`        | Max queue retries exhausted; logged for review                        |
+| `Enqueued`      | Submitted to Cloudflare® Queues for async retry                       |
 
 Sandbox fills use position ids like `bybit-testnet-BTCUSDT-LONG`. Filter them in the Dashboard Positions **mode** control (Live only / Testnet / Live + Test). See [Test Trading](/docs/enduser/guides/test-trading).
 
@@ -152,12 +154,12 @@ This displays the number of pending messages in the queue:
 
 ### Queue Health Indicators
 
-| Queue Depth | Risk Level  | Recommended Action                                                                                 |
-| :---------: | :---------: | -------------------------------------------------------------------------------------------------- |
-|      0      |  🟢 Normal  | No action needed                                                                                   |
-|     1–5     | 🟡 Watchful | Monitor exchange health pages                                                                      |
+| Queue Depth | Risk Level  | Recommended Action                                                                                   |
+| :---------: | :---------: | ---------------------------------------------------------------------------------------------------- |
+|      0      |  🟢 Normal  | No action needed                                                                                     |
+|     1–5     | 🟡 Watchful | Monitor exchange health pages                                                                        |
 |    6–20     | 🟠 Elevated | Check exchange maintenance schedule; consider `hoox config kv set webhook:queue_mode queue_disabled` |
-|    20\+     | 🔴 Critical | Verify exchange API keys are valid; check rate limit headers; scale manually if needed             |
+|    20\+     | 🔴 Critical | Verify exchange API keys are valid; check rate limit headers; scale manually if needed               |
 
 ---
 
@@ -201,21 +203,22 @@ hoox dashboard dev
 
 ### Key Metrics Tracked
 
-| Metric           | Source            | Description                      |
-| ---------------- | ----------------- | -------------------------------- |
-| Orders/Min       | analytics-worker  | Trade execution throughput       |
-| Avg Latency (ms) | analytics-worker  | Signal-to-fill round-trip time   |
-| Error Rate (%)   | analytics-worker  | Failed orders / total attempts   |
-| Queue Depth      | Cloudflare® Queues | Pending execution backlog       |
-| Daily P&L        | D1 Database       | Realized profit/loss calculation |
-| Drawdown %       | agent-worker      | Current daily asset drawdown     |
+| Metric           | Source             | Description                      |
+| ---------------- | ------------------ | -------------------------------- |
+| Orders/Min       | analytics-worker   | Trade execution throughput       |
+| Avg Latency (ms) | analytics-worker   | Signal-to-fill round-trip time   |
+| Error Rate (%)   | analytics-worker   | Failed orders / total attempts   |
+| Queue Depth      | Cloudflare® Queues | Pending execution backlog        |
+| Daily P&L        | D1 Database        | Realized profit/loss calculation |
+| Drawdown %       | agent-worker       | Current daily asset drawdown     |
 
 ---
 
 <Tip>
   If the system status check returns a red error indicator (e.g. `d1-worker ...
   ❌ FAILED`), immediately proceed to the [**Self-Healing & Repair
-  Guide**](/docs/enduser/guides/repair) to run automated diagnostics and restore service bindings!
+  Guide**](/docs/enduser/guides/repair) to run automated diagnostics and restore
+  service bindings!
 </Tip>
 
 ### 🔗 Next Steps

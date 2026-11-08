@@ -4,18 +4,26 @@
 -->
 
 ---
+
 title: "Next.js Dashboard & OpenNext Isolate"
 description: "Comprehensive engineering specification for the Next.js 16 Hoox Dashboard, covering Turbopack builds, OpenNext adapters, and Cloudflare Workers hosting."
+
 ---
 
 The **Hoox Dashboard** is the web-based command center of the trading platform. Rather than running on a traditional server, the dashboard is a **Next.js 16 application** compiled using the **OpenNext adapter** and hosted natively on Cloudflare Workers. This edge-first layout allows for real-time portfolio monitoring, dynamic form-based settings editing, and interactive kill-switch controls at microsecond speeds.
 
 <Frame caption="Setup wizard with Cloudflare infrastructure map">
-  <img src="/docs/images/dashboard/setup.png" alt="Dashboard setup wizard welcome and infrastructure" />
+  <img
+    src="/docs/images/dashboard/setup.png"
+    alt="Dashboard setup wizard welcome and infrastructure"
+  />
 </Frame>
 
 <Frame caption="Navigating primary dashboard pages">
-  <img src="/docs/images/gifs/dashboard-nav.gif" alt="GIF of dashboard sidebar navigation" />
+  <img
+    src="/docs/images/gifs/dashboard-nav.gif"
+    alt="GIF of dashboard sidebar navigation"
+  />
 </Frame>
 
 Page-by-page stills: [Interface gallery](/docs/enduser/guides/screenshots#dashboard).
@@ -24,12 +32,12 @@ Page-by-page stills: [Interface gallery](/docs/enduser/guides/screenshots#dashbo
 
 The **Positions** table integrates with exchange testnet fills produced when webhooks carry `"test": true`:
 
-| UI feature | Behavior |
-| ---------- | -------- |
-| Mode filter | **Live only** (default) · **Testnet** · **Live + Test** |
-| **TEST** badge | Shown next to the exchange for rows whose id contains `-testnet-` |
-| Close action | Sends `test: true` on the trade-worker webhook when closing a testnet position |
-| Headline stats | D1 dashboard stats exclude `TEST_EXECUTED` trades and `*-testnet-*` positions |
+| UI feature     | Behavior                                                                       |
+| -------------- | ------------------------------------------------------------------------------ |
+| Mode filter    | **Live only** (default) · **Testnet** · **Live + Test**                        |
+| **TEST** badge | Shown next to the exchange for rows whose id contains `-testnet-`              |
+| Close action   | Sends `test: true` on the trade-worker webhook when closing a testnet position |
+| Headline stats | D1 dashboard stats exclude `TEST_EXECUTED` trades and `*-testnet-*` positions  |
 
 See [Test Trading](/docs/enduser/guides/test-trading).
 
@@ -37,11 +45,11 @@ See [Test Trading](/docs/enduser/guides/test-trading).
 
 These dashboard pages call **dashboard** `/api/agent/*` routes, not agent-worker:
 
-| Page | Route | Behavior |
-| ---- | ----- | -------- |
-| Reasoning | `POST /api/agent/reasoning` | Workers AI when the model id includes `deepseek`; otherwise a mock reasoning/answer plus a note to configure keys |
-| Usage | `GET /api/agent/usage` | Reads `CONFIG_KV` `agent:usage`; empty object when unset |
-| Chat streaming | `POST /api/agent/chat` | SSE from the dashboard `AI` binding when `stream` is true |
+| Page           | Route                       | Behavior                                                                                                          |
+| -------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Reasoning      | `POST /api/agent/reasoning` | Workers AI when the model id includes `deepseek`; otherwise a mock reasoning/answer plus a note to configure keys |
+| Usage          | `GET /api/agent/usage`      | Reads `CONFIG_KV` `agent:usage`; empty object when unset                                                          |
+| Chat streaming | `POST /api/agent/chat`      | SSE from the dashboard `AI` binding when `stream` is true                                                         |
 
 agent-worker itself has chat, vision, embedding, risk-override, status, config, models, health, and housekeeping — and **does not** implement `/agent/reasoning` or `/agent/usage`. See [agent-worker](/docs/devops/workers/agent-worker).
 

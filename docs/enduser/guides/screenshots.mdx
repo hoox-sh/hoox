@@ -4,20 +4,27 @@
 -->
 
 ---
+
 title: "Interface gallery"
 description: "Screenshots and short GIFs of the HOOX CLI, TUI, and dashboard — every primary view, command group, and page."
+
 ---
 
 The same stack has three operator surfaces. Stills live under [`docs/images/`](https://github.com/hoox-sh/hoox/tree/main/docs/images). GIFs are looping, cropped tours — not recordings of a live exchange.
 
 <Note>
-  TUI stills were captured against a local mesh (`localhost:8787`). Dashboard stills use a local Next.js dev server without worker bindings, so metric cards may show empty or skeleton states. Setup, chrome, and navigation are complete.
+  TUI stills were captured against a local mesh (`localhost:8787`). Dashboard
+  stills use a local Next.js dev server without worker bindings, so metric cards
+  may show empty or skeleton states. Setup, chrome, and navigation are complete.
 </Note>
 
 ## CLI
 
 <Frame caption="Deploy command group help">
-  <img src="/docs/images/cli/help-deploy.png" alt="hoox deploy --help in a terminal" />
+  <img
+    src="/docs/images/cli/help-deploy.png"
+    alt="hoox deploy --help in a terminal"
+  />
 </Frame>
 
 ```bash
@@ -27,7 +34,10 @@ hx doctor
 ```
 
 <Frame caption="Help tour: version, logs, TUI, doctor">
-  <img src="/docs/images/gifs/cli-help-tour.gif" alt="Animated tour of hoox version and help screens" />
+  <img
+    src="/docs/images/gifs/cli-help-tour.gif"
+    alt="Animated tour of hoox version and help screens"
+  />
 </Frame>
 
 <Frame caption="hx doctor">
@@ -35,18 +45,21 @@ hx doctor
 </Frame>
 
 <Frame caption="hx check health">
-  <img src="/docs/images/gifs/cli-check-health.gif" alt="Animated hoox check health probes" />
+  <img
+    src="/docs/images/gifs/cli-check-health.gif"
+    alt="Animated hoox check health probes"
+  />
 </Frame>
 
-| Still | Command |
-| --- | --- |
+| Still                                                 | Command               |
+| ----------------------------------------------------- | --------------------- |
 | [help-onboard.png](/docs/images/cli/help-onboard.png) | `hoox onboard --help` |
-| [help-deploy.png](/docs/images/cli/help-deploy.png) | `hoox deploy --help` |
-| [help-tui.png](/docs/images/cli/help-tui.png) | `hoox tui --help` |
-| [doctor.png](/docs/images/cli/doctor.png) | `hoox doctor` |
-| [help-pyne.png](/docs/images/cli/help-pyne.png) | `hoox pyne --help` |
+| [help-deploy.png](/docs/images/cli/help-deploy.png)   | `hoox deploy --help`  |
+| [help-tui.png](/docs/images/cli/help-tui.png)         | `hoox tui --help`     |
+| [doctor.png](/docs/images/cli/doctor.png)             | `hoox doctor`         |
+| [help-pyne.png](/docs/images/cli/help-pyne.png)       | `hoox pyne --help`    |
 | [help-secrets.png](/docs/images/cli/help-secrets.png) | `hoox secrets --help` |
-| [help-infra.png](/docs/images/cli/help-infra.png) | `hoox infra --help` |
+| [help-infra.png](/docs/images/cli/help-infra.png)     | `hoox infra --help`   |
 
 Every top-level group has a `help-<group>.png` in the [cli stills folder](https://github.com/hoox-sh/hoox/tree/main/docs/images/cli). Full command tree: [CLI commands](/docs/enduser/reference/cli-commands).
 
@@ -55,43 +68,58 @@ Every top-level group has a `help-<group>.png` in the [cli stills folder](https:
 Launch: `hoox tui` (or `hx tui`). Shortcuts: `Ctrl+1`–`Ctrl+9`, `Ctrl+0`, `Ctrl+Alt+K/S/Q/C/E/W`. See [Terminal UI](/docs/enduser/guides/tui).
 
 <Frame caption="Dashboard view — service health and model status">
-  <img src="/docs/images/tui/dashboard.png" alt="HOOX TUI dashboard with worker health grid" />
+  <img
+    src="/docs/images/tui/dashboard.png"
+    alt="HOOX TUI dashboard with worker health grid"
+  />
 </Frame>
 
 <Frame caption="Cycling primary views">
-  <img src="/docs/images/gifs/tui-view-switch.gif" alt="GIF switching HOOX TUI views" />
+  <img
+    src="/docs/images/gifs/tui-view-switch.gif"
+    alt="GIF switching HOOX TUI views"
+  />
 </Frame>
 
 <Frame caption="Setup wizard — API keys step">
-  <img src="/docs/images/tui/setup-wizard-step-02-api-keys.png" alt="TUI setup wizard step 2 API keys" />
+  <img
+    src="/docs/images/tui/setup-wizard-step-02-api-keys.png"
+    alt="TUI setup wizard step 2 API keys"
+  />
 </Frame>
 
 <Frame caption="Wizard steps 1–7 (step 1 may show local wrangler whoami)">
-  <img src="/docs/images/gifs/tui-setup-wizard-steps.gif" alt="GIF of TUI setup wizard steps" />
+  <img
+    src="/docs/images/gifs/tui-setup-wizard-steps.gif"
+    alt="GIF of TUI setup wizard steps"
+  />
 </Frame>
 
 <Frame caption="Command palette (Ctrl+P)">
-  <img src="/docs/images/tui/command-palette.png" alt="TUI command palette overlay" />
+  <img
+    src="/docs/images/tui/command-palette.png"
+    alt="TUI command palette overlay"
+  />
 </Frame>
 
-| View | File | Shortcut |
-| --- | --- | --- |
-| Dashboard | [dashboard.png](/docs/images/tui/dashboard.png) | `Ctrl+1` |
-| Workers | [workers.png](/docs/images/tui/workers.png) | `Ctrl+2` |
-| Worker detail (empty selection) | [worker-detail.png](/docs/images/tui/worker-detail.png) | `Ctrl+3` |
-| Trade monitor | [trade-monitor.png](/docs/images/tui/trade-monitor.png) | `Ctrl+4` |
-| Logs | [logs-viewer.png](/docs/images/tui/logs-viewer.png) | `Ctrl+5` |
-| Service manager | [service-manager.png](/docs/images/tui/service-manager.png) | `Ctrl+6` |
-| Config editor | [config-editor.png](/docs/images/tui/config-editor.png) | `Ctrl+7` |
-| Setup wizard | [setup-wizard.png](/docs/images/tui/setup-wizard.png) | `Ctrl+8` |
-| Settings | [settings.png](/docs/images/tui/settings.png) | `Ctrl+9` |
-| Queue depth | [queue-depth.png](/docs/images/tui/queue-depth.png) | `Ctrl+0` |
-| KV (list error / offline) | [kv-viewer.png](/docs/images/tui/kv-viewer.png) | `Ctrl+Alt+K` |
-| Secrets | [secrets-viewer.png](/docs/images/tui/secrets-viewer.png) | `Ctrl+Alt+S` |
-| DB query | [db-query.png](/docs/images/tui/db-query.png) | `Ctrl+Alt+Q` |
-| AI chat | [ai-chat.png](/docs/images/tui/ai-chat.png) | `Ctrl+Alt+C` |
-| Topology | [edge-topology.png](/docs/images/tui/edge-topology.png) | `Ctrl+Alt+E` |
-| Worker settings | [worker-settings.png](/docs/images/tui/worker-settings.png) | `Ctrl+Alt+W` |
+| View                            | File                                                        | Shortcut     |
+| ------------------------------- | ----------------------------------------------------------- | ------------ |
+| Dashboard                       | [dashboard.png](/docs/images/tui/dashboard.png)             | `Ctrl+1`     |
+| Workers                         | [workers.png](/docs/images/tui/workers.png)                 | `Ctrl+2`     |
+| Worker detail (empty selection) | [worker-detail.png](/docs/images/tui/worker-detail.png)     | `Ctrl+3`     |
+| Trade monitor                   | [trade-monitor.png](/docs/images/tui/trade-monitor.png)     | `Ctrl+4`     |
+| Logs                            | [logs-viewer.png](/docs/images/tui/logs-viewer.png)         | `Ctrl+5`     |
+| Service manager                 | [service-manager.png](/docs/images/tui/service-manager.png) | `Ctrl+6`     |
+| Config editor                   | [config-editor.png](/docs/images/tui/config-editor.png)     | `Ctrl+7`     |
+| Setup wizard                    | [setup-wizard.png](/docs/images/tui/setup-wizard.png)       | `Ctrl+8`     |
+| Settings                        | [settings.png](/docs/images/tui/settings.png)               | `Ctrl+9`     |
+| Queue depth                     | [queue-depth.png](/docs/images/tui/queue-depth.png)         | `Ctrl+0`     |
+| KV (list error / offline)       | [kv-viewer.png](/docs/images/tui/kv-viewer.png)             | `Ctrl+Alt+K` |
+| Secrets                         | [secrets-viewer.png](/docs/images/tui/secrets-viewer.png)   | `Ctrl+Alt+S` |
+| DB query                        | [db-query.png](/docs/images/tui/db-query.png)               | `Ctrl+Alt+Q` |
+| AI chat                         | [ai-chat.png](/docs/images/tui/ai-chat.png)                 | `Ctrl+Alt+C` |
+| Topology                        | [edge-topology.png](/docs/images/tui/edge-topology.png)     | `Ctrl+Alt+E` |
+| Worker settings                 | [worker-settings.png](/docs/images/tui/worker-settings.png) | `Ctrl+Alt+W` |
 
 Wizard steps: `setup-wizard-step-01-prereqs.png` … `setup-wizard-step-07-deploy.png`.
 
@@ -102,38 +130,47 @@ hoox dev dashboard    # http://localhost:3000
 ```
 
 <Frame caption="Setup wizard — Welcome plus infrastructure map">
-  <img src="/docs/images/dashboard/setup.png" alt="Dashboard setup wizard welcome step" />
+  <img
+    src="/docs/images/dashboard/setup.png"
+    alt="Dashboard setup wizard welcome step"
+  />
 </Frame>
 
 <Frame caption="Sidebar walk: overview, positions, signal flow, analytics, logs, signals, settings">
-  <img src="/docs/images/gifs/dashboard-nav.gif" alt="GIF cycling dashboard pages" />
+  <img
+    src="/docs/images/gifs/dashboard-nav.gif"
+    alt="GIF cycling dashboard pages"
+  />
 </Frame>
 
 <Frame caption="Signal Flow page chrome">
-  <img src="/docs/images/dashboard/signal-flow.png" alt="Dashboard Signal Flow page with sidebar" />
+  <img
+    src="/docs/images/dashboard/signal-flow.png"
+    alt="Dashboard Signal Flow page with sidebar"
+  />
 </Frame>
 
-| Page | File |
-| --- | --- |
-| Setup | [setup.png](/docs/images/dashboard/setup.png) |
+| Page                                                 | File                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Setup                                                | [setup.png](/docs/images/dashboard/setup.png)                                                                                                                                                                                                                               |
 | Setup — welcome / workers / secrets / webhook / done | [setup-welcome](/docs/images/dashboard/setup-welcome.png) · [workers](/docs/images/dashboard/setup-workers.png) · [secrets](/docs/images/dashboard/setup-secrets.png) · [webhook](/docs/images/dashboard/setup-webhook.png) · [done](/docs/images/dashboard/setup-done.png) |
-| Overview | [overview.png](/docs/images/dashboard/overview.png) |
-| Positions | [positions.png](/docs/images/dashboard/positions.png) |
-| Signal Flow | [signal-flow.png](/docs/images/dashboard/signal-flow.png) |
-| Analytics | [analytics.png](/docs/images/dashboard/analytics.png) |
-| Logs | [logs.png](/docs/images/dashboard/logs.png) |
-| Signals | [signals.png](/docs/images/dashboard/signals.png) |
-| Notifications | [notifications.png](/docs/images/dashboard/notifications.png) |
-| Reports | [reports.png](/docs/images/dashboard/reports.png) |
-| Database | [database.png](/docs/images/dashboard/database.png) |
-| Agent | [agent.png](/docs/images/dashboard/agent.png) |
-| Agent chat | [agent-chat.png](/docs/images/dashboard/agent-chat.png) |
-| Vision | [agent-vision.png](/docs/images/dashboard/agent-vision.png) |
-| Reasoning | [agent-reasoning.png](/docs/images/dashboard/agent-reasoning.png) |
-| Models | [agent-models.png](/docs/images/dashboard/agent-models.png) |
-| Risk | [agent-risk.png](/docs/images/dashboard/agent-risk.png) |
-| Usage | [agent-usage.png](/docs/images/dashboard/agent-usage.png) |
-| Settings | [settings.png](/docs/images/dashboard/settings.png) |
+| Overview                                             | [overview.png](/docs/images/dashboard/overview.png)                                                                                                                                                                                                                         |
+| Positions                                            | [positions.png](/docs/images/dashboard/positions.png)                                                                                                                                                                                                                       |
+| Signal Flow                                          | [signal-flow.png](/docs/images/dashboard/signal-flow.png)                                                                                                                                                                                                                   |
+| Analytics                                            | [analytics.png](/docs/images/dashboard/analytics.png)                                                                                                                                                                                                                       |
+| Logs                                                 | [logs.png](/docs/images/dashboard/logs.png)                                                                                                                                                                                                                                 |
+| Signals                                              | [signals.png](/docs/images/dashboard/signals.png)                                                                                                                                                                                                                           |
+| Notifications                                        | [notifications.png](/docs/images/dashboard/notifications.png)                                                                                                                                                                                                               |
+| Reports                                              | [reports.png](/docs/images/dashboard/reports.png)                                                                                                                                                                                                                           |
+| Database                                             | [database.png](/docs/images/dashboard/database.png)                                                                                                                                                                                                                         |
+| Agent                                                | [agent.png](/docs/images/dashboard/agent.png)                                                                                                                                                                                                                               |
+| Agent chat                                           | [agent-chat.png](/docs/images/dashboard/agent-chat.png)                                                                                                                                                                                                                     |
+| Vision                                               | [agent-vision.png](/docs/images/dashboard/agent-vision.png)                                                                                                                                                                                                                 |
+| Reasoning                                            | [agent-reasoning.png](/docs/images/dashboard/agent-reasoning.png)                                                                                                                                                                                                           |
+| Models                                               | [agent-models.png](/docs/images/dashboard/agent-models.png)                                                                                                                                                                                                                 |
+| Risk                                                 | [agent-risk.png](/docs/images/dashboard/agent-risk.png)                                                                                                                                                                                                                     |
+| Usage                                                | [agent-usage.png](/docs/images/dashboard/agent-usage.png)                                                                                                                                                                                                                   |
+| Settings                                             | [settings.png](/docs/images/dashboard/settings.png)                                                                                                                                                                                                                         |
 
 Mobile crops: [overview-mobile.png](/docs/images/dashboard/overview-mobile.png). The `/login` gateway uses a full-viewport shader that does not rasterize reliably in headless capture — use the setup page for the first visual.
 

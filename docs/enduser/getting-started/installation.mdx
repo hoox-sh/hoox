@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Installation Guide"
 description: "Install the hoox CLI, bootstrap the monorepo with hoox onboard, and verify system prerequisites."
+
 ---
 
 This guide walks you through installing the `@hoox-sh/hoox-cli` tool (**0.16.0**), cloning the microservices monorepo, running `hoox onboard`, and validating local prerequisites. TUI is `@hoox-sh/hoox-tui` **0.4.0**.
@@ -34,18 +36,18 @@ All Hoox workers run on **Cloudflare® Workers** (V8 isolates). A free account i
 - **Account**: [Register free](https://dash.cloudflare.com/) (Workers, D1, KV, Queues, R2, Vectorize — free-tier limits apply).
 - **API token**: Created during `hoox onboard` (or pass `--token` / `--account` non-interactively). The Cloudflare® **“Edit Cloudflare Workers”** template is **not enough** — D1 list returns 401 until D1:Edit is added.
 
-| Scope | Permission | Why |
-| ----- | ---------- | --- |
-| Account · Workers Scripts | **Edit** | Deploy workers |
-| Account · Workers KV Storage | **Edit** | CONFIG_KV / sessions |
-| Account · Workers R2 Storage | **Edit** | Reports / PYNE bars |
-| Account · D1 | **Edit** | `wrangler d1 list` / schema (401 without this) |
-| Account · Queues | **Edit** | Trade queue |
-| Account · Vectorize | **Edit** | Gateway / Telegram RAG (`my-rag-index`, 768 dimensions) |
-| Account · Workers Observability | Read (optional) | Trace / logs |
-| Account · Workers AI | Edit (optional) | agent-worker |
-| Account · Account Settings | **Read** | `whoami` / account id |
-| User · Membership | **Read** | Token verification |
+| Scope                           | Permission      | Why                                                     |
+| ------------------------------- | --------------- | ------------------------------------------------------- |
+| Account · Workers Scripts       | **Edit**        | Deploy workers                                          |
+| Account · Workers KV Storage    | **Edit**        | CONFIG_KV / sessions                                    |
+| Account · Workers R2 Storage    | **Edit**        | Reports / PYNE bars                                     |
+| Account · D1                    | **Edit**        | `wrangler d1 list` / schema (401 without this)          |
+| Account · Queues                | **Edit**        | Trade queue                                             |
+| Account · Vectorize             | **Edit**        | Gateway / Telegram RAG (`my-rag-index`, 768 dimensions) |
+| Account · Workers Observability | Read (optional) | Trace / logs                                            |
+| Account · Workers AI            | Edit (optional) | agent-worker                                            |
+| Account · Account Settings      | **Read**        | `whoami` / account id                                   |
+| User · Membership               | **Read**        | Token verification                                      |
 
 Prefer an **API token** over `wrangler login` on a remote or headless box — OAuth times out and stale-tab state mismatches are common. Keep the token in `CLOUDFLARE_API_TOKEN`; **never** write it into `wrangler.jsonc`.
 
@@ -147,19 +149,21 @@ The wizard walks through:
     <strong>Cloudflare® authentication</strong> — API token and Account ID.
   </li>
   <li>
-    <strong>Microservice profile</strong> — enable/disable edge workers (gateway,
-    trade, agent, pyne, web3, …).
+    <strong>Microservice profile</strong> — enable/disable edge workers
+    (gateway, trade, agent, pyne, web3, …).
   </li>
   <li>
     <strong>Local credentials</strong> — generates <code>.dev.vars</code> (mode{" "}
     <code>0600</code>) and initial KV structures.
   </li>
   <li>
-    <strong>Infrastructure provisioning</strong> — D1, KV, and related resources.
+    <strong>Infrastructure provisioning</strong> — D1, KV, and related
+    resources.
   </li>
   <li>
     <strong>Setup gates</strong> — aborts if worker trees are still empty after
-    submodule clone, or if init did not produce a valid <code>wrangler.jsonc</code>.
+    submodule clone, or if init did not produce a valid{" "}
+    <code>wrangler.jsonc</code>.
   </li>
 </ol>
 
@@ -199,11 +203,11 @@ hx doctor          # Source: remembered · Runtime root: /…/hoox
 **Resolution order:** `HOOX_REPO` env → walk up from cwd → remembered monorepo
 file → `~/.hoox/repo` (managed global clone via `hoox doctor --fix-runtime`).
 
-| Override | Purpose |
-| -------- | ------- |
-| `HOOX_REPO=/path/to/hoox` | Force monorepo root |
-| `HOOX_HOME=~/.hoox` | Home for config / data / global repo (default) |
-| `HOOX_CLI_SILENT=1` | Hide the one-line “using monorepo at …” notice |
+| Override                  | Purpose                                        |
+| ------------------------- | ---------------------------------------------- |
+| `HOOX_REPO=/path/to/hoox` | Force monorepo root                            |
+| `HOOX_HOME=~/.hoox`       | Home for config / data / global repo (default) |
+| `HOOX_CLI_SILENT=1`       | Hide the one-line “using monorepo at …” notice |
 
 ---
 

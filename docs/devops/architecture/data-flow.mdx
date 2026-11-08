@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "🌊 System Data Routing Spec"
 description: "Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping."
+
 ---
 
 Hoox operates as a highly orchestrated **distributed event loop**. Because execution logic is split into isolated compute nodes, data flows recursively through multiple V8 transitions, asynchronous queues, time-series datasets, and database ledgers.
@@ -218,26 +220,26 @@ sequenceDiagram
     end
 ```
 
-| Hop | Auth / header | Notes |
-| --- | ------------- | ----- |
-| Public `/run`, `/scripts`, cron job APIs | `X-API-Key` (`API_KEY` secret) | Tooling isolate — not mesh `INTERNAL_KEY` |
-| pyne → trade-worker `/webhook` | `X-Internal-Auth-Key` (`INTERNAL_KEY_BINDING` or trade-execute key) | Required for live forward; optional `DEFAULT_EXCHANGE` on payload |
-| Duplicate protection | Idempotency key on forward | trade-worker / DO path rejects replays |
+| Hop                                      | Auth / header                                                       | Notes                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Public `/run`, `/scripts`, cron job APIs | `X-API-Key` (`API_KEY` secret)                                      | Tooling isolate — not mesh `INTERNAL_KEY`                         |
+| pyne → trade-worker `/webhook`           | `X-Internal-Auth-Key` (`INTERNAL_KEY_BINDING` or trade-execute key) | Required for live forward; optional `DEFAULT_EXCHANGE` on payload |
+| Duplicate protection                     | Idempotency key on forward                                          | trade-worker / DO path rejects replays                            |
 
 ---
 
 ## 💾 7. Global Data Persistence Mapping
 
-| Storage Platform | Namespace / Database Name      | Data Payload Details                                           | Associated Compute Workers                  |
-| :--------------- | :----------------------------- | :------------------------------------------------------------- | :------------------------------------------ |
+| Storage Platform | Namespace / Database Name      | Data Payload Details                                            | Associated Compute Workers                  |
+| :--------------- | :----------------------------- | :-------------------------------------------------------------- | :------------------------------------------ |
 | **D1 Database**  | `trade-data-db` (SQLite)       | Executed fills, open positions, signals, balances, system logs. | `d1-worker`, `trade-worker`, `agent-worker` |
-| **CONFIG_KV**    | `CONFIG_KV` (Key-Value)        | 16-key global runtime manifest, emergency Kill Switch.         | **All Workers** + Next.js Dashboard         |
-| **SESSIONS_KV**  | `SESSIONS_KV` (Key-Value)      | Session access states and API authorization cookies.           | `hoox` Gateway                              |
-| **R2 Storage**   | `trade-reports` (S3 Bucket)    | Compiled PDF portfolio reports.                                | `report-worker`                             |
-| **R2 Storage**   | `hoox-system-logs` (S3 Bucket) | Verbose JSON exchange API payloads (REST & WebSocket logs).    | `trade-worker`                              |
-| **Vectorize**    | `my-rag-index` (768-d)         | Semantic chat and history vector embeddings.                   | `hoox`, `telegram-worker`                   |
-| **D1 Database**  | `web3-wallet-transactions`     | On-chain tx records (wallet isolate).                          | `web3-wallet-worker`                        |
-| **R2 Storage**   | `pyne-worker-ohlcv`            | OHLCV bars + script registry.                                  | `pyne-worker`                               |
+| **CONFIG_KV**    | `CONFIG_KV` (Key-Value)        | 16-key global runtime manifest, emergency Kill Switch.          | **All Workers** + Next.js Dashboard         |
+| **SESSIONS_KV**  | `SESSIONS_KV` (Key-Value)      | Session access states and API authorization cookies.            | `hoox` Gateway                              |
+| **R2 Storage**   | `trade-reports` (S3 Bucket)    | Compiled PDF portfolio reports.                                 | `report-worker`                             |
+| **R2 Storage**   | `hoox-system-logs` (S3 Bucket) | Verbose JSON exchange API payloads (REST & WebSocket logs).     | `trade-worker`                              |
+| **Vectorize**    | `my-rag-index` (768-d)         | Semantic chat and history vector embeddings.                    | `hoox`, `telegram-worker`                   |
+| **D1 Database**  | `web3-wallet-transactions`     | On-chain tx records (wallet isolate).                           | `web3-wallet-worker`                        |
+| **R2 Storage**   | `pyne-worker-ohlcv`            | OHLCV bars + script registry.                                   | `pyne-worker`                               |
 
 When `TENANT_MODE` is on, D1 rows stamp `tenant_id`, KV/DO keys use `t/<id>/…`, and R2 keys use `t-<id>/…`. Off by default.
 

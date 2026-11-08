@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Product ecosystem"
 description: "HOOX, PYNE, PyneTS, AXIS, pyne-worker, and pyne-agent-worker — what each surface does."
+
 ---
 
 # Product ecosystem
@@ -13,19 +15,21 @@ description: "HOOX, PYNE, PyneTS, AXIS, pyne-worker, and pyne-agent-worker — w
 HOOX is the **execution mesh**. It is not the Pine language, and it is not the chart. The family splits those jobs on purpose.
 
 <Tip>
-  Use this page when a name with "pyne" or "pine" appears in a worker list, a CLI, or a dashboard tile. The wrong hop is usually "I charted a strategy, so it should have traded."
+  Use this page when a name with "pyne" or "pine" appears in a worker list, a
+  CLI, or a dashboard tile. The wrong hop is usually "I charted a strategy, so
+  it should have traded."
 </Tip>
 
 ## Abstract
 
-| Product | Job | Docs |
-| --- | --- | --- |
-| **HOOX** | Signal in → risk → CEX/DEX hop → notify | this site |
-| **PYNE** | Pine parse / evaluate (`hoox-pyne`, `Runtime.run`) | [hoox.sh/pyne/docs](https://hoox.sh/pyne/docs) |
-| **PyneTS** | TypeScript library `@hoox-sh/pynets` | [PyneTS](https://hoox.sh/pyne/docs/pynets) |
-| **pyne-worker** | Python Cloudflare® isolate, `POST /run` | [isolate](/docs/devops/workers/pyne-worker) · [PYNE docs](https://hoox.sh/pyne/docs/pyne-worker) |
-| **pyne-agent-worker** | Natural language → Pine | [agent](https://hoox.sh/pyne/docs/agent) |
-| **AXIS** | Charting PWA | [hoox.sh/axis/docs](https://hoox.sh/axis/docs) |
+| Product               | Job                                                | Docs                                                                                             |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **HOOX**              | Signal in → risk → CEX/DEX hop → notify            | this site                                                                                        |
+| **PYNE**              | Pine parse / evaluate (`hoox-pyne`, `Runtime.run`) | [hoox.sh/pyne/docs](https://hoox.sh/pyne/docs)                                                   |
+| **PyneTS**            | TypeScript library `@hoox-sh/pynets`               | [PyneTS](https://hoox.sh/pyne/docs/pynets)                                                       |
+| **pyne-worker**       | Python Cloudflare® isolate, `POST /run`            | [isolate](/docs/devops/workers/pyne-worker) · [PYNE docs](https://hoox.sh/pyne/docs/pyne-worker) |
+| **pyne-agent-worker** | Natural language → Pine                            | [agent](https://hoox.sh/pyne/docs/agent)                                                         |
+| **AXIS**              | Charting PWA                                       | [hoox.sh/axis/docs](https://hoox.sh/axis/docs)                                                   |
 
 ## Conceptual model
 
@@ -69,14 +73,14 @@ See [PYNE modes](https://hoox.sh/pyne/docs/enduser/reference/modes).
 
 ## Internals
 
-| Repo | Role |
-| --- | --- |
-| `hoox-sh/hoox` | Mesh, CLI, TUI, dashboard |
-| `hoox-sh/pyne` | Language SoT |
-| `hoox-sh/pynets` | TS library |
-| `hoox-sh/pyne-worker` | Edge evaluate isolate (submodule under `workers/pyne-worker`) |
-| `hoox-sh/axis` | PWA |
-| `hoox-sh/pyne-agent-worker` | Authoring agent |
+| Repo                        | Role                                                          |
+| --------------------------- | ------------------------------------------------------------- |
+| `hoox-sh/hoox`              | Mesh, CLI, TUI, dashboard                                     |
+| `hoox-sh/pyne`              | Language SoT                                                  |
+| `hoox-sh/pynets`            | TS library                                                    |
+| `hoox-sh/pyne-worker`       | Edge evaluate isolate (submodule under `workers/pyne-worker`) |
+| `hoox-sh/axis`              | PWA                                                           |
+| `hoox-sh/pyne-agent-worker` | Authoring agent                                               |
 
 ## Invariants
 
@@ -87,13 +91,13 @@ See [PYNE modes](https://hoox.sh/pyne/docs/enduser/reference/modes).
 
 ## Worked examples
 
-| You want | Do this |
-| --- | --- |
-| Chart a script | AXIS + Flask or Pyodide |
-| Evaluate at the edge | `hoox pyne deploy` |
+| You want                   | Do this                                                     |
+| -------------------------- | ----------------------------------------------------------- |
+| Chart a script             | AXIS + Flask or Pyodide                                     |
+| Evaluate at the edge       | `hoox pyne deploy`                                          |
 | Trade from strategy events | [PYNE live trading](/docs/enduser/guides/pyne-live-trading) |
-| Embed TS evaluate | `bun add @hoox-sh/pynets` |
-| Chat → script | pyne-agent-worker plugin in AXIS |
+| Embed TS evaluate          | `bun add @hoox-sh/pynets`                                   |
+| Chat → script              | pyne-agent-worker plugin in AXIS                            |
 
 ## See also
 

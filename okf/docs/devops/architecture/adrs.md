@@ -1,13 +1,13 @@
 ---
 type: "Document"
-title: "📐 Architecture Decision Records (ADRs)"
+title: "adrs"
 description: "This directory contains the Architecture Decision Records for the Hoox trading platform. Each ADR documents a significant architectural choice, its context, the decision made,…"
 resource: "docs/devops/architecture/adrs.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-03T12:12:12Z
+  at: 2026-11-08T09:32:26Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/adrs.mdx"

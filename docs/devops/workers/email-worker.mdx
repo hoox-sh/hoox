@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "📧 email-worker Isolate Profile"
 description: "Engineering specification for the Hoox email parsing worker, covering Mailgun webhook ingestion, direct JSON signal parsing, KV-configured regex patterns, and service bindings."
+
 ---
 
 The **`email-worker`** ingests trading signals from email sources, parses them, and forwards them to `trade-worker` for execution. It receives mail three ways: Mailgun HMAC on `POST /webhook`, the Cloudflare® Email Routing `email` handler, or internal JSON on `POST /email-signal` (mesh auth only — not Mailgun HMAC). No IMAP/SMTP polling — Cloudflare® Workers cannot open IMAP sockets. `EMAIL_HOST`, `EMAIL_USER`, and `EMAIL_PASS` are reserved and unread.
@@ -167,8 +169,8 @@ The worker also exposes an `email()` handler that processes incoming emails via 
 
 ### KV Namespaces
 
-| Binding     | ID                   | Purpose                      |
-| ----------- | -------------------- | ---------------------------- |
+| Binding     | ID                    | Purpose                      |
+| ----------- | --------------------- | ---------------------------- |
 | `CONFIG_KV` | `"<KV_NAMESPACE_ID>"` | Signal pattern configuration |
 
 ---

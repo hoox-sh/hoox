@@ -4,27 +4,29 @@
 -->
 
 ---
+
 title: "Private ingress (Access + Tunnel)"
 description: "How to protect the Hoox operator management plane with Cloudflare Access and optional Cloudflare Tunnel."
+
 ---
 
 # Private ingress for operators
 
 The **operator management plane** (`/v1/*` — workers list, SSE streams, health probe) should not sit open on the public internet the way TradingView® webhooks do.
 
-| Surface | Hostname (recommended) | Auth |
-| ------- | ---------------------- | ---- |
-| Trading signals | `gateway.example.com` | Body `apiKey` + IP allowlist |
-| Operator TUI / CLI | `mgmt.example.com` | Access (+ Bearer `OPERATOR_API_KEY`) |
-| Dashboard UI | `app.example.com` | Access / SSO (existing) |
+| Surface            | Hostname (recommended) | Auth                                 |
+| ------------------ | ---------------------- | ------------------------------------ |
+| Trading signals    | `gateway.example.com`  | Body `apiKey` + IP allowlist         |
+| Operator TUI / CLI | `mgmt.example.com`     | Access (+ Bearer `OPERATOR_API_KEY`) |
+| Dashboard UI       | `app.example.com`      | Access / SSO (existing)              |
 
 ## When to use Access vs Tunnel vs mTLS
 
-| Approach | Use when | Open core |
-| -------- | -------- | --------- |
-| **Cloudflare Access** (service token) | Default private operator path; free tier friendly | Yes |
+| Approach                              | Use when                                                         | Open core                  |
+| ------------------------------------- | ---------------------------------------------------------------- | -------------------------- |
+| **Cloudflare Access** (service token) | Default private operator path; free tier friendly                | Yes                        |
 | **Cloudflare Tunnel** (`cloudflared`) | Origin must not be public; self-hosted; strict network isolation | Docs + `hoox tunnel check` |
-| **API Shield mTLS** | Device-bound client certs / compliance | Enterprise |
+| **API Shield mTLS**                   | Device-bound client certs / compliance                           | Enterprise                 |
 
 **Recommended default:** Access on `mgmt.example.com` + Bearer `HOOX_API_TOKEN` ↔ Worker `OPERATOR_API_KEY`.  
 **Tunnel** is optional defense-in-depth (or required for private origins).  
@@ -67,10 +69,10 @@ hoox tui --remote --api-url https://mgmt.example.com
 
 ### Expected probe results
 
-| Caller | Healthy outcome |
-| ------ | --------------- |
-| Anonymous `GET /v1/health` | `302` Access redirect or `401` (not `200`) |
-| Authed (Bearer + Access headers) | `200` JSON `{ plane: "operator", … }` |
+| Caller                           | Healthy outcome                            |
+| -------------------------------- | ------------------------------------------ |
+| Anonymous `GET /v1/health`       | `302` Access redirect or `401` (not `200`) |
+| Authed (Bearer + Access headers) | `200` JSON `{ plane: "operator", … }`      |
 
 ## Optional: Cloudflare Tunnel
 
@@ -92,22 +94,22 @@ Tunnel does **not** replace `CLOUDFLARE_API_TOKEN` for deploy/secrets (control p
 
 ## CLI surface
 
-| Command | Purpose |
-| ------- | ------- |
-| `hoox doctor --security` | Hygiene + optional probes |
-| `hoox tunnel check` | cloudflared detect + optional probes |
-| `hoox config transport` | Show resolved transport profile |
+| Command                            | Purpose                                     |
+| ---------------------------------- | ------------------------------------------- |
+| `hoox doctor --security`           | Hygiene + optional probes                   |
+| `hoox tunnel check`                | cloudflared detect + optional probes        |
+| `hoox config transport`            | Show resolved transport profile             |
 | `hoox config transport set access` | Persist preference to `~/.hoox/config.json` |
-| `hoox tui --remote` | Fail-closed launch (Bearer or Access env) |
+| `hoox tui --remote`                | Fail-closed launch (Bearer or Access env)   |
 
 Env reference:
 
-| Variable | Role |
-| -------- | ---- |
-| `HOOX_API_URL` | Management base URL |
-| `HOOX_API_TOKEN` | Bearer → `OPERATOR_API_KEY` |
-| `HOOX_TRANSPORT` | `public` \| `access` \| `mtls` \| `tunnel` |
-| `CF_ACCESS_CLIENT_ID` / `SECRET` | Access service token |
+| Variable                         | Role                                       |
+| -------------------------------- | ------------------------------------------ |
+| `HOOX_API_URL`                   | Management base URL                        |
+| `HOOX_API_TOKEN`                 | Bearer → `OPERATOR_API_KEY`                |
+| `HOOX_TRANSPORT`                 | `public` \| `access` \| `mtls` \| `tunnel` |
+| `CF_ACCESS_CLIENT_ID` / `SECRET` | Access service token                       |
 
 ## Align dashboard + management Access
 

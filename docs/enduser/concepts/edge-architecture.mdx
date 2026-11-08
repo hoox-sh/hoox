@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Edge-first architecture"
 description: "Why V8 isolates and Cloudflare® Workers cut order-path latency versus a single VPS."
+
 ---
 
 # ⚡ Edge-First Architecture
@@ -48,16 +50,16 @@ Traditional trading bots are deployed on a single virtual private server (VPS) i
 
 Traditional architectures run on Virtual Machines or Docker containers. These runtimes carry significant memory overhead and introduce **cold starts**—the time required to spin up a container after inactivity.
 
-| Architectural Dimension |      Traditional VM / Container (VPS)       |       Cloudflare® Edge Worker (V8 Isolate)        |
-| :---------------------- | :-----------------------------------------: | :----------------------------------------------: |
-| **Boot Architecture**   |  Heavy guest OS, Node runtime, npm modules  |      Sandboxed JavaScript V8 Engine runtime      |
-| **Cold-Start Delay**    |   **1,000ms – 15,000ms** (system stalls)    |        **< 3ms** (virtually non-existent)        |
-| **Memory Footprint**    |          256MB – 2GB per instance           |        **128MB max** (highly lightweight)        |
-| **Global Failover**     |  Requires complex DNS/Load Balancer setup   |    Natively distributed across 330+ locations    |
-| **Geographic Location** |              Fixed data center              |    Automatically routes to nearest user node     |
-| **Scaling Model**       |  Manual provisioning or autoscaling groups  | Automatic — each request may hit a different PoP |
+| Architectural Dimension |       Traditional VM / Container (VPS)       |       Cloudflare® Edge Worker (V8 Isolate)       |
+| :---------------------- | :------------------------------------------: | :----------------------------------------------: |
+| **Boot Architecture**   |  Heavy guest OS, Node runtime, npm modules   |      Sandboxed JavaScript V8 Engine runtime      |
+| **Cold-Start Delay**    |    **1,000ms – 15,000ms** (system stalls)    |        **< 3ms** (virtually non-existent)        |
+| **Memory Footprint**    |           256MB – 2GB per instance           |        **128MB max** (highly lightweight)        |
+| **Global Failover**     |   Requires complex DNS/Load Balancer setup   |    Natively distributed across 330+ locations    |
+| **Geographic Location** |              Fixed data center               |    Automatically routes to nearest user node     |
+| **Scaling Model**       |  Manual provisioning or autoscaling groups   | Automatic — each request may hit a different PoP |
 | **DDoS Protection**     | Requires separate service (e.g. Cloudflare®) |           Built-in at the network edge           |
-| **Cost Model**          |         Pay for idle capacity 24/7          |       Pay-per-request; zero cost when idle       |
+| **Cost Model**          |          Pay for idle capacity 24/7          |       Pay-per-request; zero cost when idle       |
 
 ---
 

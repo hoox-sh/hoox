@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Enterprise Security & Compliance"
 description: "Extending the 5-layer model with Bot Management, API Shield, Zero Trust, mTLS, AI Guardrails, and immutable audit for HOOX Enterprise."
+
 ---
 
 # Enterprise Security & Compliance
@@ -19,6 +21,7 @@ HOOX's existing 5-layer security model is excellent. Enterprise adds several pow
 ## Extended Layers
 
 ### Layer 0: Bot Management (Enterprise)
+
 - Scores every request (`cf.botManagement.score`).
 - Detects verified bots, corporate proxies, automated tooling.
 - JA3/JA4 fingerprinting, JS challenge results.
@@ -26,6 +29,7 @@ HOOX's existing 5-layer security model is excellent. Enterprise adds several pow
 - Combined with WAF custom rules and rate limiting.
 
 Example in Dispatch / Gateway:
+
 ```ts
 const bot = request.cf?.botManagement;
 if (bot && !bot.verifiedBot && bot.score < 30) {
@@ -34,6 +38,7 @@ if (bot && !bot.verifiedBot && bot.score < 30) {
 ```
 
 ### Layer 1: Advanced WAF + API Shield
+
 - Enterprise WAF supports 100 rate limiting rules, complex expressions, high cardinality.
 - **API Shield**:
   - JSON Schema validation on webhook and internal-ish endpoints.
@@ -42,22 +47,26 @@ if (bot && !bot.verifiedBot && bot.score < 30) {
   - Sequence / anomaly detection.
 
 ### Layer 2: Zero Trust / Access
+
 - Dashboard and management APIs protected by Cloudflare Access (SSO, device posture, WARP, etc.).
 - Replaces or augments custom passkeys for human operators.
 - SCIM for team provisioning in larger organizations.
 - Gateway policies for outbound control if needed.
 
 ### Layer 3: Internal + mTLS
+
 - Existing `INTERNAL_KEY_BINDING` + `requireInternalAuth` remains.
 - Add mTLS between Workers where possible (or use Service Binding + strong claims).
 - Per-tenant claims propagated in auth headers.
 
 ### Layer 4: Durable Object + Cryptographic Controls
+
 - SQLite DOs for tamper-evident logs (append-only tables with hashes).
 - Signatures on important events (fills, kill switches, config changes).
 - Stored in D1 + R2 (dual write for durability).
 
 ### Layer 5: AI Guardrails (new)
+
 - **AI Gateway** in front of all LLM calls (risk agents, summaries, strategy parsing).
   - Prompt injection detection / sanitization.
   - Logging + caching + rate limits + fallbacks.
@@ -69,6 +78,7 @@ if (bot && !bot.verifiedBot && bot.score < 30) {
 Every security-relevant event flows to Logpush → R2 (see [Observability & audit](/docs/enterprise/observability-audit)).
 
 Key events:
+
 - All webhook / signal ingress (with bot score, WAF decision)
 - Auth decisions (success + failure)
 - Idempotency DO outcomes
@@ -101,6 +111,7 @@ Retention: typically 7 years for financial services (configurable via R2 lifecyc
 ## Threat Model Updates (Enterprise)
 
 New / amplified threats addressed:
+
 - Malicious or compromised tenant code (mitigated by WfP isolation + review gates).
 - Supply-chain attacks on customer strategies (AI Gateway + sandboxing patterns).
 - Regulatory "prove you didn't front-run" → full immutable trace + signatures.

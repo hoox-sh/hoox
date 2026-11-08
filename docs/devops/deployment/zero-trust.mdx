@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Zero Trust & Security Hardening"
 description: "How to configure Cloudflare® Access (Zero Trust), enforce Multi-Factor Authentication (MFA), and configure WAF firewall allow-lists for TradingView® webhook IPs."
+
 ---
 
 While the Hoox dashboard features a highly secure, custom cookie-based authentication middleware, wrapping your dashboard and **operator management APIs** inside **Cloudflare® Zero Trust (Access)** provides an enterprise-grade security perimeter.
@@ -30,12 +32,12 @@ hoox tui --remote --api-url https://mgmt.example.com
 
 Management routes (all require Bearer):
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `GET` | `/v1/health` | Operator auth + plane probe |
-| `GET` | `/v1/workers` | Minimal worker list (JSON array) |
-| `GET` | `/v1/trades/stream` | SSE trades (polls trade-worker) |
-| `GET` | `/v1/logs/stream` | SSE logs (polls trade-worker) |
+| Method | Path                | Purpose                          |
+| ------ | ------------------- | -------------------------------- |
+| `GET`  | `/v1/health`        | Operator auth + plane probe      |
+| `GET`  | `/v1/workers`       | Minimal worker list (JSON array) |
+| `GET`  | `/v1/trades/stream` | SSE trades (polls trade-worker)  |
+| `GET`  | `/v1/logs/stream`   | SSE logs (polls trade-worker)    |
 
 `GET /health` stays public for liveness. Do **not** put operator Bearer on TradingView® `/webhook`.
 

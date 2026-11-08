@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "System Topology & Overview"
 description: "High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models."
+
 ---
 
 Hoox is a serverless algorithmic trading platform on **Cloudflare® Workers**. Version **0.16.0** splits the system into **11 compute surfaces**: 10 workers under `workers/*` plus the **dashboard** (Next.js 16 / OpenNext). **pyne-worker** is Python; the rest are TypeScript V8 isolates.
@@ -105,19 +107,19 @@ graph TB
 
 ## 📊 Comprehensive Micro-Worker Catalog
 
-| Worker Name            |  Runtime Scope   | Cron Trigger |    Public Routing    |      Smart Placement       | Primary Observability |
-| :--------------------- | :--------------: | :----------: | :------------------: | :------------------------: | :-------------------: |
-| **`hoox`**             |  Gateway Router  |      No      | **Yes** (`/webhook`, `/health`, operator `/v1/*` + `/wallet/*`) |    **Yes**     | Time-series Telemetry |
-| **`trade-worker`**     | CEX + spot DEX execution  |      No      |    No (Isolated)     | **Yes** |    Execution Logs     |
-| **`agent-worker`**     | Risk Management  |  Cron 1–1440 min (default `*/15`)  |    No (Isolated)     | **Yes** |      Alert Logs       |
-| **`telegram-worker`**  |  Alerts & Chat   |      No      |    No (Isolated)     |  **Yes**   |     Command Logs      |
-| **`d1-worker`**        |  SQLite Manager  |      No      |    No (Isolated)     |   **Yes**   |     Query Latency     |
-| **`report-worker`**    | Browser Rendering PDF (`BROWSER`) | Cron `08:00` and `18:00` UTC |    No (Isolated)     |  **Yes**  |     Print Status      |
-| **`email-worker`**     | Mailgun / Email Routing / JSON | No inbox poll |    No (Isolated)     |             **Yes**             |   Parse Statistics    |
-| **`web3-wallet-worker`** | On-chain wallet + spot DEX |      No      |    No (Isolated)     | **Yes** |     Tx Sign Logs      |
-| **`analytics-worker`** |  Observability   |      No      |    No (Isolated)     |             **Yes**             |    Metrics Dataset    |
-| **`pyne-worker`**      | Pine edge evaluate | Cron `* * * * *` | **Tooling** (`API_KEY` / `X-API-Key`) | **Yes** | Evaluate / forward logs |
-| **`dashboard`**        | Next.js 16 ops UI (OpenNext)   |      No      | **Yes** (public)     |             No             |    UI / binding calls |
+| Worker Name              |           Runtime Scope           |           Cron Trigger           |                         Public Routing                          | Smart Placement |  Primary Observability  |
+| :----------------------- | :-------------------------------: | :------------------------------: | :-------------------------------------------------------------: | :-------------: | :---------------------: |
+| **`hoox`**               |          Gateway Router           |                No                | **Yes** (`/webhook`, `/health`, operator `/v1/*` + `/wallet/*`) |     **Yes**     |  Time-series Telemetry  |
+| **`trade-worker`**       |     CEX + spot DEX execution      |                No                |                          No (Isolated)                          |     **Yes**     |     Execution Logs      |
+| **`agent-worker`**       |          Risk Management          | Cron 1–1440 min (default `*/15`) |                          No (Isolated)                          |     **Yes**     |       Alert Logs        |
+| **`telegram-worker`**    |           Alerts & Chat           |                No                |                          No (Isolated)                          |     **Yes**     |      Command Logs       |
+| **`d1-worker`**          |          SQLite Manager           |                No                |                          No (Isolated)                          |     **Yes**     |      Query Latency      |
+| **`report-worker`**      | Browser Rendering PDF (`BROWSER`) |   Cron `08:00` and `18:00` UTC   |                          No (Isolated)                          |     **Yes**     |      Print Status       |
+| **`email-worker`**       |  Mailgun / Email Routing / JSON   |          No inbox poll           |                          No (Isolated)                          |     **Yes**     |    Parse Statistics     |
+| **`web3-wallet-worker`** |    On-chain wallet + spot DEX     |                No                |                          No (Isolated)                          |     **Yes**     |      Tx Sign Logs       |
+| **`analytics-worker`**   |           Observability           |                No                |                          No (Isolated)                          |     **Yes**     |     Metrics Dataset     |
+| **`pyne-worker`**        |        Pine edge evaluate         |         Cron `* * * * *`         |              **Tooling** (`API_KEY` / `X-API-Key`)              |     **Yes**     | Evaluate / forward logs |
+| **`dashboard`**          |   Next.js 16 ops UI (OpenNext)    |                No                |                        **Yes** (public)                         |       No        |   UI / binding calls    |
 
 > **Public vs mesh-private:** Mesh workers (`trade-worker`, `d1-worker`, `agent-worker`, `web3-wallet-worker`, …) expose **no** public HTTP. Service-to-service calls send `X-Internal-Auth-Key`. The **hoox gateway** is public for webhooks and health; operator Bearer (`OPERATOR_API_KEY`) gates `/v1/*` and `/wallet/*`. **`pyne-worker`** public routes use **`API_KEY`**, not mesh `INTERNAL_KEY`. When pyne forwards strategy events to `trade-worker`, that hop uses mesh internal auth.
 

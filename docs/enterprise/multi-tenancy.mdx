@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Multi-Tenancy with Workers for Platforms"
 description: "How HOOX Enterprise achieves strong multi-tenant isolation using Cloudflare Workers for Platforms, namespaces, dispatch, and per-tenant Durable Objects / bindings."
+
 ---
 
 # Multi-Tenancy with Workers for Platforms
@@ -66,7 +68,7 @@ export default {
       tenantId,
       // forward internal auth with tenant claim
     });
-  }
+  },
 };
 ```
 
@@ -86,11 +88,16 @@ Existing `requireInternalAuth` is extended with tenant claims:
 
 ```ts
 // in @hoox-shared
-export function requireInternalAuthWithTenant(req: Request, env: Env, tenantId: string) {
+export function requireInternalAuthWithTenant(
+  req: Request,
+  env: Env,
+  tenantId: string
+) {
   const err = requireInternalAuth(req, env);
   if (err) return err;
   const claim = req.headers.get("X-Tenant-Id");
-  if (claim !== tenantId) return new Response("Tenant mismatch", { status: 403 });
+  if (claim !== tenantId)
+    return new Response("Tenant mismatch", { status: 403 });
 }
 ```
 
@@ -111,6 +118,7 @@ Both modes share the same core architecture.
 ## Limits & Scaling Notes
 
 Enterprise customers get:
+
 - Much higher numbers of scripts / namespaces.
 - Higher request volume and concurrency.
 - Custom limit increases.

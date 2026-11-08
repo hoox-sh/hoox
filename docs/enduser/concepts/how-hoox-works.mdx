@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "How Hoox Works"
 description: "High-level overview of the pipeline turning a trade signal into an executed edge order."
+
 ---
 
 At its core, **Hoox** functions as a highly resilient, low-latency pipeline that intercepts trading signals from external sources, validates and decodes the payloads, and converts them into cryptographically signed order placements on global exchanges in milliseconds.
@@ -103,26 +105,24 @@ When a signal hits your public endpoint, the **`hoox` gateway** interceptor imme
     the pipeline aborts immediately to protect your capital.
   </li>
   <li>
-    <strong>Rate Limiting</strong>: Atomic{" "}
-    <code>RateLimiterStore</code> Durable Object when bound (else KV /
-    in-memory). Default: <strong>10 requests / 60s</strong> per session.
-    Exceeded → <code>429</code>.
+    <strong>Rate Limiting</strong>: Atomic <code>RateLimiterStore</code> Durable
+    Object when bound (else KV / in-memory). Default:{" "}
+    <strong>10 requests / 60s</strong> per session. Exceeded → <code>429</code>.
   </li>
   <li>
-    <strong>Two-phase idempotency</strong>:{" "}
-    <code>IdempotencyStore</code> <strong>reserves</strong> the key as{" "}
-    <code>pending</code> before dispatch, <strong>commits</strong> only on
-    true success, and <strong>releases</strong> on soft-fail or error so
-    retries can proceed. Missing DO is <strong>fail-closed</strong> (
-    <code>503</code>). Duplicates → <code>409</code>. Prefer a client{" "}
-    <code>idempotencyKey</code> / <code>Idempotency-Key</code> header; auto
-    fingerprints include a per-minute time bucket. See{" "}
+    <strong>Two-phase idempotency</strong>: <code>IdempotencyStore</code>{" "}
+    <strong>reserves</strong> the key as <code>pending</code> before dispatch,{" "}
+    <strong>commits</strong> only on true success, and <strong>releases</strong>{" "}
+    on soft-fail or error so retries can proceed. Missing DO is{" "}
+    <strong>fail-closed</strong> (<code>503</code>). Duplicates →{" "}
+    <code>409</code>. Prefer a client <code>idempotencyKey</code> /{" "}
+    <code>Idempotency-Key</code> header; auto fingerprints include a per-minute
+    time bucket. See{" "}
     <a href="/docs/enduser/concepts/idempotency">Idempotency</a>.
   </li>
   <li>
-    <strong>Notify chat allowlist</strong>: Telegram{" "}
-    <code>chatId</code> must be listed when allowlists are configured
-    (fail-closed for unlisted IDs).
+    <strong>Notify chat allowlist</strong>: Telegram <code>chatId</code> must be
+    listed when allowlists are configured (fail-closed for unlisted IDs).
   </li>
 </ol>
 

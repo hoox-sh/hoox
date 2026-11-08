@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "hoox Gateway Isolate Profile"
 description: "Comprehensive engineering specification for the Hoox public gateway, covering ingress WAF rules, Durable Object idempotency stores, and Service Binding configurations."
+
 ---
 
 The **`hoox`** gateway is the public-facing entry point of the trading ecosystem. Running as an ultra-low-latency Cloudflare® Worker, the gateway is responsible for authorizing incoming trade signals (TradingView® alerts, email routing, manual commands), executing rate-limiting checks, locking transaction trace IDs via Durable Objects to prevent duplicate fills, and routing validated events privately to background compute nodes.
@@ -127,15 +129,15 @@ TELEGRAM_ALLOWED_CHAT_IDS=123456789
 
 Applied on the webhook critical path **before** dispatch:
 
-| Control | Behavior |
-| ------- | -------- |
-| **Kill switch** | Reads `trade:kill_switch` **or** `global:kill_switch` from `CONFIG_KV`. Either set to a truthy value (`true` / `1` / `yes` / `on`) returns **`503`** with `code: "KILL_SWITCH"`. Agent / CLI write `trade:kill_switch`; gateway dashboard section uses `global:kill_switch`. |
-| **IP allowlist** | When `webhook:tradingview:ip_check_enabled` is true (default), `CF-Connecting-IP` must be in the built-in TradingView® set or `webhook:tradingview:allowed_ips` JSON array. Missing IP → `403`. |
-| **Body size** | Hard cap **64 KiB** (Content-Length early reject + stream read). Oversized → `413`. |
-| **Auth** | Body `apiKey` compared with `timingSafeEqual` against `WEBHOOK_API_KEY_BINDING`. Missing/invalid → `403` (no key material in responses). |
-| **Rate limit** | Atomic `RateLimiterStore` DO when `RATE_LIMITER` bound; else KV / in-memory. Session-keyed, default **10 req / 60s**. Exceeded → `429` `code: "RATE_LIMITED"`. |
-| **Notify chat allowlist** | `TELEGRAM_ALLOWED_CHAT_IDS` / `AUTHORIZED_CHAT_IDS` (+ optional KV). Unconfigured or non-listed `chatId` → notify rejected (fail-closed). |
-| **Idempotency** | Durable Object `IdempotencyStore` **two-phase**: `reserve` (pending) → dispatch → `commit` on true success / `release` on soft-fail or error. Fail-closed if binding missing (`503`). Prefers body `idempotencyKey` or `Idempotency-Key` header; else auto fingerprint `trade:{exchange}:{symbol}:{action}:{quantity}:{live\|test}:{minuteBucket}`. Duplicates / in-flight → `409`. |
+| Control                   | Behavior                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Kill switch**           | Reads `trade:kill_switch` **or** `global:kill_switch` from `CONFIG_KV`. Either set to a truthy value (`true` / `1` / `yes` / `on`) returns **`503`** with `code: "KILL_SWITCH"`. Agent / CLI write `trade:kill_switch`; gateway dashboard section uses `global:kill_switch`.                                                                                                        |
+| **IP allowlist**          | When `webhook:tradingview:ip_check_enabled` is true (default), `CF-Connecting-IP` must be in the built-in TradingView® set or `webhook:tradingview:allowed_ips` JSON array. Missing IP → `403`.                                                                                                                                                                                     |
+| **Body size**             | Hard cap **64 KiB** (Content-Length early reject + stream read). Oversized → `413`.                                                                                                                                                                                                                                                                                                 |
+| **Auth**                  | Body `apiKey` compared with `timingSafeEqual` against `WEBHOOK_API_KEY_BINDING`. Missing/invalid → `403` (no key material in responses).                                                                                                                                                                                                                                            |
+| **Rate limit**            | Atomic `RateLimiterStore` DO when `RATE_LIMITER` bound; else KV / in-memory. Session-keyed, default **10 req / 60s**. Exceeded → `429` `code: "RATE_LIMITED"`.                                                                                                                                                                                                                      |
+| **Notify chat allowlist** | `TELEGRAM_ALLOWED_CHAT_IDS` / `AUTHORIZED_CHAT_IDS` (+ optional KV). Unconfigured or non-listed `chatId` → notify rejected (fail-closed).                                                                                                                                                                                                                                           |
+| **Idempotency**           | Durable Object `IdempotencyStore` **two-phase**: `reserve` (pending) → dispatch → `commit` on true success / `release` on soft-fail or error. Fail-closed if binding missing (`503`). Prefers body `idempotencyKey` or `Idempotency-Key` header; else auto fingerprint `trade:{exchange}:{symbol}:{action}:{quantity}:{live\|test}:{minuteBucket}`. Duplicates / in-flight → `409`. |
 
 ---
 
@@ -221,13 +223,13 @@ Applied on the webhook critical path **before** dispatch:
 
 Bearer `OPERATOR_API_KEY` (or legacy `INTERNAL_API_KEY`). Prefer Cloudflare Access on a dedicated mgmt hostname.
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| `GET` | `/v1/health` | Operator plane liveness |
-| `GET` | `/v1/workers` | Minimal gateway self-view (`WorkerInfo[]`) |
-| `GET` | `/v1/trades/stream` | SSE trade feed (polls trade-worker `/api/signals`) |
-| `GET` | `/v1/logs/stream` | SSE log feed (polls trade-worker `/api/system-logs`) |
-| `GET` | `/workers` | Legacy alias of `/v1/workers` |
+| Method | Path                | Description                                          |
+| ------ | ------------------- | ---------------------------------------------------- |
+| `GET`  | `/v1/health`        | Operator plane liveness                              |
+| `GET`  | `/v1/workers`       | Minimal gateway self-view (`WorkerInfo[]`)           |
+| `GET`  | `/v1/trades/stream` | SSE trade feed (polls trade-worker `/api/signals`)   |
+| `GET`  | `/v1/logs/stream`   | SSE log feed (polls trade-worker `/api/system-logs`) |
+| `GET`  | `/workers`          | Legacy alias of `/v1/workers`                        |
 
 ---
 
@@ -237,16 +239,16 @@ Operator Bearer (`OPERATOR_API_KEY` or legacy `INTERNAL_API_KEY`). Forwards to *
 
 Allowlisted upstream paths (GET and POST on every path; PUT on `/config`):
 
-| Gateway path | Upstream |
-| ------------ | -------- |
-| `GET`/`POST` `/wallet` | `/` |
-| `GET`/`POST` `/wallet/status` | `/status` |
-| `GET`/`PUT`/`POST` `/wallet/config` | `/config` |
-| `GET`/`POST` `/wallet/balance` | `/balance` |
-| `GET`/`POST` `/wallet/transfer` | `/transfer` |
-| `GET`/`POST` `/wallet/approve` | `/approve` |
-| `GET`/`POST` `/wallet/quote` | `/quote` |
-| `GET`/`POST` `/wallet/swap` | `/swap` |
+| Gateway path                        | Upstream        |
+| ----------------------------------- | --------------- |
+| `GET`/`POST` `/wallet`              | `/`             |
+| `GET`/`POST` `/wallet/status`       | `/status`       |
+| `GET`/`PUT`/`POST` `/wallet/config` | `/config`       |
+| `GET`/`POST` `/wallet/balance`      | `/balance`      |
+| `GET`/`POST` `/wallet/transfer`     | `/transfer`     |
+| `GET`/`POST` `/wallet/approve`      | `/approve`      |
+| `GET`/`POST` `/wallet/quote`        | `/quote`        |
+| `GET`/`POST` `/wallet/swap`         | `/swap`         |
 | `GET`/`POST` `/wallet/transactions` | `/transactions` |
 
 Anything else under `/wallet` returns **404**. Missing `WEB3_WALLET_SERVICE` returns **500**. Upstream errors are logged server-side and returned with the wallet isolate’s status. This is the operator-facing path onto the wallet isolate — web3-wallet-worker itself has no public URL.
@@ -258,8 +260,8 @@ See [web3-wallet-worker](/docs/devops/workers/web3-wallet-worker) for payload sh
 <Tip>
   If exchange APIs experience high latency or go offline, the gateway intercepts
   the failure, serializes the payload, and pushes it to the `TRADE_QUEUE`
-  producer (queue_failover mode), returning a `"status": "Enqueued"`
-  (**202 Accepted**) response to TradingView®.
+  producer (queue_failover mode), returning a `"status": "Enqueued"` (**202
+  Accepted**) response to TradingView®.
 </Tip>
 
 ### 🔗 Next Steps

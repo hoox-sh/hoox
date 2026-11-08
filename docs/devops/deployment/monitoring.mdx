@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Observability & Telemetry"
 description: "How to configure Cloudflare Analytics Engine, set up 100% head sampling observability, and deploy real-time alarm systems."
+
 ---
 
 Operating a globally distributed algorithmic trading network demands extreme observability. A silent failure in an order loop or a transient API throttling event can lead to missed targets and unhedged exposures.
@@ -108,9 +110,9 @@ if (orderResponse.status === "Rejected") {
 ---
 
 <Tip>
-  Need to tail live worker logs to debug a custom strategy? Run `hoox logs worker
-  trade-worker` in your terminal to open a real-time WebSocket connection to
-  Cloudflare’s global edge logging console!
+  Need to tail live worker logs to debug a custom strategy? Run `hoox logs
+  worker trade-worker` in your terminal to open a real-time WebSocket connection
+  to Cloudflare’s global edge logging console!
 </Tip>
 
 ### 🔗 Next Steps

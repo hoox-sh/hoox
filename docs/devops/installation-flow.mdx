@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Cloudflare® Workers Setup Flow"
 description: "Detailed system onboarding, toolchain validation steps, wrangler.jsonc schemas, and Secret Store binding architectures."
+
 ---
 
 This document details the step-by-step installation, bootstrapping, and validation workflows executed by the Hoox CLI during project initialization.
@@ -54,10 +56,10 @@ Prompts for your Cloudflare® API token (with `Account.D1`, `Account.KV`, `Accou
 
 Chooses a **preset** rather than free-form per-worker toggles in the wizard:
 
-| Preset     | Focus                                                                 |
-| :--------- | :-------------------------------------------------------------------- |
-| `minimal`  | Gateway + D1 + analytics — webhook processing only                    |
-| `standard` | Trading + analytics + Telegram notifications                          |
+| Preset     | Focus                                                                                        |
+| :--------- | :------------------------------------------------------------------------------------------- |
+| `minimal`  | Gateway + D1 + analytics — webhook processing only                                           |
+| `standard` | Trading + analytics + Telegram notifications                                                 |
 | `full`     | All workers (AI agent, spot DEX wallet, email, pyne-worker / Pine Script™, …) + integrations |
 
 Pass `--preset minimal|standard|full` for non-interactive runs (`hoox onboard` / `hoox init`). You can still edit `wrangler.jsonc` afterward to refine enabled workers.

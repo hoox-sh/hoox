@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "CLI Architecture & Features"
 description: "Detailed specification of the Hoox Command-Line Interface, monorepo workspaces compilation, and task-management engines."
+
 ---
 
 The **`hoox` CLI** (`packages/cli`, **0.16.0**) is the unified lifecycle engine of the trading platform monorepo. It governs local sandboxes, compiles TypeScript structures, coordinates Cloudflare infrastructure resources, deploys edge isolates, manages encrypted secrets, and executes self-healing diagnostics.
@@ -51,12 +53,12 @@ Workspace configuration (`wrangler.jsonc`), path layout (`$HOME/.hoox`, monorepo
 
 Before commands run, `ensureWorkspaceContext()` (`packages/cli/src/services/workspace/`) resolves the monorepo and switches the process into it:
 
-| Priority | Source | Notes |
-| -------- | ------ | ----- |
-| 1 | `HOOX_REPO` | Explicit override |
-| 2 | Walk up from `cwd` | Local clone markers |
-| 3 | `~/.hoox/config/monorepo.json` | Last discovered checkout |
-| 4 | `~/.hoox/repo` | Managed global clone (`doctor --fix-runtime`) |
+| Priority | Source                         | Notes                                         |
+| -------- | ------------------------------ | --------------------------------------------- |
+| 1        | `HOOX_REPO`                    | Explicit override                             |
+| 2        | Walk up from `cwd`             | Local clone markers                           |
+| 3        | `~/.hoox/config/monorepo.json` | Last discovered checkout                      |
+| 4        | `~/.hoox/repo`                 | Managed global clone (`doctor --fix-runtime`) |
 
 **Markers** (`isHooxSetupRoot`): `packages/cli/package.json` **and** one of
 `wrangler.jsonc` / `wrangler.jsonc.example` / `workers/` / `.gitmodules`.
@@ -96,9 +98,10 @@ hoox repair infra
 
 <Tip>
   Every command honors `--json` and `--quiet`. Commands that run through the
-  shared task runner (`hoox deploy all`, `hoox check setup`, `hoox check health`,
-  …) write a **task-result array** on stdout when `--json` is set (`title`,
-  `ok`, `ms`, optional `value` / `error` / `details`). `--quiet` prints nothing.
+  shared task runner (`hoox deploy all`, `hoox check setup`, `hoox check
+  health`, …) write a **task-result array** on stdout when `--json` is set
+  (`title`, `ok`, `ms`, optional `value` / `error` / `details`). `--quiet`
+  prints nothing.
 </Tip>
 
 ---
@@ -243,12 +246,12 @@ Every formatter handles the format modes for you — you never read
 Top-level `hoox secrets` (alias of `hoox config secrets`) manages Worker secrets
 declared in workspace `wrangler.jsonc`:
 
-| Mode | Command | Behavior |
-| ---- | ------- | -------- |
-| **System / mesh only** | `hoox secrets sync --system` | Syncs internal auth + gateway keys only (`INTERNAL_KEY_BINDING`, `WEBHOOK_API_KEY_BINDING`, session keys, …). Walks every worker in root `wrangler.jsonc` (including empty `secrets: []`). Skips exchange keys, bot tokens, and other integration secrets. Alias: `--required`. Prefer after `hoox keys generate` / key rotation. |
-| **Full sync** | `hoox secrets sync` / `hoox secrets sync <worker>` | Puts all declared secrets present in local `.dev.vars`. Reports **synced** / **skipped** (placeholders or missing) / **failed**. Clones empty optional satellites before put. |
-| **Single secret** | `hoox secrets set <worker> <name>` | Worker is required. Prompts for the value (hidden stdin). Writes `.dev.vars` and `wrangler secret put`. Enables/clones optional satellites (`pyne-worker`, `pyne-agent-worker`) when missing or empty. Canonical trade secrets: `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING`. |
-| **List / delete** | `hoox secrets list [worker]`, `hoox secrets delete …` | Inventory or remove. Delete confirms wrangler non-interactively. |
+| Mode                   | Command                                               | Behavior                                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **System / mesh only** | `hoox secrets sync --system`                          | Syncs internal auth + gateway keys only (`INTERNAL_KEY_BINDING`, `WEBHOOK_API_KEY_BINDING`, session keys, …). Walks every worker in root `wrangler.jsonc` (including empty `secrets: []`). Skips exchange keys, bot tokens, and other integration secrets. Alias: `--required`. Prefer after `hoox keys generate` / key rotation. |
+| **Full sync**          | `hoox secrets sync` / `hoox secrets sync <worker>`    | Puts all declared secrets present in local `.dev.vars`. Reports **synced** / **skipped** (placeholders or missing) / **failed**. Clones empty optional satellites before put.                                                                                                                                                     |
+| **Single secret**      | `hoox secrets set <worker> <name>`                    | Worker is required. Prompts for the value (hidden stdin). Writes `.dev.vars` and `wrangler secret put`. Enables/clones optional satellites (`pyne-worker`, `pyne-agent-worker`) when missing or empty. Canonical trade secrets: `EXCHANGE_KEY_BINDING` / `EXCHANGE_SECRET_BINDING`.                                               |
+| **List / delete**      | `hoox secrets list [worker]`, `hoox secrets delete …` | Inventory or remove. Delete confirms wrangler non-interactively.                                                                                                                                                                                                                                                                  |
 
 `hoox check setup` only fails remote secret checks when declared names are
 **missing on Cloudflare®** (with `hoox secrets sync` hints) — healthy local
@@ -262,14 +265,14 @@ The shared worker catalog is the source of known isolates and default enabled
 flags. Enable/disable writes `workers.<name>.enabled` in the root
 `wrangler.jsonc`. Missing catalog workers are seeded on enable.
 
-| Command | Behavior |
-| ------- | -------- |
-| `hoox workers list` | Catalog + config merge: status, default, path, membership |
-| `hoox workers catalog` | Canonical names, tier (`core` / `optional` / `planned`), default enabled flags |
-| `hoox workers enable <name...>` | Set `enabled: true` (seed from catalog if absent; optional satellites clone + wire callers) |
-| `hoox workers disable <name...>` | Set `enabled: false` (skipped by deploy/logs/all) |
-| `hoox workers dev <name>` | Delegates to `hoox dev worker` |
-| `hoox workers logs <name>` | Delegates to `hoox logs worker` |
+| Command                          | Behavior                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------- |
+| `hoox workers list`              | Catalog + config merge: status, default, path, membership                                   |
+| `hoox workers catalog`           | Canonical names, tier (`core` / `optional` / `planned`), default enabled flags              |
+| `hoox workers enable <name...>`  | Set `enabled: true` (seed from catalog if absent; optional satellites clone + wire callers) |
+| `hoox workers disable <name...>` | Set `enabled: false` (skipped by deploy/logs/all)                                           |
+| `hoox workers dev <name>`        | Delegates to `hoox dev worker`                                                              |
+| `hoox workers logs <name>`       | Delegates to `hoox logs worker`                                                             |
 
 `hoox deploy worker` / `dev worker` / `test worker` / `repair` / `update` also ensure optional satellites are enabled and checked out when the tree is empty.
 
@@ -280,12 +283,12 @@ Health checks stay on `hoox check health`. Deploy stays on `hoox deploy workers`
 
 ## 🚪 7. Setup gates (`hoox onboard` / `hoox setup`)
 
-| Gate | Behavior |
-| ---- | -------- |
-| **Init incomplete** | Onboard does **not** run setup unless `wrangler.jsonc` exists after step 1 (cancel / risk-decline stay fail-closed). |
-| **Cloudflare® auth** | Setup and onboard step 2 require `wrangler whoami` / token env; fail early with login hints. |
-| **Workers gate** | After submodule clone, setup aborts if worker trees are still missing. |
-| **`--skip-keys`** | Loads mesh keys from `.keys/setup.env` so secrets can still push without regenerating keys. |
+| Gate                 | Behavior                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Init incomplete**  | Onboard does **not** run setup unless `wrangler.jsonc` exists after step 1 (cancel / risk-decline stay fail-closed). |
+| **Cloudflare® auth** | Setup and onboard step 2 require `wrangler whoami` / token env; fail early with login hints.                         |
+| **Workers gate**     | After submodule clone, setup aborts if worker trees are still missing.                                               |
+| **`--skip-keys`**    | Loads mesh keys from `.keys/setup.env` so secrets can still push without regenerating keys.                          |
 
 ---
 

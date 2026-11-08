@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Hoox Documentation"
 description: "Edge-Native Algorithmic Trading on the Cloudflare® Edge"
+
 ---
 
 Hoox is a free, open-source, edge-native algorithmic trading framework and automation engine deployed natively to the Cloudflare® Edge Network. By utilizing a distributed microservice architecture, Hoox processes trade signals, evaluates risk parameters, executes order routing, and fires Telegram notifications—all within milliseconds and directly from the edge nodes closest to exchange servers.
@@ -38,10 +40,19 @@ graph TB
   <Card title="Ecosystem" icon="mesh" href="/docs/enduser/concepts/ecosystem">
     HOOX vs PYNE vs AXIS vs PyneTS vs pyne-worker — what each surface does.
   </Card>
-  <Card title="PYNE live trading" icon="signal" href="/docs/enduser/guides/pyne-live-trading">
-    Strategy events from pyne-worker to trade-worker. Alerts are a separate path.
+  <Card
+    title="PYNE live trading"
+    icon="signal"
+    href="/docs/enduser/guides/pyne-live-trading"
+  >
+    Strategy events from pyne-worker to trade-worker. Alerts are a separate
+    path.
   </Card>
-  <Card title="AXIS and HOOX" icon="chart" href="/docs/enduser/guides/axis-and-hoox">
+  <Card
+    title="AXIS and HOOX"
+    icon="chart"
+    href="/docs/enduser/guides/axis-and-hoox"
+  >
     The PWA evaluates. The mesh executes. They do not share an order router.
   </Card>
   <Card title="Architecture" icon="layers" href="/docs/devops/architecture">
@@ -69,13 +80,13 @@ graph TB
 
 ## Popular paths
 
-| Goal | Start here |
-| ---- | ---------- |
-| Install CLI + first deploy | [Installation](/docs/enduser/getting-started/installation) · [Quick Start](/docs/enduser/getting-started/quick-start) |
-| Sandbox / testnet orders | [Test Trading](/docs/enduser/guides/test-trading) |
-| Uniswap / Jupiter spots | [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps) |
-| How a signal becomes a fill | [How Hoox Works](/docs/enduser/concepts/how-hoox-works) |
-| Pine strategy → live order | [PYNE live trading](/docs/enduser/guides/pyne-live-trading) |
-| Chart without trading | [AXIS and HOOX](/docs/enduser/guides/axis-and-hoox) |
-| Exchange execution isolate | [trade-worker](/docs/devops/workers/trade-worker) |
-| Production rollout | [Production Deployment](/docs/devops/deployment/production) |
+| Goal                        | Start here                                                                                                            |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Install CLI + first deploy  | [Installation](/docs/enduser/getting-started/installation) · [Quick Start](/docs/enduser/getting-started/quick-start) |
+| Sandbox / testnet orders    | [Test Trading](/docs/enduser/guides/test-trading)                                                                     |
+| Uniswap / Jupiter spots     | [DEX spot swaps](/docs/enduser/guides/dex-spot-swaps)                                                                 |
+| How a signal becomes a fill | [How Hoox Works](/docs/enduser/concepts/how-hoox-works)                                                               |
+| Pine strategy → live order  | [PYNE live trading](/docs/enduser/guides/pyne-live-trading)                                                           |
+| Chart without trading       | [AXIS and HOOX](/docs/enduser/guides/axis-and-hoox)                                                                   |
+| Exchange execution isolate  | [trade-worker](/docs/devops/workers/trade-worker)                                                                     |
+| Production rollout          | [Production Deployment](/docs/devops/deployment/production)                                                           |

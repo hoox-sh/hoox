@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Telegram Bot Setup"
 description: "How to provision a secure Telegram Bot via BotFather, bind credentials, deploy webhooks, and execute commands."
+
 ---
 
 The **`telegram-worker`** is a central operational pillar of the Hoox trading ecosystem. It serves two critical functions:
@@ -97,9 +99,9 @@ Beyond static commands, `telegram-worker` is integrated with **Cloudflare® Work
 
 <Warning>
   The `telegram-worker` strictly filters incoming messages. Inbound `/webhook`
-  commands fail-closed when `AUTHORIZED_CHAT_IDS` is unset. Outbound alerts
-  must land on that allowlist (or `TG_CHAT_ID_BINDING` when the allowlist is
-  empty). Unlisted chat IDs are dropped.
+  commands fail-closed when `AUTHORIZED_CHAT_IDS` is unset. Outbound alerts must
+  land on that allowlist (or `TG_CHAT_ID_BINDING` when the allowlist is empty).
+  Unlisted chat IDs are dropped.
 </Warning>
 
 ### 🔗 Next Steps

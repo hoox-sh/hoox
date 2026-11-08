@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "Local Development"
 description: "How to run, hot-reload, and test Hoox workers locally using native wrangler runtimes or Docker Compose containers."
+
 ---
 
 Hoox provides a comprehensive local development workspace designed to match your production Cloudflare® edge environment. You can run all microservices with hot-reload enabled, monitor them visually via the Terminal UI (TUI), and execute the full test suite using native Bun tools or isolated Docker containers. Prefer `hoox dev` / `hx dev` over calling Wrangler by hand.
@@ -83,15 +85,15 @@ network — the same topology as production Cloudflare® Workers Service Binding
 
 `hoox dev start` pins the ports below. agent-worker, email-worker, report-worker, and analytics-worker are not pinned; they take `8800` and up, in enable order. Docker Compose publishes only `8787` (gateway) and `8794` (dashboard) to the host.
 
-| Worker | `hoox dev` port | Endpoint URL | Purpose |
-| :-------------------- | :-------------: | :---------------------- | :-------------------------------- |
-| **`hoox`** | `8787` | `http://localhost:8787` | Public Gateway & Webhook Receiver |
-| **`trade-worker`** | `8788` | `http://localhost:8788` | Trade Execution Engine |
-| **`d1-worker`** | `8789` | `http://localhost:8789` | SQLite Database Operations |
-| **`telegram-worker`** | `8790` | `http://localhost:8790` | Telegram Bot Alerts & Commands |
-| **`web3-wallet-worker`** | `8792` | `http://localhost:8792` | On-Chain DeFi Execution |
-| **`dashboard`** | `8794` | `http://localhost:8794` | Next.js Dashboard Cockpit |
-| **`pyne-worker`** | `8799` | `http://localhost:8799` | Pine Script™ edge evaluate (PYNE) |
+| Worker                   | `hoox dev` port | Endpoint URL            | Purpose                           |
+| :----------------------- | :-------------: | :---------------------- | :-------------------------------- |
+| **`hoox`**               |     `8787`      | `http://localhost:8787` | Public Gateway & Webhook Receiver |
+| **`trade-worker`**       |     `8788`      | `http://localhost:8788` | Trade Execution Engine            |
+| **`d1-worker`**          |     `8789`      | `http://localhost:8789` | SQLite Database Operations        |
+| **`telegram-worker`**    |     `8790`      | `http://localhost:8790` | Telegram Bot Alerts & Commands    |
+| **`web3-wallet-worker`** |     `8792`      | `http://localhost:8792` | On-Chain DeFi Execution           |
+| **`dashboard`**          |     `8794`      | `http://localhost:8794` | Next.js Dashboard Cockpit         |
+| **`pyne-worker`**        |     `8799`      | `http://localhost:8799` | Pine Script™ edge evaluate (PYNE) |
 
 ```bash
 # Probe / evaluate via CLI (when pyne-worker is enabled)

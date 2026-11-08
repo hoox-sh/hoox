@@ -4,8 +4,10 @@
 -->
 
 ---
+
 title: "🔗 Isolate Communication Spec"
 description: "Detailed specification of Cloudflare Service Bindings, zero-overhead V8 isolate routing, and standard cross-worker auth middleware."
+
 ---
 
 In a traditional server-based monorepo or Docker cluster, microservices communicate over TCP/IP connections using protocols like REST, gRPC, or WebSockets. These introduce significant **networking overhead**: DNS resolution, TCP handshakes, TLS negotiation, and data serialization.
@@ -124,12 +126,12 @@ export async function handleRequest(
 ```
 
 <Note>
-  Mesh workers bind `INTERNAL_KEY_BINDING`. Prefer scoped secrets when you
-  set them: `WALLET_EXECUTE_KEY_BINDING` (wallet `/swap` and the gateway
-  `/wallet` proxy), `TRADE_EXECUTE_KEY_BINDING`, `D1_READ_KEY_BINDING` /
-  `D1_WRITE_KEY_BINDING`. Each falls back to the shared key.
-  **pyne-worker** public routes use `API_KEY` (`X-API-Key`); only the
-  strategy → trade-worker hop sends `X-Internal-Auth-Key`.
+  Mesh workers bind `INTERNAL_KEY_BINDING`. Prefer scoped secrets when you set
+  them: `WALLET_EXECUTE_KEY_BINDING` (wallet `/swap` and the gateway `/wallet`
+  proxy), `TRADE_EXECUTE_KEY_BINDING`, `D1_READ_KEY_BINDING` /
+  `D1_WRITE_KEY_BINDING`. Each falls back to the shared key. **pyne-worker**
+  public routes use `API_KEY` (`X-API-Key`); only the strategy → trade-worker
+  hop sends `X-Internal-Auth-Key`.
 </Note>
 
 ---
