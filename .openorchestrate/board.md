@@ -9,7 +9,7 @@
 | hoox: docs/**/*.mdx fail prettier --check (pre-existing drift)                                                             | oo-spec-2 | Todo             |
 | Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | oo-spec-2 | Ready for Review |
 | hoox: fix 7 lint errors and triage 339 warnings (seeded from HQ)                                                           | oo-spec-2 | Todo             |
-| hoox: close the L4/7 ladder gaps (seeded from HQ)                                                                          | oo-ops    | Todo             |
+| hoox: close the L4/7 ladder gaps (seeded from HQ)                                                                          | oo-ops    | Ready for Review |
 
 ## Rules
 
