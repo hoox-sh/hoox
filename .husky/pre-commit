@@ -9,3 +9,9 @@ fi
 
 echo "Refreshing OKF bundle…"
 bun scripts/okf/cli.ts enrich --from-index --stage || exit 1
+# oo-verify:begin
+# OpenOrchestrate verify (composed into husky; keep these markers)
+if [ -f scripts/verify.sh ]; then
+  bash scripts/verify.sh pre-commit || exit 1
+fi
+# oo-verify:end
