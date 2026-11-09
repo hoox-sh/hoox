@@ -28,6 +28,12 @@ Autonomy: **draft**
 11. Same answer every time? A script, not a model call.
 12. Wake-ups times re-reads is your bill.
 
+## Optional skills
+
+The public skill-pack catalog is **off** by default. Agents may recommend
+`oo skills enable catalog/…` with a reason. Never auto-install on `oo init`.
+Ask first before `npx skills add` (third-party code).
+
 ## The board
 
 Path: `.openorchestrate/board.md`
