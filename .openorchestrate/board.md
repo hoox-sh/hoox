@@ -3,11 +3,13 @@
 > One place for work. Statuses: Todo · Working · Blocked · Ready for Review · Done.
 > Nothing is done until this file says Done.
 
-| Task                                                                                                                       | Owner     | Status  |
-| -------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| Smoke-test the OO board pipeline: verify card lifecycle (Todo → Working → Done) end-to-end                                 | oo-misc   | Todo    |
-| hoox: docs/**/*.mdx fail prettier --check (pre-existing drift)                                                             | oo-spec-2 | Todo    |
-| Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | oo-spec-2 | Working — Batches A-C + table gating applied and verified (1406 tests pass, 2 pre-existing SetupService fails, typecheck 16/16; audit: packages/cli/CLI-REVIEW.md). Awaiting Quality Gate. |
+| Task                                                                                                                       | Owner     | Status           |
+| -------------------------------------------------------------------------------------------------------------------------- | --------- | ---------------- |
+| Smoke-test the OO board pipeline: verify card lifecycle (Todo → Working → Done) end-to-end                                 | oo-misc   | Todo             |
+| hoox: docs/**/*.mdx fail prettier --check (pre-existing drift)                                                             | oo-spec-2 | Todo             |
+| Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | oo-spec-2 | Ready for Review |
+| hoox: fix 7 lint errors and triage 339 warnings (seeded from HQ)                                                           | oo-spec-2 | Todo             |
+| hoox: close the L4/7 ladder gaps (seeded from HQ)                                                                          | oo-ops    | Todo             |
 
 ## Rules
 
