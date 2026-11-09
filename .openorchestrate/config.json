@@ -94,7 +94,28 @@
   },
   "routines": {
     "enabled": true,
-    "items": []
+    "items": [
+      {
+        "id": "board-sweep",
+        "name": "Board sweep",
+        "owner": "oo-ops",
+        "schedule": "daily at 09:00",
+        "job": "Sweep this agency board: failing checks, review comments, conflicts, and stale cards. Send each problem back to its owner with the exact gap. Move nothing that is not yours. Never run oo board sync.",
+        "file": "routines/board-sweep.md",
+        "enabled": true,
+        "silentOnNoChange": true
+      },
+      {
+        "id": "nightly-audit",
+        "name": "Nightly audit",
+        "owner": "oo-spec-2",
+        "schedule": "daily at 03:00",
+        "job": "Audit the codebase: dead code, load time, bundle size, failing checks. Open small PRs with proof. Never merge.",
+        "file": "routines/nightly-audit.md",
+        "enabled": true,
+        "silentOnNoChange": false
+      }
+    ]
   },
   "memory": {
     "playbook": "playbook.md",

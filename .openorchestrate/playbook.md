@@ -36,6 +36,11 @@ Five statuses: Todo, Working, Blocked, Ready for Review, Done.
 
 A handoff contains: from, to, objective, artifacts, decisions, open questions, next gate.
 
+- The board is the source of truth; a chat message is not a handoff.
+- One owner per card.
+- A card without proof, or with weak proof (no assertion), does not move to Done.
+- Do not run `oo board sync`; edit `.openorchestrate/board.md` and run `oo board lint` only.
+
 ## The gate
 
 - Ask first before spending money or buying anything.
