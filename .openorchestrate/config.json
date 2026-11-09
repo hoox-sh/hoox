@@ -173,5 +173,14 @@
     "updatedAt": "2026-11-07T16:52:13.475Z",
     "generator": "openorchestrate",
     "version": "0.2.0"
+  },
+  "optionalSkills": {
+    "enabledPacks": [
+      "catalog/addyosmani-agent-skills",
+      "catalog/cloudflare-security-audit",
+      "catalog/google-elephant-goldfish",
+      "catalog/kepano-obsidian-skills",
+      "catalog/mattpocock-skills"
+    ]
   }
 }
