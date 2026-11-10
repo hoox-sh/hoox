@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app"
@@ -18,16 +18,16 @@ okf_lock: generated
 
 # Files
 
-- `error.tsx` — RootError
-- `footer.tsx` — Footer
-- `global-error.tsx` — GlobalError, dynamic
-- `layout.tsx` — RootLayout, dynamic, metadata, viewport
-- `not-found.tsx` — NotFound
-- `page.tsx` — HomePage
+* `error.tsx` — RootError
+* `footer.tsx` — Footer
+* `global-error.tsx` — GlobalError, dynamic
+* `layout.tsx` — RootLayout, dynamic, metadata, viewport
+* `not-found.tsx` — NotFound
+* `page.tsx` — HomePage
 
 # Other files
 
-- `globals.css`
+* `globals.css`
 
 # Packages
 
@@ -35,4 +35,4 @@ okf_lock: generated
 
 # Nested
 
-- [workers/dashboard/src/app/dashboard](/code/workers/dashboard/src/app/dashboard.md)
+* [workers/dashboard/src/app/dashboard](/code/workers/dashboard/src/app/dashboard.md)

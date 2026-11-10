@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/workers/hoox.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/devops/workers/hoox.mdx`.
 
 # Outline
 
-- 🏗️ Architectural Topology
-- ⚡ 1. Declared Wrangler Configurations & Bindings
-- 🔑 2. Environmental Variables & Encrypted Secrets
-  - Local Development Mocking (.dev.vars)
-- 🛡️ 2b. Ingress controls (WAF-layer)
-- 🛜 3. API Route Specifications
-  - A. Ingest Signal Webhook
-  - B. Gateway Health Diagnostics
-  - C. Operator management plane (/v1/)
-  - D. Operator wallet proxy (/wallet/)
-  - 🔗 Next Steps
+* 🏗️ Architectural Topology
+* ⚡ 1. Declared Wrangler Configurations & Bindings
+* 🔑 2. Environmental Variables & Encrypted Secrets
+  * Local Development Mocking (.dev.vars)
+* 🛡️ 2b. Ingress controls (WAF-layer)
+* 🛜 3. API Route Specifications
+  * A. Ingest Signal Webhook
+  * B. Gateway Health Diagnostics
+  * C. Operator management plane (/v1/)
+  * D. Operator wallet proxy (/wallet/)
+  * 🔗 Next Steps

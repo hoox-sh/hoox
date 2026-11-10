@@ -7,7 +7,7 @@ tags: [code, hooks, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/tui/src/hooks"
@@ -18,11 +18,11 @@ okf_lock: generated
 
 # Files
 
-- `hooks.test.ts`
-- `index.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, getRendererRef, isShellOverlayOpen, setRendererRef, usePolling, useViewKeyboard
-- `renderer-ref.ts` — getRendererRef, setRendererRef
-- `shell-overlay.ts` — ViewKeyEvent, isShellOverlayOpen, useViewKeyboard
-- `use-polling.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, usePolling
+* `hooks.test.ts`
+* `index.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, getRendererRef, isShellOverlayOpen, setRendererRef, usePolling, useViewKeyboard
+* `renderer-ref.ts` — getRendererRef, setRendererRef
+* `shell-overlay.ts` — ViewKeyEvent, isShellOverlayOpen, useViewKeyboard
+* `use-polling.ts` — POLLING_MAX_BACKOFF_MS, UsePollingOptions, computePollingBackoff, createPollingController, formatPollIntervalLabel, usePolling
 
 # Packages
 
@@ -30,12 +30,12 @@ okf_lock: generated
 
 # Depends on
 
-- [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
+* [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
 
 # Used by
 
-- [packages/tui/src](/code/packages/tui/src.md)
-- [packages/tui/src/components/layout](/code/packages/tui/src/components/layout.md)
-- [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
-- [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
-- [packages/tui/src/services](/code/packages/tui/src/services.md)
+* [packages/tui/src](/code/packages/tui/src.md)
+* [packages/tui/src/components/layout](/code/packages/tui/src/components/layout.md)
+* [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
+* [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
+* [packages/tui/src/services](/code/packages/tui/src/services.md)

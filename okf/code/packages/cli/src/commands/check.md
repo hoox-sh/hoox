@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/check"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-- `check-command.test.ts`
-- `check-command.ts` — probeWorkerHealth, registerCheckCommand, resolveWorkerBaseUrl
-- `index.ts` — CheckCategory, CheckReport, CheckResult, FixAction, FixReport, HealthCheckResult, registerCheckCommand, registerPrerequisitesCommand
-- `prerequisites-command.test.ts`
-- `prerequisites-command.ts` — registerPrerequisitesCommand, runPrerequisitesCheck
-- `types.ts` — CheckCategory, CheckReport, CheckResult, FixAction, FixReport, HealthCheckResult
+* `check-command.test.ts`
+* `check-command.ts` — probeWorkerHealth, registerCheckCommand, resolveWorkerBaseUrl
+* `index.ts` — CheckCategory, CheckReport, CheckResult, FixAction, FixReport, HealthCheckResult, registerCheckCommand, registerPrerequisitesCommand
+* `prerequisites-command.test.ts`
+* `prerequisites-command.ts` — registerPrerequisitesCommand, runPrerequisitesCheck
+* `types.ts` — CheckCategory, CheckReport, CheckResult, FixAction, FixReport, HealthCheckResult
 
 # Packages
 

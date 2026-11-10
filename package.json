@@ -9,10 +9,10 @@
     "packages/test-utils"
   ],
   "scripts": {
-    "test": "bun run scripts/test-with-table.ts --isolate --path-ignore-patterns 'tests/live/**' --path-ignore-patterns 'packages/tui/**' && bun run test:tui",
+    "test": "bun run scripts/test-with-table.ts --isolate --path-ignore-patterns 'tests/live/**' --path-ignore-patterns 'packages/tui/**' --path-ignore-patterns 'packages/cli/workers/**' && bun run test:tui",
     "test:live": "bun run scripts/test-with-table.ts tests/live/ --jobs 1",
-    "test:cli": "bun run scripts/test-with-table.ts --isolate packages/cli/",
-    "test:tui": "bun run scripts/test-with-table.ts --preload ./packages/tui/src/test-setup.ts packages/tui/",
+    "test:cli": "bun run scripts/test-with-table.ts --isolate --path-ignore-patterns 'packages/cli/workers/**' packages/cli/",
+    "test:tui": "bun run scripts/test-with-table.ts --preload ./packages/tui/src/test-setup.ts --path-ignore-patterns 'packages/cli/workers/**' packages/tui/",
     "test:shared": "bun run scripts/test-with-table.ts --isolate packages/shared/",
     "test:workers": "bun run scripts/test-with-table.ts --isolate workers/",
     "test:trade-worker": "bun test workers/trade-worker",

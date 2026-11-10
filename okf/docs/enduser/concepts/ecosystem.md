@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/ecosystem.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/enduser/concepts/ecosystem.mdx`.
 
 # Outline
 
-- Abstract
-- Conceptual model
-- Interface surface
-  - What executes a live order
-  - What evaluates Pine
-- Internals
-- Invariants
-- Worked examples
-- See also
+* Abstract
+* Conceptual model
+* Interface surface
+  * What executes a live order
+  * What evaluates Pine
+* Internals
+* Invariants
+* Worked examples
+* See also

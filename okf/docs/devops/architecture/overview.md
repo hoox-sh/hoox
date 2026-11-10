@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/overview.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/devops/architecture/overview.mdx`.
 
 # Outline
 
-- 🗺️ High-Level System Architecture
-- 📊 Comprehensive Micro-Worker Catalog
-- 🛡️ The 5-Layer Security Architecture
-  - Layer 1: Edge-Level Firewall & WAF
-  - Layer 2: Webhook Passkey Authentication
-  - Layer 3: Service Binding Encrypted Isolation
-  - Layer 4: Standardized Internal Authorization
-  - Layer 5: Durable Object Idempotency Locks
-- Opt-in tenant isolation
-- Bindings graph (local)
-  - Next Steps
+* 🗺️ High-Level System Architecture
+* 📊 Comprehensive Micro-Worker Catalog
+* 🛡️ The 5-Layer Security Architecture
+  * Layer 1: Edge-Level Firewall & WAF
+  * Layer 2: Webhook Passkey Authentication
+  * Layer 3: Service Binding Encrypted Isolation
+  * Layer 4: Standardized Internal Authorization
+  * Layer 5: Durable Object Idempotency Locks
+* Opt-in tenant isolation
+* Bindings graph (local)
+  * Next Steps

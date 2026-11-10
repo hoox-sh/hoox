@@ -7,7 +7,7 @@ tags: [contributing, doc]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "CONTRIBUTING.md"
@@ -22,21 +22,21 @@ Repo path `CONTRIBUTING.md`.
 
 # Outline
 
-- 🏗️ How Can I Contribute?
-  - 🐛 Reporting Bugs
-  - 💡 Suggesting Enhancements
-  - 🔀 Pull Requests
-- 🛠️ Development Setup
-  - Prerequisites
-  - Step-by-Step Setup
-  - Git Workflow
-  - Running Tests
-  - Code Style
-  - Testing Patterns
-  - Documentation Standards
-- 🤝 Code of Conduct
-- 📋 Reference
+* 🏗️ How Can I Contribute?
+  * 🐛 Reporting Bugs
+  * 💡 Suggesting Enhancements
+  * 🔀 Pull Requests
+* 🛠️ Development Setup
+  * Prerequisites
+  * Step-by-Step Setup
+  * Git Workflow
+  * Running Tests
+  * Code Style
+  * Testing Patterns
+  * Documentation Standards
+* 🤝 Code of Conduct
+* 📋 Reference
 
 # Mentions
 
-- [tests/live](/code/tests/live.md)
+* [tests/live](/code/tests/live.md)

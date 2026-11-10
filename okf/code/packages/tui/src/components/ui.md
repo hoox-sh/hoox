@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/ui"
@@ -18,13 +18,13 @@ okf_lock: generated
 
 # Files
 
-- `connection-toasts.test.ts`
-- `connection-toasts.ts` — messageAuthMissing, messageAuthRequired, messageConnected, messageConnectionLost, messageOfflineStartup, messageReconnected, toastAuthMissingRemote, toastAuthRequiredMode, toastConfigSaved, toastConnectedMode, toastConnectionLost, toastConnectionLostMode
-- `dialog-state.ts` — isHooxDialogOpen, setOpenDialogCount
-- `dialog.tsx` — ChoiceDialogOptions, ChoiceOption, ConfirmDialogOptions, DialogHandle, DialogProvider, DialogProviderProps, showChoice, showConfirm, showLoading, useDialog
-- `progress.tsx` — ProgressBar, ProgressBarProps
-- `pulse.tsx` — PulseDot, PulseWave, StepTick
-- `toast.tsx` — ToastId, ToastOptions, dismissToast, messageCopiedToClipboard, toastCopiedToClipboard, toastCopyFailed, toastError, toastInfo, toastLoading, toastSuccess, toastWarning
+* `connection-toasts.test.ts`
+* `connection-toasts.ts` — messageAuthMissing, messageAuthRequired, messageConnected, messageConnectionLost, messageOfflineStartup, messageReconnected, toastAuthMissingRemote, toastAuthRequiredMode, toastConfigSaved, toastConnectedMode, toastConnectionLost, toastConnectionLostMode
+* `dialog-state.ts` — isHooxDialogOpen, setOpenDialogCount
+* `dialog.tsx` — ChoiceDialogOptions, ChoiceOption, ConfirmDialogOptions, DialogHandle, DialogProvider, DialogProviderProps, showChoice, showConfirm, showLoading, useDialog
+* `progress.tsx` — ProgressBar, ProgressBarProps
+* `pulse.tsx` — PulseDot, PulseWave, StepTick
+* `toast.tsx` — ToastId, ToastOptions, dismissToast, messageCopiedToClipboard, toastCopiedToClipboard, toastCopyFailed, toastError, toastInfo, toastLoading, toastSuccess, toastWarning
 
 # Packages
 
@@ -32,11 +32,11 @@ okf_lock: generated
 
 # Depends on
 
-- [packages/tui/src/services](/code/packages/tui/src/services.md)
+* [packages/tui/src/services](/code/packages/tui/src/services.md)
 
 # Used by
 
-- [packages/tui/src](/code/packages/tui/src.md)
-- [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
-- [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
-- [packages/tui/src/services](/code/packages/tui/src/services.md)
+* [packages/tui/src](/code/packages/tui/src.md)
+* [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
+* [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+* [packages/tui/src/services](/code/packages/tui/src/services.md)

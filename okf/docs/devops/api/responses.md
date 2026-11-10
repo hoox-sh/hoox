@@ -7,7 +7,7 @@ tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/api/responses.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/devops/api/responses.mdx`.
 
 # Outline
 
-- 🛡️ 1. Standard Response Envelope
-- 🏆 2. Success Response Templates
-  - A. Trade Execution Fill Success (trade-worker - 200 OK)
-  - B. Telegram Push Success (telegram-worker - 200 OK)
-- 🚨 3. Error Models & Edge Error Codes
-  - A. 400 Bad Request (JSON Validation Error)
-  - B. 409 Conflict (Idempotency Mutex Intercept)
-- 🛠️ 4. Shared Errors Factory Middleware
-  - 🔗 Next Steps
+* 🛡️ 1. Standard Response Envelope
+* 🏆 2. Success Response Templates
+  * A. Trade Execution Fill Success (trade-worker - 200 OK)
+  * B. Telegram Push Success (telegram-worker - 200 OK)
+* 🚨 3. Error Models & Edge Error Codes
+  * A. 400 Bad Request (JSON Validation Error)
+  * B. 409 Conflict (Idempotency Mutex Intercept)
+* 🛠️ 4. Shared Errors Factory Middleware
+  * 🔗 Next Steps

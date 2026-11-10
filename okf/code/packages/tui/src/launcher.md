@@ -7,7 +7,7 @@ tags: [code, launcher, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/tui/src/launcher"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-- `app.test.tsx`
-- `app.tsx` — LauncherApp, LauncherAppProps
-- `filter.test.ts`
-- `filter.ts` — filterLauncherItems
-- `logo.tsx` — HooxLogo, LOGO_HEIGHT, LOGO_WIDTH
-- `types.ts` — FALLBACK_CATALOG, LauncherCatalog, LauncherGroup, LauncherItem, LauncherResult
+* `app.test.tsx`
+* `app.tsx` — LauncherApp, LauncherAppProps
+* `filter.test.ts`
+* `filter.ts` — filterLauncherItems
+* `logo.tsx` — HooxLogo, LOGO_HEIGHT, LOGO_WIDTH
+* `types.ts` — FALLBACK_CATALOG, LauncherCatalog, LauncherGroup, LauncherItem, LauncherResult
 
 # Packages
 
@@ -31,8 +31,8 @@ okf_lock: generated
 
 # Depends on
 
-- [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
+* [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
 
 # Used by
 
-- [packages/tui/src](/code/packages/tui/src.md)
+* [packages/tui/src](/code/packages/tui/src.md)

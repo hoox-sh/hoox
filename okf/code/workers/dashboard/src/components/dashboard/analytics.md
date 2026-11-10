@@ -7,7 +7,7 @@ tags: [code, components, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/components/dashboard/analytics"
@@ -18,17 +18,17 @@ okf_lock: generated
 
 # Files
 
-- `analytics-shell.tsx` — AnalyticsCard, AnalyticsCardSkeleton, AnalyticsEmpty, AnalyticsErrorState, AnalyticsTableSkeleton, KpiSkeleton, KpiTile, MetricInfo, SectionLabel
-- `analytics-toolbar.tsx` — AnalyticsToolbar
-- `api-stats.tsx` — ApiStats
-- `index.ts` — AnalyticsCard, AnalyticsCardSkeleton, AnalyticsEmpty, AnalyticsErrorState, AnalyticsToolbar, ApiStats, KpiStrip, KpiTile, MetricInfo, SectionLabel, SignalOutcomes, SuccessRateCard
-- `kpi-strip.tsx` — KpiStrip
-- `signal-outcomes.tsx` — SignalOutcomes
-- `success-rate-card.tsx` — SuccessRateCard
-- `time-range.ts` — TIME_RANGE_OPTIONS, TimeRangeKey, appendTimeRangeParams, isTimeRangeKey, timeRangeLabel, timeRangeToStartIso
-- `trade-metrics-chart.tsx` — TradeMetricsChart
-- `use-analytics-query.ts` — AnalyticsErrorCode, AnalyticsQueryError, AnalyticsQueryResult, useAnalyticsQuery
-- `worker-performance.tsx` — WorkerPerformance
+* `analytics-shell.tsx` — AnalyticsCard, AnalyticsCardSkeleton, AnalyticsEmpty, AnalyticsErrorState, AnalyticsTableSkeleton, KpiSkeleton, KpiTile, MetricInfo, SectionLabel
+* `analytics-toolbar.tsx` — AnalyticsToolbar
+* `api-stats.tsx` — ApiStats
+* `index.ts` — AnalyticsCard, AnalyticsCardSkeleton, AnalyticsEmpty, AnalyticsErrorState, AnalyticsToolbar, ApiStats, KpiStrip, KpiTile, MetricInfo, SectionLabel, SignalOutcomes, SuccessRateCard
+* `kpi-strip.tsx` — KpiStrip
+* `signal-outcomes.tsx` — SignalOutcomes
+* `success-rate-card.tsx` — SuccessRateCard
+* `time-range.ts` — TIME_RANGE_OPTIONS, TimeRangeKey, appendTimeRangeParams, isTimeRangeKey, timeRangeLabel, timeRangeToStartIso
+* `trade-metrics-chart.tsx` — TradeMetricsChart
+* `use-analytics-query.ts` — AnalyticsErrorCode, AnalyticsQueryError, AnalyticsQueryResult, useAnalyticsQuery
+* `worker-performance.tsx` — WorkerPerformance
 
 # Packages
 

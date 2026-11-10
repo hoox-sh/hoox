@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, tutorials]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/tutorials/telegram-bot.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/tutorials/telegram-bot.mdx`.
 
 # Outline
 
-- 🏁 Step-by-Step Configuration Path
-  - Step 1: Provision a Bot via BotFather
-  - Step 2: Retrieve Your Private Chat ID
-  - Step 3: Inject Credentials via Hoox CLI
-  - Step 4: Register the Webhook with Telegram
-- 🕹️ Interactive Chat Commands
-- 🧠 Conversational AI Chat & Chart Audits
-  - 🔗 Next Steps
+* 🏁 Step-by-Step Configuration Path
+  * Step 1: Provision a Bot via BotFather
+  * Step 2: Retrieve Your Private Chat ID
+  * Step 3: Inject Credentials via Hoox CLI
+  * Step 4: Register the Webhook with Telegram
+* 🕹️ Interactive Chat Commands
+* 🧠 Conversational AI Chat & Chart Audits
+  * 🔗 Next Steps

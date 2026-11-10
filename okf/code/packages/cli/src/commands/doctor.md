@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/doctor"
@@ -18,8 +18,8 @@ okf_lock: generated
 
 # Files
 
-- `doctor-command.ts` — registerDoctorCommand
-- `index.ts` — registerDoctorCommand
+* `doctor-command.ts` — registerDoctorCommand
+* `index.ts` — registerDoctorCommand
 
 # Packages
 

@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/db"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-- `db-service.test.ts`
-- `db-service.ts` — DbService, QueryResult
-- `index.ts` — DbService
+* `db-service.test.ts`
+* `db-service.ts` — DbService, QueryResult
+* `index.ts` — DbService
 
 # Packages
 

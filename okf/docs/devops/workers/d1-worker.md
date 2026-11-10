@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/workers/d1-worker.mdx"
@@ -22,15 +22,15 @@ Repo path `docs/devops/workers/d1-worker.mdx`.
 
 # Outline
 
-- ⚡ 1. Declared Wrangler Configurations & Bindings
-- 🔌 2. Internal REST API Specification
-  - A. Named RPC (preferred for hot paths)
-  - B. Execute Single SQL Query (SELECT-only free-form)
-  - C. Execute Transactional Batch Operations
-  - C. Dashboard Telemetry Statistics
-- 🛡️ 3. Security & SQL Injection Protection
-  - 🔗 Next Steps
+* ⚡ 1. Declared Wrangler Configurations & Bindings
+* 🔌 2. Internal REST API Specification
+  * A. Named RPC (preferred for hot paths)
+  * B. Execute Single SQL Query (SELECT-only free-form)
+  * C. Execute Transactional Batch Operations
+  * C. Dashboard Telemetry Statistics
+* 🛡️ 3. Security & SQL Injection Protection
+  * 🔗 Next Steps
 
 # Mentions
 
-- [scripts](/code/scripts.md)
+* [scripts](/code/scripts.md)

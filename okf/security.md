@@ -1,4 +1,5 @@
 ---
+okf_lock: human
 type: Policy
 title: Security
 description: Permission model, gates, and secret handling.

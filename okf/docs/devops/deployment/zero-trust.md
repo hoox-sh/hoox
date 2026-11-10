@@ -7,7 +7,7 @@ tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/zero-trust.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/devops/deployment/zero-trust.mdx`.
 
 # Outline
 
-  - CLI / TUI remote operators
-- 🏗️ The Zero Trust Protective Boundary
-- ⚡ 1. Step-by-Step Dashboard Access Setup
-  - Step 1: Enable Zero Trust on Your Account
-  - Step 2: Create a Self-Hosted Application
-  - Step 3: Configure Authorization Policies
-  - Step 4: Map Identity Providers & Save
-- 🧱 2. Strict WAF Webhook IP Allow-listing
-- ⚙️ 3. Optional: Bypassing Local Dashboard Auth
-  - 🔗 Next Steps
+  * CLI / TUI remote operators
+* 🏗️ The Zero Trust Protective Boundary
+* ⚡ 1. Step-by-Step Dashboard Access Setup
+  * Step 1: Enable Zero Trust on Your Account
+  * Step 2: Create a Self-Hosted Application
+  * Step 3: Configure Authorization Policies
+  * Step 4: Map Identity Providers & Save
+* 🧱 2. Strict WAF Webhook IP Allow-listing
+* ⚙️ 3. Optional: Bypassing Local Dashboard Auth
+  * 🔗 Next Steps

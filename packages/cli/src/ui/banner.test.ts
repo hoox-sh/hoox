@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect } from "bun:test";
+import ansis from "ansis";
 import {
   renderBanner,
   renderBannerMinimal,
@@ -15,6 +16,68 @@ import {
   DISCLAIMER,
 } from "./banner.js";
 import { stripAnsi } from "../utils/theme.js";
+
+/** Run `fn` with a rich TTY (color on) and restore the environment after. */
+function withRichMode<T>(fn: () => T): T {
+  const origTTY = process.stdout.isTTY;
+  const origNoColor = process.env.NO_COLOR;
+  const origTerm = process.env.TERM;
+  const origLevel = ansis.level;
+  Object.defineProperty(process.stdout, "isTTY", {
+    value: true,
+    configurable: true,
+    writable: true,
+  });
+  delete process.env.NO_COLOR;
+  process.env.TERM = "xterm-256color";
+  ansis.level = 3;
+  try {
+    return fn();
+  } finally {
+    Object.defineProperty(process.stdout, "isTTY", {
+      value: origTTY,
+      configurable: true,
+      writable: true,
+    });
+    if (origNoColor === undefined) delete process.env.NO_COLOR;
+    else process.env.NO_COLOR = origNoColor;
+    if (origTerm === undefined) delete process.env.TERM;
+    else process.env.TERM = origTerm;
+    ansis.level = origLevel;
+  }
+}
+
+/** Run `fn` with a non-TTY (piped) environment and restore it after. */
+function withPipedMode<T>(fn: () => T): T {
+  const origTTY = process.stdout.isTTY;
+  const origNoColor = process.env.NO_COLOR;
+  const origTerm = process.env.TERM;
+  Object.defineProperty(process.stdout, "isTTY", {
+    value: false,
+    configurable: true,
+    writable: true,
+  });
+  delete process.env.NO_COLOR;
+  process.env.TERM = "xterm-256color";
+  try {
+    return fn();
+  } finally {
+    Object.defineProperty(process.stdout, "isTTY", {
+      value: origTTY,
+      configurable: true,
+      writable: true,
+    });
+    if (origNoColor === undefined) delete process.env.NO_COLOR;
+    else process.env.NO_COLOR = origNoColor;
+    if (origTerm === undefined) delete process.env.TERM;
+    else process.env.TERM = origTerm;
+  }
+}
+
+/** True when the string contains only printable ASCII and newlines. */
+function isAsciiOnly(value: string): boolean {
+  return /^[\x20-\x7e\n]*$/.test(value);
+}
 
 describe("renderBanner", () => {
   it("renders the logo variant by default", () => {
@@ -30,19 +93,23 @@ describe("renderBanner", () => {
   });
 
   it("renders the explicitly-requested variant", () => {
-    const horizon = renderBanner("horizon");
-    const logo = renderBanner("logo");
-    expect(stripAnsi(horizon)).not.toBe(stripAnsi(logo));
+    withRichMode(() => {
+      const horizon = renderBanner("horizon");
+      const logo = renderBanner("logo");
+      expect(stripAnsi(horizon)).not.toBe(stripAnsi(logo));
+    });
   });
 
-  it("renders Linear Rail wordmark (◆ H · O · O · X)", () => {
-    const plain = stripAnsi(renderBannerLogo());
-    // No old ASCII box-drawing wordmark patterns
-    expect(plain).not.toContain("_   _");
-    expect(plain).not.toContain("| | | |");
-    // Linear Rail letters + diamond
-    expect(plain).toContain("◆");
-    expect(plain).toMatch(/H\s*·\s*O\s*·\s*O\s*·\s*X/);
+  it("renders Linear Rail wordmark (◆ H · O · O · X) on a TTY", () => {
+    withRichMode(() => {
+      const plain = stripAnsi(renderBannerLogo());
+      // No old ASCII box-drawing wordmark patterns
+      expect(plain).not.toContain("_   _");
+      expect(plain).not.toContain("| | | |");
+      // Linear Rail letters + diamond
+      expect(plain).toContain("◆");
+      expect(plain).toMatch(/H\s*·\s*O\s*·\s*O\s*·\s*X/);
+    });
   });
 
   it("includes the HOOX wordmark and tagline", () => {
@@ -96,16 +163,34 @@ describe("renderCompactBanner", () => {
     expect(out.split("\n").length).toBe(1);
   });
 
-  it("includes diamond, Hoox, and version", () => {
-    const plain = stripAnsi(renderCompactBanner());
-    expect(plain).toContain("◆");
-    expect(plain).toContain("Hoox");
-    expect(plain).toMatch(/v\d+\.\d+\.\d+/);
+  it("includes diamond, Hoox, and version on a TTY", () => {
+    withRichMode(() => {
+      const plain = stripAnsi(renderCompactBanner());
+      expect(plain).toContain("◆");
+      expect(plain).toContain("Hoox");
+      expect(plain).toMatch(/v\d+\.\d+\.\d+/);
+    });
+  });
+
+  it("is plain ASCII when piped", () => {
+    withPipedMode(() => {
+      const out = renderCompactBanner();
+      expect(out).not.toContain("\x1b");
+      expect(out).not.toContain("◆");
+      expect(isAsciiOnly(out)).toBe(true);
+      expect(out).toMatch(/v\d+\.\d+\.\d+/);
+    });
   });
 });
 
 describe("animateBanner", () => {
-  it("writes a static frame when forced static (non-TTY path)", async () => {
+  it("writes a plain ASCII frame on the non-TTY path", async () => {
+    const origTTY = process.stdout.isTTY;
+    Object.defineProperty(process.stdout, "isTTY", {
+      value: false,
+      configurable: true,
+      writable: true,
+    });
     const chunks: string[] = [];
     const origWrite = process.stdout.write.bind(process.stdout);
     process.stdout.write = ((chunk: string | Uint8Array) => {
@@ -115,12 +200,15 @@ describe("animateBanner", () => {
 
     try {
       const lines = await animateBanner({ static: true });
-      // Linear Rail: title + rule + meta ≈ 3 lines
+      // Plain frame: wordmark + rule + meta = 3 lines
       expect(lines).toBeGreaterThanOrEqual(2);
       expect(lines).toBeLessThanOrEqual(5);
       const out = chunks.join("");
-      expect(stripAnsi(out)).toContain("Cloudflare Workers Platform");
-      expect(stripAnsi(out)).toMatch(/H\s*·\s*O\s*·\s*O\s*·\s*X/);
+      expect(out).toContain("Cloudflare Workers Platform");
+      expect(out).toContain("HOOX");
+      // Piped output carries no ANSI and no decorative glyphs.
+      expect(out).not.toContain("\x1b");
+      expect(isAsciiOnly(out)).toBe(true);
       // Static path must not use cursor hide / line-clear animation sequences
       expect(out).not.toContain("\x1b[?25l");
       expect(out).not.toContain("\x1b[2K");
@@ -128,6 +216,11 @@ describe("animateBanner", () => {
       expect(out).not.toMatch(/\x1b\[\d+A/);
     } finally {
       process.stdout.write = origWrite;
+      Object.defineProperty(process.stdout, "isTTY", {
+        value: origTTY,
+        configurable: true,
+        writable: true,
+      });
     }
   });
 
@@ -216,11 +309,61 @@ describe("animateBanner", () => {
 
 describe("renderBannerSignal / horizon", () => {
   it("renders signal and horizon variants with tagline", () => {
-    const signal = stripAnsi(BANNER_VARIANTS.signal());
-    const horizon = stripAnsi(BANNER_VARIANTS.horizon());
-    expect(signal).toContain("Cloudflare Workers Platform");
-    expect(horizon).toContain("Cloudflare Workers Platform");
-    expect(signal).not.toBe(horizon);
+    withRichMode(() => {
+      const signal = stripAnsi(BANNER_VARIANTS.signal());
+      const horizon = stripAnsi(BANNER_VARIANTS.horizon());
+      expect(signal).toContain("Cloudflare Workers Platform");
+      expect(horizon).toContain("Cloudflare Workers Platform");
+      expect(signal).not.toBe(horizon);
+    });
+  });
+});
+
+describe("banner plain mode (P2-7)", () => {
+  it("renderBannerLogo is ASCII-only when piped", () => {
+    withPipedMode(() => {
+      const out = renderBannerLogo();
+      expect(out).not.toContain("\x1b");
+      expect(isAsciiOnly(out)).toBe(true);
+      expect(out).toContain("Cloudflare Workers Platform");
+      expect(out).toMatch(/v\d+\.\d+\.\d+/);
+    });
+  });
+
+  it("renderBanner falls back to the plain frame for every variant when piped", () => {
+    withPipedMode(() => {
+      for (const variant of Object.keys(BANNER_VARIANTS) as Array<
+        keyof typeof BANNER_VARIANTS
+      >) {
+        const out = renderBanner(variant);
+        expect(out).not.toContain("\x1b");
+        expect(isAsciiOnly(out)).toBe(true);
+      }
+    });
+  });
+
+  it("honors NO_COLOR even on a TTY", () => {
+    const origTTY = process.stdout.isTTY;
+    const origNoColor = process.env.NO_COLOR;
+    Object.defineProperty(process.stdout, "isTTY", {
+      value: true,
+      configurable: true,
+      writable: true,
+    });
+    process.env.NO_COLOR = "1";
+    try {
+      const out = renderBannerLogo();
+      expect(out).not.toContain("\x1b");
+      expect(isAsciiOnly(out)).toBe(true);
+    } finally {
+      Object.defineProperty(process.stdout, "isTTY", {
+        value: origTTY,
+        configurable: true,
+        writable: true,
+      });
+      if (origNoColor === undefined) delete process.env.NO_COLOR;
+      else process.env.NO_COLOR = origNoColor;
+    }
   });
 });
 

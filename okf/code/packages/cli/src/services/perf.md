@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/perf"
@@ -18,14 +18,14 @@ okf_lock: generated
 
 # Files
 
-- `endpoint-resolver.test.ts`
-- `endpoint-resolver.ts` — ResolveOptions, resolveGatewayUrl
-- `observability-reader.test.ts`
-- `observability-reader.ts` — HopSamples, ObservabilityQueryRequest, ObservabilityQueryResponse, ObservabilityReader, ObservabilityReaderDeps, ReadProbeOptions, ReadProbeResult
-- `percentile.test.ts`
-- `percentile.ts` — Summary, mean, percentile, stddev, summarize
-- `probe-sender.test.ts`
-- `probe-sender.ts` — ProbeRequest, ProbeResult, ProbeResultStatus, ProbeSenderOptions, sendProbe
+* `endpoint-resolver.test.ts`
+* `endpoint-resolver.ts` — ResolveOptions, resolveGatewayUrl
+* `observability-reader.test.ts`
+* `observability-reader.ts` — HopSamples, ObservabilityQueryRequest, ObservabilityQueryResponse, ObservabilityReader, ObservabilityReaderDeps, ReadProbeOptions, ReadProbeResult
+* `percentile.test.ts`
+* `percentile.ts` — Summary, mean, percentile, stddev, summarize
+* `probe-sender.test.ts`
+* `probe-sender.ts` — ProbeRequest, ProbeResult, ProbeResultStatus, ProbeSenderOptions, sendProbe
 
 # Packages
 

@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/db"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-- `db-command.test.ts`
-- `db-command.ts` — registerDbCommand
-- `index.ts` — registerDbCommand
+* `db-command.test.ts`
+* `db-command.ts` — registerDbCommand
+* `index.ts` — registerDbCommand
 
 # Packages
 

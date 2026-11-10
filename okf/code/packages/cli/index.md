@@ -2,8 +2,8 @@
 
 # Concepts
 
-- [packages/cli/src](src.md) - Hoox CLI — main entry point.
+* [packages/cli/src](src.md) - Hoox CLI — main entry point.
 
 # Nested
 
-- [src](src/) - Hoox CLI — main entry point.
+* [src](src/) - Hoox CLI — main entry point.

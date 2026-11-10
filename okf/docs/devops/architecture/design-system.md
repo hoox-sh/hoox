@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/design-system.mdx"
@@ -22,9 +22,9 @@ Repo path `docs/devops/architecture/design-system.mdx`.
 
 # Outline
 
-- 🎨 1. OKLCH Color Palette
-  - Dark Mode (Primary)
-- 📐 2. Layout, Borders & Density
-- 🔤 3. Typography
-- 📦 4. Icons
-  - 🔗 Next Steps
+* 🎨 1. OKLCH Color Palette
+  * Dark Mode (Primary)
+* 📐 2. Layout, Borders & Density
+* 🔤 3. Typography
+* 📦 4. Icons
+  * 🔗 Next Steps

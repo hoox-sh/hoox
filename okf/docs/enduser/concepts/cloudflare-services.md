@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/cloudflare-services.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/concepts/cloudflare-services.mdx`.
 
 # Outline
 
-- 🗄️ 1. D1 Database (Edge SQL Engine)
-- 🔑 2. KV Store (Sub-Millisecond Key-Value Configuration)
-- 📨 3. Cloudflare® Queues (Asynchronous Messaging Guard)
-- 🔒 4. Durable Objects (Distributed Coordination & Idempotency)
-- 📦 5. R2 Object Storage (Zero-Egress Asset Vault)
-- 🧠 6. Vectorize & Workers AI (Embedded RAG & LLMs)
-- 🌐 7. Browser Rendering
-  - 🔗 Next Steps
+* 🗄️ 1. D1 Database (Edge SQL Engine)
+* 🔑 2. KV Store (Sub-Millisecond Key-Value Configuration)
+* 📨 3. Cloudflare® Queues (Asynchronous Messaging Guard)
+* 🔒 4. Durable Objects (Distributed Coordination & Idempotency)
+* 📦 5. R2 Object Storage (Zero-Egress Asset Vault)
+* 🧠 6. Vectorize & Workers AI (Embedded RAG & LLMs)
+* 🌐 7. Browser Rendering
+  * 🔗 Next Steps
