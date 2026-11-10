@@ -9,3 +9,9 @@
 .openorchestrate/config.json | oo-ops | hoox: close the L4/7 ladder gaps (seeded from HQ) | M
 .openorchestrate/playbook.md | oo-ops | hoox: close the L4/7 ladder gaps (seeded from HQ) | M
 .openorchestrate/board.md | oo-ops | hoox: close the L4/7 ladder gaps (seeded from HQ) | M
+.openorchestrate/board.md | oo-misc | Smoke-test the OO board pipeline: verify card lifecycle (Todo → Working → Done) end-to-end | M
+.openorchestrate/state/oo-lifecycle-smoke-2026-11-09.md | oo-misc | Smoke-test the OO board pipeline: verify card lifecycle (Todo → Working → Done) end-to-end | ??
+.openorchestrate/state/oo-lifecycle-smoke-check.py | oo-misc | Smoke-test the OO board pipeline: verify card lifecycle (Todo → Working → Done) end-to-end | ??
+.openorchestrate/board.md | oo-spec-2 | Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | M
+.openorchestrate/plans/cli-review-proof.py | oo-spec-2 | Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | ??
+packages/cli/CLI-REVIEW.md | oo-spec-2 | Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | ??

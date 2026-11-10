@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "project": {
     "name": "hoox",
-    "description": "HOOX \u2014 ultra-low-latency edge trading framework on Cloudflare Workers. Stack: hoox + pyne + axis (hoox.sh)",
+    "description": "HOOX — ultra-low-latency edge trading framework on Cloudflare Workers. Stack: hoox + pyne + axis (hoox.sh)",
     "languages": [
       "TypeScript",
       "Python",
