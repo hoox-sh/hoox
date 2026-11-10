@@ -113,7 +113,7 @@
         "job": "Audit the codebase: dead code, load time, bundle size, failing checks. Open small PRs with proof. Never merge.",
         "file": "routines/nightly-audit.md",
         "enabled": true,
-        "silentOnNoChange": false
+        "silentOnNoChange": true
       }
     ]
   },
