@@ -7,7 +7,7 @@ tags: [devops, doc, docs, mcp]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/mcp.mdx"
@@ -22,7 +22,7 @@ Repo path `docs/devops/mcp.mdx`.
 
 # Outline
 
-- Command tools
-- Five operator features
-- Confirm gate
-- Refused commands
+* Command tools
+* Five operator features
+* Confirm gate
+* Refused commands

@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/workers/pyne-worker.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/devops/workers/pyne-worker.mdx`.
 
 # Outline
 
-- Bindings
-- Secrets
-  - Security notes
-- Endpoints
-- Setup in HOOX
-- Related
+* Bindings
+* Secrets
+  * Security notes
+* Endpoints
+* Setup in HOOX
+* Related
 
 # Mentions
 
-- [scripts](/code/scripts.md)
+* [scripts](/code/scripts.md)

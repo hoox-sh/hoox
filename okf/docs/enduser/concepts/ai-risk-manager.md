@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/ai-risk-manager.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/enduser/concepts/ai-risk-manager.mdx`.
 
 # Outline
 
-- 🛡️ 1. Automated Risk Protection Engine
-  - A. Trailing Stop-Loss Mathematics
-  - B. Scaled Take-Profits (Partial Fills)
-  - C. Max Daily Drawdown & Global Kill Switch
-- 🤖 2. Multi-Provider AI Gateway & Reasoning
-  - A. The Resilient Provider Fallback Chain
-  - B. Agent isolate endpoints
-  - 🔗 Next Steps
+* 🛡️ 1. Automated Risk Protection Engine
+  * A. Trailing Stop-Loss Mathematics
+  * B. Scaled Take-Profits (Partial Fills)
+  * C. Max Daily Drawdown & Global Kill Switch
+* 🤖 2. Multi-Provider AI Gateway & Reasoning
+  * A. The Resilient Provider Fallback Chain
+  * B. Agent isolate endpoints
+  * 🔗 Next Steps

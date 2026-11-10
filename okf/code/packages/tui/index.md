@@ -2,8 +2,8 @@
 
 # Concepts
 
-- [packages/tui/src](src.md) - @jsxImportSource @opentui/react.
+* [packages/tui/src](src.md) - @jsxImportSource @opentui/react.
 
 # Nested
 
-- [src](src/) - @jsxImportSource @opentui/react.
+* [src](src/) - @jsxImportSource @opentui/react.

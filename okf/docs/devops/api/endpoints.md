@@ -7,7 +7,7 @@ tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/api/endpoints.mdx"
@@ -22,16 +22,16 @@ Repo path `docs/devops/api/endpoints.mdx`.
 
 # Outline
 
-- 🔒 Security & Authorization Headers
-- 🚀 Ingress Webhook Endpoints (workers/hoox-worker)
-  - A. Ingest Signal Webhook
-  - B. Proactive Health Diagnostics
-- Operator management plane (/v1/)
-- Wallet operator proxy (/wallet/)
-- 🗄️ Database Service Endpoints (workers/d1-worker)
-  - A. Execute Single SQL Statement
-  - B. Execute Transactional Batch Statements
-- 🧠 AI Risk & Chat Endpoints (workers/agent-worker)
-  - A. Conversational Chat Stream (Server-Sent Events)
-  - B. Multimodal AI Vision Audit
-  - 🔗 Next Steps
+* 🔒 Security & Authorization Headers
+* 🚀 Ingress Webhook Endpoints (workers/hoox-worker)
+  * A. Ingest Signal Webhook
+  * B. Proactive Health Diagnostics
+* Operator management plane (/v1/)
+* Wallet operator proxy (/wallet/)
+* 🗄️ Database Service Endpoints (workers/d1-worker)
+  * A. Execute Single SQL Statement
+  * B. Execute Transactional Batch Statements
+* 🧠 AI Risk & Chat Endpoints (workers/agent-worker)
+  * A. Conversational Chat Stream (Server-Sent Events)
+  * B. Multimodal AI Vision Audit
+  * 🔗 Next Steps

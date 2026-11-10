@@ -7,7 +7,7 @@ tags: [code, packages, shared, types]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/shared/src/types"
@@ -18,10 +18,10 @@ okf_lock: generated
 
 # Files
 
-- `errors.ts` — AppError, ErrorResponse
-- `router.ts` — Handler, MiddlewareHandler, RouteDefinition, RouteParams, Router
+* `errors.ts` — AppError, ErrorResponse
+* `router.ts` — Handler, MiddlewareHandler, RouteDefinition, RouteParams, Router
 
 # Used by
 
-- [packages/shared/src](/code/packages/shared/src.md)
-- [packages/shared/src/middleware](/code/packages/shared/src/middleware.md)
+* [packages/shared/src](/code/packages/shared/src.md)
+* [packages/shared/src/middleware](/code/packages/shared/src/middleware.md)

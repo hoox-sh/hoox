@@ -7,7 +7,7 @@ tags: [code, okf, tests]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "tests/okf"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-- `bundle.test.ts` — chart, main, x
+* `bundle.test.ts` — chart, main, x
 
 # Packages
 
@@ -26,4 +26,4 @@ okf_lock: generated
 
 # Depends on
 
-- [scripts/okf](/code/scripts/okf.md)
+* [scripts/okf](/code/scripts/okf.md)

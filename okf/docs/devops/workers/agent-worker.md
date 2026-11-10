@@ -7,7 +7,7 @@ tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/workers/agent-worker.mdx"
@@ -22,18 +22,18 @@ Repo path `docs/devops/workers/agent-worker.mdx`.
 
 # Outline
 
-- Core Capabilities
-- Architecture & Flow
-- Endpoints & Interactions
-  - Management Endpoints
-  - AI Interaction Endpoints
-  - Risk & status
-  - Dashboard-only agent pages
-- Configuration
-  - Cron schedule (1–1440 minutes)
-  - KV Keys
-  - Default Agent Config
-  - Supported Models
-  - AI Gateway Features
-- Internal Service Bindings
-- Testing
+* Core Capabilities
+* Architecture & Flow
+* Endpoints & Interactions
+  * Management Endpoints
+  * AI Interaction Endpoints
+  * Risk & status
+  * Dashboard-only agent pages
+* Configuration
+  * Cron schedule (1–1440 minutes)
+  * KV Keys
+  * Default Agent Config
+  * Supported Models
+  * AI Gateway Features
+* Internal Service Bindings
+* Testing

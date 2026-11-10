@@ -1,4 +1,5 @@
 ---
+okf_lock: human
 type: Reference
 title: Architecture
 description: The project shape and the OpenOrchestrate team.
@@ -41,5 +42,5 @@ Todo, Working, Blocked, Ready for Review, Done. A card moves to Done only with p
 
 ## Related
 
-- [Development](development.md)
-- [Security](security.md)
+- [Development](/development.md)
+- [Security](/security.md)

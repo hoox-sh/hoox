@@ -7,7 +7,7 @@ tags: [code, scripts]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "scripts"
@@ -18,27 +18,27 @@ okf_lock: generated
 
 # Files
 
-- `changelog-notes.ts`
-- `check-coverage.ts`
-- `check-script-paths.ts`
-- `check-worker-submodules.ts`
-- `cloudflare-workers-shim.js`
-- `extract-graph.ts`
-- `generate-worker-types.ts`
-- `prepare-publish.ts`
-- `render-test-table.ts`
-- `sync-dashboard-configs.ts`
-- `test-with-table.ts`
-- `typecheck-all.ts`
+* `changelog-notes.ts`
+* `check-coverage.ts`
+* `check-script-paths.ts`
+* `check-worker-submodules.ts`
+* `cloudflare-workers-shim.js`
+* `extract-graph.ts`
+* `generate-worker-types.ts`
+* `prepare-publish.ts`
+* `render-test-table.ts`
+* `sync-dashboard-configs.ts`
+* `test-with-table.ts`
+* `typecheck-all.ts`
 
 # Other files
 
-- `docker-entrypoint-dev.sh`
-- `helpers.sh`
-- `install-hooks.sh`
-- `install.sh`
-- `migrate-tracking.sh`
-- `verify.sh`
+* `docker-entrypoint-dev.sh`
+* `helpers.sh`
+* `install-hooks.sh`
+* `install.sh`
+* `migrate-tracking.sh`
+* `verify.sh`
 
 # Packages
 
@@ -46,9 +46,9 @@ okf_lock: generated
 
 # Depends on
 
-- [packages/shared/src/schemas](/code/packages/shared/src/schemas.md)
-- [packages/test-utils/src](/code/packages/test-utils/src.md)
+* [packages/shared/src/schemas](/code/packages/shared/src/schemas.md)
+* [packages/test-utils/src](/code/packages/test-utils/src.md)
 
 # Nested
 
-- [scripts/okf](/code/scripts/okf.md)
+* [scripts/okf](/code/scripts/okf.md)

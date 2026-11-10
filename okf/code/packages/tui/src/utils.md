@@ -7,7 +7,7 @@ tags: [code, packages, tui, utils]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/tui/src/utils"
@@ -18,8 +18,8 @@ okf_lock: generated
 
 # Files
 
-- `colors.test.ts`
-- `formatters.test.ts`
+* `colors.test.ts`
+* `formatters.test.ts`
 
 # Packages
 

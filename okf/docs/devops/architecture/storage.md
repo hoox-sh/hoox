@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/storage.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/devops/architecture/storage.mdx`.
 
 # Outline
 
-- 1. The Multi-Tier Storage Architecture
-- 2. D1 relational engine and schema.sql
-- 3. R2 log offloading
-- 4. KV eventual consistency
-  - Next steps
+* 1. The Multi-Tier Storage Architecture
+* 2. D1 relational engine and schema.sql
+* 3. R2 log offloading
+* 4. KV eventual consistency
+  * Next steps
 
 # Mentions
 
-- [scripts](/code/scripts.md)
+* [scripts](/code/scripts.md)

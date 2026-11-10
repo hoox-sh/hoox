@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/agent"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-- `agent-command.test.ts`
-- `agent-command.ts` — HealthOptions, ProbeResult, ProviderHealth, ProviderStatus, __setSecretSourceForTests, handleHealth, probeProvider, registerAgentCommand, resolveSecret
-- `index.ts` — registerAgentCommand
+* `agent-command.test.ts`
+* `agent-command.ts` — HealthOptions, ProbeResult, ProviderHealth, ProviderStatus, __setSecretSourceForTests, handleHealth, probeProvider, registerAgentCommand, resolveSecret
+* `index.ts` — registerAgentCommand
 
 # Packages
 

@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/axis-and-hoox.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/enduser/guides/axis-and-hoox.mdx`.
 
 # Outline
 
-- Abstract
-- Conceptual model
-- Interface surface
-- Internals
-- Invariants
-- Worked examples
-  - Research only
-  - Research + same evaluate host as prod
-  - Authoring
-- Failure modes
-- See also
+* Abstract
+* Conceptual model
+* Interface surface
+* Internals
+* Invariants
+* Worked examples
+  * Research only
+  * Research + same evaluate host as prod
+  * Authoring
+* Failure modes
+* See also

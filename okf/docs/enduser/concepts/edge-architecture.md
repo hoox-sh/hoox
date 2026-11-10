@@ -7,7 +7,7 @@ tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/edge-architecture.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/enduser/concepts/edge-architecture.mdx`.
 
 # Outline
 
-- 🏎️ The Physics of Latency: Why Traditional VPS Bots Fail
-  - The VPS Bottleneck (200ms+ slippage)
-  - The Hoox Edge Path (Under 15ms latency)
-- 🧅 V8 Isolates vs. Traditional VMs / Containers
-- 🎯 Smart Placement: Zero-Config Latency Optimizer
-  - How Smart Placement Works
-  - Latency Comparison: Real Numbers
-- ⚙️ Hardware-Level Security
-  - Service Binding Architecture
-  - 🔗 Next Steps
+* 🏎️ The Physics of Latency: Why Traditional VPS Bots Fail
+  * The VPS Bottleneck (200ms+ slippage)
+  * The Hoox Edge Path (Under 15ms latency)
+* 🧅 V8 Isolates vs. Traditional VMs / Containers
+* 🎯 Smart Placement: Zero-Config Latency Optimizer
+  * How Smart Placement Works
+  * Latency Comparison: Real Numbers
+* ⚙️ Hardware-Level Security
+  * Service Binding Architecture
+  * 🔗 Next Steps

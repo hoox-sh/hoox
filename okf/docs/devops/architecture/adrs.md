@@ -7,7 +7,7 @@ tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/adrs.mdx"
@@ -22,11 +22,11 @@ Repo path `docs/devops/architecture/adrs.mdx`.
 
 # Outline
 
-- ADR Index
-- ADR-001: Cloudflare® Workers as Execution Platform
-- ADR-002: SQLite-backed Durable Objects for Idempotency
-- ADR-003: Mesh of specialized Workers
-- ADR-004: Dual-Layer Configuration (Environment \+ KV)
-- ADR-005: Multi-Provider AI Gateway with Fallback Chain
-- ADR-006: Bun Workspaces for Monorepo Management
-- ADR-007: Opt-in Tenant Isolation (TenantEnv)
+* ADR Index
+* ADR-001: Cloudflare® Workers as Execution Platform
+* ADR-002: SQLite-backed Durable Objects for Idempotency
+* ADR-003: Mesh of specialized Workers
+* ADR-004: Dual-Layer Configuration (Environment \+ KV)
+* ADR-005: Multi-Provider AI Gateway with Fallback Chain
+* ADR-006: Bun Workspaces for Monorepo Management
+* ADR-007: Opt-in Tenant Isolation (TenantEnv)

@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, getting-started]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/getting-started/configuration.mdx"
@@ -22,13 +22,13 @@ Repo path `docs/enduser/getting-started/configuration.mdx`.
 
 # Outline
 
-- 1. Declarative Environment Variables (.env.local)
-  - A. ⚡ Cloudflare® Core Infrastructure
-  - B. 💱 Exchange API Keys (Securely Redacted)
-  - C. 💬 Telegram Bot Alerts
-  - D. 🧠 Multi-Provider AI Credentials
-- 2. Managing Environment & Secrets via CLI
-- 3. Worker Configurations (wrangler.jsonc)
-- 4. Runtime KV Configuration (Sub-millisecond Settings)
-  - Managing KV Settings via CLI
-  - 🔗 Next Steps
+* 1. Declarative Environment Variables (.env.local)
+  * A. ⚡ Cloudflare® Core Infrastructure
+  * B. 💱 Exchange API Keys (Securely Redacted)
+  * C. 💬 Telegram Bot Alerts
+  * D. 🧠 Multi-Provider AI Credentials
+* 2. Managing Environment & Secrets via CLI
+* 3. Worker Configurations (wrangler.jsonc)
+* 4. Runtime KV Configuration (Sub-millisecond Settings)
+  * Managing KV Settings via CLI
+  * 🔗 Next Steps

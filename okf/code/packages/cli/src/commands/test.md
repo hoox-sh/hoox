@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/test"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-- `index.ts` — TestStepResult, TestSummary, registerTestCommand
-- `test-command.test.ts`
-- `test-command.ts` — TestStepResult, TestSummary, printSummary, registerTestCommand, runStep
+* `index.ts` — TestStepResult, TestSummary, registerTestCommand
+* `test-command.test.ts`
+* `test-command.ts` — TestStepResult, TestSummary, printSummary, registerTestCommand, runStep
 
 # Packages
 

@@ -7,7 +7,7 @@ tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-10T14:53:51Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/deploy-workers.mdx"
@@ -22,15 +22,15 @@ Repo path `docs/enduser/guides/deploy-workers.mdx`.
 
 # Outline
 
-- ⛓️ The Strict Deployment Dependency Chain
-  - Deployment Order Explained
-- ⚡ Deployment CLI Commands
-  - Deploy All Flags
-- 🔧 Critical Post-Deployment Steps
-  - Why These Steps Are Required
-- 🖥️ Next.js Dashboard Deployment (OpenNext)
-  - Dashboard Features
-- 🔄 Routine Update & Upgrade Workflow
-  - Rollback Procedure
-- 🛠️ Post-Deployment Troubleshooting Matrix
-  - 🔗 Next Steps
+* ⛓️ The Strict Deployment Dependency Chain
+  * Deployment Order Explained
+* ⚡ Deployment CLI Commands
+  * Deploy All Flags
+* 🔧 Critical Post-Deployment Steps
+  * Why These Steps Are Required
+* 🖥️ Next.js Dashboard Deployment (OpenNext)
+  * Dashboard Features
+* 🔄 Routine Update & Upgrade Workflow
+  * Rollback Procedure
+* 🛠️ Post-Deployment Troubleshooting Matrix
+  * 🔗 Next Steps
