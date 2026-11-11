@@ -10,6 +10,10 @@
 | Full CLI review + optimization: functionality, correctness, visual output, input/selection UX — fixes with tests and proof | oo-spec-2 | Ready for Review |
 | hoox: fix 7 lint errors and triage 339 warnings (seeded from HQ)                                                           | oo-spec-2 | Todo             |
 | hoox: close the L4/7 ladder gaps (seeded from HQ)                                                                          | oo-ops    | Ready for Review |
+| Wrangler TS config (cloudflare.config.ts) — verify release, assess adoption, deliver migration plan                        | oo-spec-2 | Done             |
+| Phase 1: typed deploy-config generator for 11 wrangler.jsonc + wrangler 4.159.0 bump + CI typegen gate                     | oo-spec-2 | Todo             |
+| pyne-worker: data-ingest workflow still shells npx wrangler (unpinned) — pin to workspace binary                           | oo-spec-2 | Todo             |
+| pyne-agent-worker: refresh stale tracked bun.lock (wrangler 4.120.0 vs ^4.159.0) without unrelated churn                   | oo-spec-2 | Todo             |
 
 ## Rules
 

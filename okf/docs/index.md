@@ -10,3 +10,4 @@
 * [devops](devops/) - Nested concepts.
 * [enduser](enduser/) - Nested concepts.
 * [enterprise](enterprise/) - Nested concepts.
+* [planning](planning/) - Nested concepts.
