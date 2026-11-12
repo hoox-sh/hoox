@@ -64,7 +64,7 @@
       "agentFile": ".opencode/agents/oo-misc.md"
     }
   ],
-  "autonomy": "draft",
+  "autonomy": "autopilot",
   "gates": [
     "Ask first before spending money or buying anything.",
     "Ask first before changing permissions or logins.",
@@ -167,6 +167,15 @@
   "templates": {
     "dir": ".openorchestrate/templates",
     "includeSecrets": false
+  },
+  "optionalSkills": {
+    "enabledPacks": [
+      "catalog/addyosmani-agent-skills",
+      "catalog/cloudflare-security-audit",
+      "catalog/google-elephant-goldfish",
+      "catalog/kepano-obsidian-skills",
+      "catalog/mattpocock-skills"
+    ]
   },
   "setup": {
     "createdAt": "2026-11-07T14:15:53.745Z",
