@@ -707,5 +707,10 @@ async function runCommand(
         inCard: false,
       });
     }
+
+    // A menu command is one step in an interactive session. Its failure has
+    // been formatted and reported; leaving process.exitCode set would poison
+    // the session's final exit status and suppress later completion footers.
+    process.exitCode = 0;
   }
 }

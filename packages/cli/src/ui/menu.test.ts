@@ -123,3 +123,41 @@ describe("runInteractiveTUI argv", () => {
     expect(calls).toEqual([["logs", "worker", "my worker"]]);
   });
 });
+
+describe("runInteractiveTUI exit code", () => {
+  it("clears a failed menu command so later successes exit 0", async () => {
+    const calls: string[][] = [];
+    const behaviors: Behavior[] = [
+      { exitCode: 1, error: new Error("repair failed") },
+      {},
+    ];
+    installPromptSpies(
+      ["manage", "repair check", "db list", "__back", "__exit"],
+      []
+    );
+
+    await runInteractiveTUI(makeProgram(calls, behaviors));
+
+    expect(calls).toEqual([
+      ["repair", "check"],
+      ["db", "list"],
+    ]);
+    expect(process.exitCode).toBe(0);
+  });
+
+  it("keeps a genuine non-menu failure non-zero", async () => {
+    // The reset is scoped to the interactive loop. A normal CLI invocation
+    // that fails must still produce a non-zero exit status.
+    const { program } = await import("../index.js");
+    const previous = process.exitCode;
+    process.exitCode = undefined;
+    try {
+      await expect(
+        program.parseAsync(["definitely-not-a-command"], { from: "user" })
+      ).rejects.toThrow();
+      expect(process.exitCode).toBeGreaterThan(0);
+    } finally {
+      process.exitCode = previous;
+    }
+  });
+});
