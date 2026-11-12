@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "trade-worker.mdx"
-description: "description: \"Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers.\"."
+description: 'description: "Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers.".'
 resource: "docs/devops/workers/trade-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/trade-worker.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/devops/workers/trade-worker.mdx`.
 
 # Outline
 
-* ⚡ 1. Declared Wrangler Configurations & Bindings
-* 🔄 Position reconciliation
-* 🧪 Test trading (test: true)
-* Spot DEX venues
-* 🔀 2. The Provider-Based ExchangeRouter Pattern
-  * A. Generic Exchange Provider Interface
-  * B. Dynamic Runtime Routing
-* 🔌 3. Internal REST API Specification
-  * A. Process Order Pipeline
-* 🛡️ 4. Standardized Exception Handling
-  * 🔗 Next Steps
+- ⚡ 1. Declared Wrangler Configurations & Bindings
+- 🔄 Position reconciliation
+- 🧪 Test trading (test: true)
+- Spot DEX venues
+- 🔀 2. The Provider-Based ExchangeRouter Pattern
+  - A. Generic Exchange Provider Interface
+  - B. Dynamic Runtime Routing
+- 🔌 3. Internal REST API Specification
+  - A. Process Order Pipeline
+- 🛡️ 4. Standardized Exception Handling
+  - 🔗 Next Steps

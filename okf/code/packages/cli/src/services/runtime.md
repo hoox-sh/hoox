@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/runtime"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — DEFAULT_HOOX_SETUP_REPO, ensureGlobalRuntime, getRuntimeStatus
-* `runtime-service.test.ts`
-* `runtime-service.ts` — DEFAULT_HOOX_RUNTIME_REPO, DEFAULT_HOOX_SETUP_REPO, EnsureRuntimeOptions, EnsureRuntimeResult, RuntimeStatus, ensureGlobalRuntime, getRuntimeStatus
+- `index.ts` — DEFAULT_HOOX_SETUP_REPO, ensureGlobalRuntime, getRuntimeStatus
+- `runtime-service.test.ts`
+- `runtime-service.ts` — DEFAULT_HOOX_RUNTIME_REPO, DEFAULT_HOOX_SETUP_REPO, EnsureRuntimeOptions, EnsureRuntimeResult, RuntimeStatus, ensureGlobalRuntime, getRuntimeStatus
 
 # Packages
 

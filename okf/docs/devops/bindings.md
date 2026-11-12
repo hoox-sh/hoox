@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "bindings.mdx"
-description: "title: \"Cloudflare® Workers Bindings & Environment Variables\"."
+description: 'title: "Cloudflare® Workers Bindings & Environment Variables".'
 resource: "docs/devops/bindings.mdx"
 tags: [bindings, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/bindings.mdx"
@@ -22,22 +22,22 @@ Repo path `docs/devops/bindings.mdx`.
 
 # Outline
 
-* Table of Contents
-* Secrets & Environment Variables
-* Service Bindings
-* KV Namespace Bindings
-* R2 Bucket Bindings
-* D1 Database Bindings
-* AI Bindings
-* Vectorize Bindings
-* Analytics Engine Bindings
-* Queue Bindings
-* Durable Object Bindings
-* Browser Rendering
-* Local Development URLs
-* Configuration
-* Setting Up Secrets
+- Table of Contents
+- Secrets & Environment Variables
+- Service Bindings
+- KV Namespace Bindings
+- R2 Bucket Bindings
+- D1 Database Bindings
+- AI Bindings
+- Vectorize Bindings
+- Analytics Engine Bindings
+- Queue Bindings
+- Durable Object Bindings
+- Browser Rendering
+- Local Development URLs
+- Configuration
+- Setting Up Secrets
 
 # Mentions
 
-* [packages/cli/src/commands/dev](/code/packages/cli/src/commands/dev.md)
+- [packages/cli/src/commands/dev](/code/packages/cli/src/commands/dev.md)

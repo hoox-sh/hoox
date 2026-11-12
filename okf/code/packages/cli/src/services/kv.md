@@ -7,7 +7,7 @@ tags: [cli, code, packages, services]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src/services/kv"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — KvSyncService
-* `kv-sync-service.test.ts`
-* `kv-sync-service.ts` — KvManifest, KvManifestKey, KvSyncService, stripWranglerStdoutNoise
+- `index.ts` — KvSyncService
+- `kv-sync-service.test.ts`
+- `kv-sync-service.ts` — KvManifest, KvManifestKey, KvSyncService, stripWranglerStdoutNoise
 
 # Packages
 

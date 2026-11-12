@@ -46,7 +46,14 @@ export function asList(value: unknown): unknown[] {
 }
 
 export function quote(value: string): string {
-  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, " ")}"`;
+  const flat = value.replace(/\r?\n/g, " ");
+  // Prettier's YAML printer switches to single quotes when a value contains a
+  // double quote but no single quote. Emitting that shape keeps the generated
+  // bundle stable under `prettier --check`.
+  if (flat.includes('"') && !flat.includes("'") && !flat.includes("\\")) {
+    return `'${flat}'`;
+  }
+  return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
 export function cmp(a: string, b: string): number {

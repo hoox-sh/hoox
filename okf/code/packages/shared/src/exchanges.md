@@ -7,7 +7,7 @@ tags: [code, exchanges, packages, shared]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/shared/src/exchanges"
@@ -18,10 +18,10 @@ okf_lock: generated
 
 # Files
 
-* `base-exchange-client.ts` — BaseExchangeClient, ExchangeClientOptions, ExchangeConfig, OrderResponse, Position, TradeParams
-* `index.ts` — BaseExchangeClient, SupportedExchange
-* `types.ts` — ExchangeOrder, ExchangePosition, SupportedExchange
+- `base-exchange-client.ts` — BaseExchangeClient, ExchangeClientOptions, ExchangeConfig, OrderResponse, Position, TradeParams
+- `index.ts` — BaseExchangeClient, SupportedExchange
+- `types.ts` — ExchangeOrder, ExchangePosition, SupportedExchange
 
 # Used by
 
-* [packages/shared/src](/code/packages/shared/src.md)
+- [packages/shared/src](/code/packages/shared/src.md)

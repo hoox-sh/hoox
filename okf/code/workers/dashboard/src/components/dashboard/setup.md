@@ -7,7 +7,7 @@ tags: [code, components, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/components/dashboard/setup"
@@ -18,11 +18,11 @@ okf_lock: generated
 
 # Files
 
-* `first-run-redirect.tsx` — FirstRunRedirect
-* `setup-circular-progress.tsx` — CircularProgress
-* `setup-config.ts` — CRITICAL_SECRET_NAMES, HousekeepingCheckVM, MESH_AUTOMATE_COMMAND, MESH_SYNC_COMMAND, REQUIRED_SECRETS, RequiredSecret, SECRETS_LIST_COMMAND, SYSTEM_SECRET_NAMES, SecretGroup, SecretKind, SecretPriority, SecretStatus
-* `setup-progress.ts` — SETUP_STORAGE_KEY, isSetupCompleted, markSetupCompleted, resetSetupProgress
-* `setup-wizard.tsx` — SetupWizard
+- `first-run-redirect.tsx` — FirstRunRedirect
+- `setup-circular-progress.tsx` — CircularProgress
+- `setup-config.ts` — CRITICAL_SECRET_NAMES, HousekeepingCheckVM, MESH_AUTOMATE_COMMAND, MESH_SYNC_COMMAND, REQUIRED_SECRETS, RequiredSecret, SECRETS_LIST_COMMAND, SYSTEM_SECRET_NAMES, SecretGroup, SecretKind, SecretPriority, SecretStatus
+- `setup-progress.ts` — SETUP_STORAGE_KEY, isSetupCompleted, markSetupCompleted, resetSetupProgress
+- `setup-wizard.tsx` — SetupWizard
 
 # Packages
 
@@ -30,12 +30,12 @@ okf_lock: generated
 
 # Depends on
 
-* [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)
+- [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)
 
 # Used by
 
-* [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)
+- [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)
 
 # Nested
 
-* [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)
+- [workers/dashboard/src/components/dashboard/setup/steps](/code/workers/dashboard/src/components/dashboard/setup/steps.md)

@@ -7,7 +7,7 @@ tags: [code, packages, shared, stores]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/shared/src/stores"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `config-store.ts` — ConfigState, getTuiPreferencesPath, useConfigStore
-* `service-store.ts` — ServiceState, useServiceStore
-* `ui-store.ts` — UIState, useUIStore
+- `config-store.ts` — ConfigState, getTuiPreferencesPath, useConfigStore
+- `service-store.ts` — ServiceState, useServiceStore
+- `ui-store.ts` — UIState, useUIStore
 
 # Packages
 
@@ -28,8 +28,8 @@ okf_lock: generated
 
 # Depends on
 
-* [packages/shared/src](/code/packages/shared/src.md)
+- [packages/shared/src](/code/packages/shared/src.md)
 
 # Used by
 
-* [packages/shared/src](/code/packages/shared/src.md)
+- [packages/shared/src](/code/packages/shared/src.md)

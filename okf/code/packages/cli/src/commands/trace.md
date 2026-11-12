@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/trace"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — registerTraceCommand
-* `trace-command.test.ts`
-* `trace-command.ts` — registerTraceCommand
-* `trace-service.test.ts`
-* `trace-service.ts` — TraceService
-* `types.ts` — FilterOperation, LiveTailEvent, LiveTailSession, TraceCalculation, TraceCalculationResult, TraceDestination, TraceDestinationInput, TraceEvent, TraceFilter, TraceGroupBy, TraceKey, TraceKeysResponse
+- `index.ts` — registerTraceCommand
+- `trace-command.test.ts`
+- `trace-command.ts` — registerTraceCommand
+- `trace-service.test.ts`
+- `trace-service.ts` — TraceService
+- `types.ts` — FilterOperation, LiveTailEvent, LiveTailSession, TraceCalculation, TraceCalculationResult, TraceDestination, TraceDestinationInput, TraceEvent, TraceFilter, TraceGroupBy, TraceKey, TraceKeysResponse
 
 # Packages
 

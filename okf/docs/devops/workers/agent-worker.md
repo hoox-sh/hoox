@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "agent-worker.mdx"
-description: "description: \"Comprehensive engineering specification for the Hoox Agent Cron Worker, covering multi-provider AI Gateway configurations, vision analysis, and risk protection…"
+description: 'description: "Comprehensive engineering specification for the Hoox Agent Cron Worker, covering multi-provider AI Gateway configurations, vision analysis, and risk protection…'
 resource: "docs/devops/workers/agent-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/agent-worker.mdx"
@@ -22,18 +22,18 @@ Repo path `docs/devops/workers/agent-worker.mdx`.
 
 # Outline
 
-* Core Capabilities
-* Architecture & Flow
-* Endpoints & Interactions
-  * Management Endpoints
-  * AI Interaction Endpoints
-  * Risk & status
-  * Dashboard-only agent pages
-* Configuration
-  * Cron schedule (1–1440 minutes)
-  * KV Keys
-  * Default Agent Config
-  * Supported Models
-  * AI Gateway Features
-* Internal Service Bindings
-* Testing
+- Core Capabilities
+- Architecture & Flow
+- Endpoints & Interactions
+  - Management Endpoints
+  - AI Interaction Endpoints
+  - Risk & status
+  - Dashboard-only agent pages
+- Configuration
+  - Cron schedule (1–1440 minutes)
+  - KV Keys
+  - Default Agent Config
+  - Supported Models
+  - AI Gateway Features
+- Internal Service Bindings
+- Testing

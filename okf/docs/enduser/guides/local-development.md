@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "local-development.mdx"
-description: "description: \"How to run, hot-reload, and test Hoox workers locally using native wrangler runtimes or Docker Compose containers.\"."
+description: 'description: "How to run, hot-reload, and test Hoox workers locally using native wrangler runtimes or Docker Compose containers.".'
 resource: "docs/enduser/guides/local-development.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/local-development.mdx"
@@ -22,15 +22,15 @@ Repo path `docs/enduser/guides/local-development.mdx`.
 
 # Outline
 
-* 🚀 Starting the Local Workspace
-  * Option A: Native Runtime (Recommended for speed)
-  * Option B: Docker Runtime (Recommended for isolation)
-* 🐳 Docker Compose Profiles
-* 📍 Local Port Mapping & Endpoint Access
-* 🛠️ Operating Individual Services
-* 🧪 Running the Verification CI Pipeline
-  * 🔗 Next Steps
+- 🚀 Starting the Local Workspace
+  - Option A: Native Runtime (Recommended for speed)
+  - Option B: Docker Runtime (Recommended for isolation)
+- 🐳 Docker Compose Profiles
+- 📍 Local Port Mapping & Endpoint Access
+- 🛠️ Operating Individual Services
+- 🧪 Running the Verification CI Pipeline
+  - 🔗 Next Steps
 
 # Mentions
 
-* [scripts](/code/scripts.md)
+- [scripts](/code/scripts.md)
