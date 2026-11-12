@@ -116,9 +116,8 @@ async function runOpenTuiLoop(program: Command): Promise<boolean> {
     launchedOnce = true;
     if (result.action === "quit") return true;
 
-    const commandStr = result.argv.join(" ");
-    pushRecent(commandStr);
-    await runCommand(program, commandStr);
+    pushRecent(result.argv.join(" "));
+    await runCommand(program, result.argv);
   }
 }
 
@@ -252,7 +251,7 @@ async function showSetupMenu(
     if (isCancel(choice)) return "back";
     if (choice === "__back") return "continue";
 
-    await runCommand(program, choice);
+    await runCommand(program, [choice]);
   }
 }
 
@@ -289,10 +288,10 @@ async function showDeployMenu(
       });
       if (isCancel(name)) continue;
       if (!name) continue;
-      await runCommand(program, `deploy worker ${name}`);
+      await runCommand(program, ["deploy", "worker", name]);
     } else {
-      const cmd = choice === "all" ? "deploy all" : `deploy ${choice}`;
-      await runCommand(program, cmd);
+      const argv = choice === "all" ? ["deploy", "all"] : ["deploy", choice];
+      await runCommand(program, argv);
     }
   }
 }
@@ -300,6 +299,11 @@ async function showDeployMenu(
 // ---------------------------------------------------------------------------
 // Develop sub-menu
 // ---------------------------------------------------------------------------
+
+/** Static menu IDs → argv. User-entered values are appended, never split. */
+const DEVELOP_ARGV: Record<string, readonly string[]> = {
+  "dev start": ["dev", "start"],
+};
 
 async function showDevelopMenu(
   program: Command
@@ -320,7 +324,7 @@ async function showDevelopMenu(
     if (isCancel(choice)) return "back";
     if (choice === "__back") return "continue";
 
-    await runCommand(program, choice);
+    await runCommand(program, DEVELOP_ARGV[choice] ?? [choice]);
   }
 }
 
@@ -366,7 +370,7 @@ async function showManageMenu(
 
     switch (choice) {
       case "infra provision":
-        await runCommand(program, "infra provision");
+        await runCommand(program, ["infra", "provision"]);
         break;
       case "config":
         await showConfigSubMenu(program);
@@ -378,10 +382,10 @@ async function showManageMenu(
         await showKeysSubMenu(program);
         break;
       case "repair check":
-        await runCommand(program, "repair check");
+        await runCommand(program, ["repair", "check"]);
         break;
       case "db list":
-        await runCommand(program, "db list");
+        await runCommand(program, ["db", "list"]);
         break;
     }
   }
@@ -418,9 +422,9 @@ async function showConfigSubMenu(program: Command): Promise<void> {
     });
     if (isCancel(value) || value === undefined) return;
 
-    await runCommand(program, `config set ${key} ${value ?? ""}`);
+    await runCommand(program, ["config", "set", key, value ?? ""]);
   } else {
-    await runCommand(program, "config show");
+    await runCommand(program, ["config", "show"]);
   }
 }
 
@@ -443,7 +447,7 @@ async function showSecretsSubMenu(program: Command): Promise<void> {
 
   switch (choice) {
     case "list":
-      await runCommand(program, "secrets list");
+      await runCommand(program, ["secrets", "list"]);
       break;
     case "set": {
       const worker = await text({
@@ -466,11 +470,11 @@ async function showSecretsSubMenu(program: Command): Promise<void> {
       });
       if (isCancel(secretName) || !secretName) return;
 
-      await runCommand(program, `secrets set ${worker} ${secretName}`);
+      await runCommand(program, ["secrets", "set", worker, secretName]);
       break;
     }
     case "sync":
-      await runCommand(program, "secrets sync --system");
+      await runCommand(program, ["secrets", "sync", "--system"]);
       break;
   }
 }
@@ -500,12 +504,20 @@ async function showKeysSubMenu(program: Command): Promise<void> {
     if (isCancel(proceed) || !proceed) return;
   }
 
-  await runCommand(program, `keys ${choice}`);
+  await runCommand(program, ["keys", choice]);
 }
 
 // ---------------------------------------------------------------------------
 // Monitor sub-menu
 // ---------------------------------------------------------------------------
+
+/** Static menu IDs → argv. User-entered values are appended, never split. */
+const MONITOR_ARGV: Record<string, readonly string[]> = {
+  "check setup": ["check", "setup"],
+  "check health": ["check", "health"],
+  "check fix": ["check", "fix"],
+  test: ["test"],
+};
 
 async function showMonitorMenu(
   program: Command
@@ -550,20 +562,33 @@ async function showMonitorMenu(
           placeholder: "e.g. hoox, trade-worker, d1-worker",
         });
         if (isCancel(name) || !name) continue;
-        await runCommand(program, `logs worker ${name}`);
+        await runCommand(program, ["logs", "worker", name]);
       } else {
-        await runCommand(program, "logs all");
+        await runCommand(program, ["logs", "all"]);
       }
       continue;
     }
 
-    await runCommand(program, choice);
+    await runCommand(program, MONITOR_ARGV[choice] ?? [choice]);
   }
 }
 
 // ---------------------------------------------------------------------------
 // Tools sub-menu
 // ---------------------------------------------------------------------------
+
+/** Static menu IDs → argv. User-entered values are appended, never split. */
+const TOOLS_ARGV: Record<string, readonly string[]> = {
+  tui: ["tui"],
+  clone: ["clone"],
+  "dashboard deploy": ["dashboard", "deploy"],
+  "dashboard dev": ["dashboard", "dev"],
+  "waf status": ["waf", "status"],
+  "agent health": ["agent", "health"],
+  "pyne health": ["pyne", "health"],
+  "pyne sync-vendor": ["pyne", "sync-vendor"],
+  "pyne deploy": ["pyne", "deploy"],
+};
 
 async function showToolsMenu(
   program: Command
@@ -624,7 +649,7 @@ async function showToolsMenu(
     if (isCancel(choice)) return "back";
     if (choice === "__back") return "continue";
 
-    await runCommand(program, choice);
+    await runCommand(program, TOOLS_ARGV[choice] ?? [choice]);
   }
 }
 
@@ -633,14 +658,20 @@ async function showToolsMenu(
 // ---------------------------------------------------------------------------
 
 /**
- * Run a Commander command string inside the TUI loop.
+ * Run a Commander command inside the TUI loop.
  *
- * Delegates to `program.parseAsync()` with the given arguments.
+ * Takes an argv array so prompt values are never re-tokenized: a worker or
+ * config value containing spaces stays exactly one argument. Delegates to
+ * `program.parseAsync()`.
  * Wraps in try-catch so errors don't terminate the loop.
  * Long-running commands (dev, tui, logs) require confirmation so the
  * menu does not appear "hung".
  */
-async function runCommand(program: Command, commandStr: string): Promise<void> {
+async function runCommand(
+  program: Command,
+  argv: readonly string[]
+): Promise<void> {
+  const commandStr = argv.join(" ");
   if (isLongRunning(commandStr)) {
     const proceed = await confirm({
       message: `"${commandStr}" runs until you stop it. Leave the menu?`,
@@ -652,12 +683,10 @@ async function runCommand(program: Command, commandStr: string): Promise<void> {
     }
   }
 
-  const args = commandStr.split(" ").filter(Boolean);
-
   try {
     // from: "user" means Commander expects raw user arguments only —
     // NOT [node, script, ...args] format. So just pass the args directly.
-    await program.parseAsync(args, {
+    await program.parseAsync([...argv], {
       from: "user",
     });
   } catch (err) {
@@ -678,5 +707,10 @@ async function runCommand(program: Command, commandStr: string): Promise<void> {
         inCard: false,
       });
     }
+
+    // A menu command is one step in an interactive session. Its failure has
+    // been formatted and reported; leaving process.exitCode set would poison
+    // the session's final exit status and suppress later completion footers.
+    process.exitCode = 0;
   }
 }

@@ -64,7 +64,7 @@
       "agentFile": ".opencode/agents/oo-misc.md"
     }
   ],
-  "autonomy": "draft",
+  "autonomy": "autopilot",
   "gates": [
     "Ask first before spending money or buying anything.",
     "Ask first before changing permissions or logins.",
@@ -103,7 +103,8 @@
         "job": "Sweep this agency board: failing checks, review comments, conflicts, and stale cards. Send each problem back to its owner with the exact gap. Move nothing that is not yours. Never run oo board sync.",
         "file": "routines/board-sweep.md",
         "enabled": true,
-        "silentOnNoChange": true
+        "silentOnNoChange": true,
+        "testCommand": "grep -q boardHash .openorchestrate/routines/board-sweep.md || { echo 'board-sweep: hash guard missing from routine file'; exit 1; }; { [ ! -f .openorchestrate/state/board-sweep.json ] || grep -q boardHash .openorchestrate/state/board-sweep.json; } || { echo 'board-sweep: state file has no boardHash, guard can never match'; exit 1; }; oo board lint --json | grep -qE '\"ok\": *true' || { echo 'board-sweep: oo board lint reports errors'; exit 1; }"
       },
       {
         "id": "nightly-audit",
@@ -113,7 +114,8 @@
         "job": "Audit the codebase: dead code, load time, bundle size, failing checks. Open small PRs with proof. Never merge.",
         "file": "routines/nightly-audit.md",
         "enabled": true,
-        "silentOnNoChange": false
+        "silentOnNoChange": true,
+        "testCommand": "awk '/treeHash/{f=1} /^## Prompt/{exit} END{if(!f) exit 1}' .openorchestrate/routines/nightly-audit.md || { echo 'nightly-audit: treeHash gate missing or read after the prompt'; exit 1; }; { [ ! -f .openorchestrate/state/nightly-audit.json ] || grep -q treeHash .openorchestrate/state/nightly-audit.json; } || { echo 'nightly-audit: state file has no treeHash, gate can never match'; exit 1; }; oo board lint --json | grep -qE '\"ok\": *true' || { echo 'nightly-audit: board has an unproven claim (done-without-proof)'; exit 1; }"
       }
     ]
   },
@@ -167,6 +169,15 @@
   "templates": {
     "dir": ".openorchestrate/templates",
     "includeSecrets": false
+  },
+  "optionalSkills": {
+    "enabledPacks": [
+      "catalog/addyosmani-agent-skills",
+      "catalog/cloudflare-security-audit",
+      "catalog/google-elephant-goldfish",
+      "catalog/kepano-obsidian-skills",
+      "catalog/mattpocock-skills"
+    ]
   },
   "setup": {
     "createdAt": "2026-11-07T14:15:53.745Z",

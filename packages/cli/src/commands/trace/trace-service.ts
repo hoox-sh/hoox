@@ -305,8 +305,7 @@ export class TraceService {
       (c) => ({
         operator:
           c.operator as TraceQueryRequest["parameters"]["calculations"] extends
-            | (infer U)[]
-            | undefined
+            (infer U)[] | undefined
             ? U extends { operator: infer O }
               ? O
               : never

@@ -27,11 +27,7 @@ export type CFServiceType =
   | "Browser Rendering";
 
 export type CFServiceCategory =
-  | "Data"
-  | "Compute"
-  | "Messaging"
-  | "Network"
-  | "Rendering";
+  "Data" | "Compute" | "Messaging" | "Network" | "Rendering";
 
 export interface CFServiceDef {
   name: string;

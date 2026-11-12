@@ -2,4 +2,4 @@
 
 # Nested
 
-* [dashboard](dashboard/) - Nested concepts.
+- [dashboard](dashboard/) - Nested concepts.

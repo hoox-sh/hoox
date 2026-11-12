@@ -42,6 +42,13 @@ export interface UpdatePlan {
 const MONOREPO_SCAN_DEPTH = 5;
 
 /**
+ * Upper bound on the npm-registry version check. A CLI must not hang on a
+ * stalled registry request; when the bound trips, `checkLatestVersion()`
+ * returns null and the update flow degrades to "unknown latest".
+ */
+const REGISTRY_TIMEOUT_MS = 2_000;
+
+/**
  * Resolve how wrangler should be updated from `startDir`.
  * Exported for unit tests (real filesystem, tmp dirs).
  */
@@ -214,7 +221,9 @@ export class UpdateService {
    */
   async checkLatestVersion(): Promise<string | null> {
     try {
-      const res = await fetch("https://registry.npmjs.org/wrangler/latest");
+      const res = await fetch("https://registry.npmjs.org/wrangler/latest", {
+        signal: AbortSignal.timeout(REGISTRY_TIMEOUT_MS),
+      });
       if (!res.ok) return null;
       const data = (await res.json()) as { version?: string };
       return data.version ?? null;

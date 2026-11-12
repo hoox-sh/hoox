@@ -7,7 +7,7 @@ tags: [code, dashboard, lib, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/lib"
@@ -18,12 +18,12 @@ okf_lock: generated
 
 # Files
 
-* `agent-config-schema.ts` — agentConfigSchema
-* `api.ts` — DashboardStats, Position, Report, SystemLog, WorkerStatus, api, isTestnetPosition
-* `config.ts` — AuthType, ConfigError, ENV_KEYS, TRADINGVIEW_WEBHOOK_PATH, assertProductionAuthConfigured, config, extractWorkersSubdomainPrefix, getAuthType, getConfig, getEnvVar, getInternalAuthKeys, requireSafeSessionSecret
-* `env.ts` — DashboardEnv
-* `safe-image-src.ts` — parseSafeImageSrc
-* `utils.ts` — cn
+- `agent-config-schema.ts` — agentConfigSchema
+- `api.ts` — DashboardStats, Position, Report, SystemLog, WorkerStatus, api, isTestnetPosition
+- `config.ts` — AuthType, ConfigError, ENV_KEYS, TRADINGVIEW_WEBHOOK_PATH, assertProductionAuthConfigured, config, extractWorkersSubdomainPrefix, getAuthType, getConfig, getEnvVar, getInternalAuthKeys, requireSafeSessionSecret
+- `env.ts` — DashboardEnv
+- `safe-image-src.ts` — parseSafeImageSrc
+- `utils.ts` — cn
 
 # Packages
 
@@ -31,8 +31,8 @@ okf_lock: generated
 
 # Used by
 
-* [workers/dashboard/src](/code/workers/dashboard/src.md)
+- [workers/dashboard/src](/code/workers/dashboard/src.md)
 
 # Nested
 
-* [workers/dashboard/src/lib/settings](/code/workers/dashboard/src/lib/settings.md)
+- [workers/dashboard/src/lib/settings](/code/workers/dashboard/src/lib/settings.md)
