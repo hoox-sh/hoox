@@ -382,9 +382,7 @@ class ApiClient {
    */
   async requestSecretsCliHint(
     action:
-      | "automate-mesh"
-      | "hint"
-      | "sync-all-internal-keys" = "automate-mesh"
+      "automate-mesh" | "hint" | "sync-all-internal-keys" = "automate-mesh"
   ): Promise<{
     success: boolean;
     message?: string;

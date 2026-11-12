@@ -20,12 +20,7 @@ import type { TenantContext } from "./types";
 
 /** Billable capability scopes — one account, one key format, per-service-kind. */
 export type EntitlementScope =
-  | "trade"
-  | "signal"
-  | "pyne:run"
-  | "agent:chat"
-  | "axis:stream"
-  | "axis:run";
+  "trade" | "signal" | "pyne:run" | "agent:chat" | "axis:stream" | "axis:run";
 
 /**
  * Tenant context enriched with commercial entitlement data.

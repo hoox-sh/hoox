@@ -148,10 +148,7 @@ export async function executeAnalyticsQuery(
 }
 
 export type AnalyticsErrorCode =
-  | "MISSING_CREDENTIALS"
-  | "QUERY_FAILED"
-  | "BAD_REQUEST"
-  | "UNKNOWN";
+  "MISSING_CREDENTIALS" | "QUERY_FAILED" | "BAD_REQUEST" | "UNKNOWN";
 
 export class AnalyticsApiError extends Error {
   code: AnalyticsErrorCode;
