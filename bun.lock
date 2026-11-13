@@ -34,7 +34,7 @@
     },
     "packages/cli": {
       "name": "@hoox-sh/hoox-cli",
-      "version": "0.19.1",
+      "version": "0.20.0",
       "bin": {
         "hoox": "bin/hoox.js",
         "hx": "bin/hoox.js",
