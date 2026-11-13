@@ -1,4 +1,10 @@
 [test]
+# The git-ignored build artifact at packages/cli/workers/** (see .gitignore)
+# is not a workspace package and cannot satisfy its deps; keep bun's
+# discovery out of it so e.g. `bun test packages/mcp` doesn't pick up its
+# tests. CLI --path-ignore-patterns flags override this list, so the
+# package.json scripts that pass their own patterns keep working.
+pathIgnorePatterns = ["packages/cli/workers/**"]
 coverage = true
 coverageReporter = ["text", "lcov"]
 coverageDir = "./coverage"
