@@ -25,7 +25,6 @@ dist.bak/
 */.next/
 */.vercel/
 # Ignore bun files
-bun.lock
 .bun/
 
 # Ignore bun files in all subdirectories

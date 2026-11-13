@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/clone"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `clone-command.test.ts`
-* `clone-command.ts` — registerCloneCommand
-* `index.ts` — registerCloneCommand
+- `clone-command.test.ts`
+- `clone-command.ts` — registerCloneCommand
+- `index.ts` — registerCloneCommand
 
 # Packages
 

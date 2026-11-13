@@ -46,11 +46,7 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 
 type CommandGroupName =
-  | "Primary"
-  | "Monitoring"
-  | "System"
-  | "Agent"
-  | "Actions";
+  "Primary" | "Monitoring" | "System" | "Agent" | "Actions";
 
 interface CommandPaletteItem {
   icon: React.ComponentType<{ className?: string }>;

@@ -14,12 +14,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export type DashboardFieldType =
-  | "boolean"
-  | "number"
-  | "text"
-  | "select"
-  | "json"
-  | "textarea";
+  "boolean" | "number" | "text" | "select" | "json" | "textarea";
 
 export type DashboardFieldKind = "normal" | "dangerous" | "secret";
 

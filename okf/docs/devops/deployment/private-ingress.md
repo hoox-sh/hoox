@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "Private ingress for operators"
-description: "title: \"Private ingress (Access + Tunnel)\"."
+description: 'title: "Private ingress (Access + Tunnel)".'
 resource: "docs/devops/deployment/private-ingress.mdx"
 tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/private-ingress.mdx"
@@ -22,10 +22,10 @@ Repo path `docs/devops/deployment/private-ingress.mdx`.
 
 # Outline
 
-* When to use Access vs Tunnel vs mTLS
-* Quick setup (Access only)
-  * Expected probe results
-* Optional: Cloudflare Tunnel
-* CLI surface
-* Align dashboard + management Access
-* Related
+- When to use Access vs Tunnel vs mTLS
+- Quick setup (Access only)
+  - Expected probe results
+- Optional: Cloudflare Tunnel
+- CLI surface
+- Align dashboard + management Access
+- Related

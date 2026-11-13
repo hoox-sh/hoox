@@ -291,9 +291,9 @@
       "label": "trade-data-db (D1)",
       "kind": "infrastructure",
       "category": "database",
-      "description": "Cloudflare D1 SQLite database. Stores trade_signals, trades, positions, balances, system_logs tables. Database ID: a682f084-594e-4bd8-be2d-40ea5f8cf42e.",
+      "description": "Cloudflare D1 SQLite database. Stores trade_signals, trades, positions, balances, system_logs tables. Database ID: 03ec3b05-2629-49b6-ab59-48a9357b7969.",
       "tags": ["d1", "sqlite", "database", "persistence"],
-      "llmContext": "Central SQLite database (D1). Tables: trade_signals (incoming signals with raw payload + parsed status), trades (executed orders with exchange/symbol/quantity/price/status), positions (open/closed positions with unrealized_pnl), balances (exchange/asset balance snapshots with timestamps), system_logs (structured app logs with level/source/message/details), trade_requests, trade_responses (request/response pair audit log). Accessed exclusively through d1-worker service binding (workers/d1-worker). Direct DB binding also available for workers/trade-worker (legacy, for DbLogger) and workers/agent-worker (legacy direct D1 access, being migrated to d1-worker). DB ID: a682f084-594e-4bd8-be2d-40ea5f8cf42e. All queries validated against table allowlist.",
+      "llmContext": "Central SQLite database (D1). Tables: trade_signals (incoming signals with raw payload + parsed status), trades (executed orders with exchange/symbol/quantity/price/status), positions (open/closed positions with unrealized_pnl), balances (exchange/asset balance snapshots with timestamps), system_logs (structured app logs with level/source/message/details), trade_requests, trade_responses (request/response pair audit log). Accessed exclusively through d1-worker service binding (workers/d1-worker). Direct DB binding also available for workers/trade-worker (legacy, for DbLogger) and workers/agent-worker (legacy direct D1 access, being migrated to d1-worker). DB ID: 03ec3b05-2629-49b6-ab59-48a9357b7969. All queries validated against table allowlist.",
       "bindingName": "DB",
       "usedBy": [
         "workers/agent-worker",

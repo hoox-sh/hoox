@@ -5,6 +5,6 @@
     "types": ["bun-types", "node"],
     "lib": ["ES2022"]
   },
-  "include": ["src/**/*.ts", "bin/**/*.js"],
+  "include": ["src/**/*.ts", "bin/**/*.js", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

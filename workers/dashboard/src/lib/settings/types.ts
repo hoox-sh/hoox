@@ -4,12 +4,7 @@
  */
 
 export type FieldType =
-  | "boolean"
-  | "number"
-  | "text"
-  | "select"
-  | "json"
-  | "textarea";
+  "boolean" | "number" | "text" | "select" | "json" | "textarea";
 
 /**
  * Marks how a field should be rendered in the form.

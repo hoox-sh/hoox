@@ -338,7 +338,7 @@ describe("CloudflareService", () => {
         "Resource location: remote\n" +
         "\n" +
         "There is a newer version of Wrangler available (current: 4.98.0, latest: 4.105.0).\n" +
-        "🌀 Executing on remote database trade-data-db (a682f084-...):\n" +
+        "🌀 Executing on remote database trade-data-db (03ec3b05-...):\n" +
         "🚣 Executed 1 command in 0.22ms\n" +
         JSON.stringify([
           { name: "trade_signals" },

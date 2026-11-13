@@ -5,13 +5,16 @@
   "compatibility_date": "2026-07-01",
   "workers_dev": false,
   "routes": [
-    { "pattern": "dispatch.hoox-enterprise.example.com/*", "custom_domain": true }
+    {
+      "pattern": "dispatch.hoox-enterprise.example.com/*",
+      "custom_domain": true,
+    },
   ],
   "vars": {
-    "ENVIRONMENT": "enterprise"
+    "ENVIRONMENT": "enterprise",
   },
   "durable_objects": {
-    "bindings": []
+    "bindings": [],
   },
   "services": [
     // System services that the dispatch can call
@@ -20,15 +23,15 @@
     "namespaces": [
       {
         "binding": "TENANT_DISPATCHER",
-        "namespace": "hoox-tenants"
-      }
-    ]
+        "namespace": "hoox-tenants",
+      },
+    ],
   },
   "logpush": true,
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "limits": {
-    "cpu_ms": 30000
-  }
+    "cpu_ms": 30000,
+  },
 }

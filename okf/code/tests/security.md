@@ -7,7 +7,7 @@ tags: [code, security, tests]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "tests/security"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `auth-bypass.test.ts`
-* `fuzz.test.ts`
-* `security-headers.test.ts`
+- `auth-bypass.test.ts`
+- `fuzz.test.ts`
+- `security-headers.test.ts`
 
 # Packages
 

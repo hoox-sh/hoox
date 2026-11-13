@@ -27,12 +27,21 @@ jobs:
             workers/email-worker \
             workers/analytics-worker \
             workers/report-worker \
+            workers/pyne-worker \
+            workers/pyne-agent-worker \
             || echo "::warning::Some submodules could not be initialized due to token permissions. Continuing."
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
+
+      - name: Setup Node.js
+        # Wrangler 4.159.0+ requires Node >=22.12.0. Bun runs the scripts,
+        # but this makes the supported floor explicit and exercised in CI.
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v5
@@ -87,12 +96,21 @@ jobs:
             workers/email-worker \
             workers/analytics-worker \
             workers/report-worker \
+            workers/pyne-worker \
+            workers/pyne-agent-worker \
             || echo "::warning::Some submodules could not be initialized due to token permissions. Continuing."
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
+
+      - name: Setup Node.js
+        # Wrangler 4.159.0+ requires Node >=22.12.0. Bun runs the scripts,
+        # but this makes the supported floor explicit and exercised in CI.
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v5
@@ -184,12 +202,21 @@ jobs:
             workers/email-worker \
             workers/analytics-worker \
             workers/report-worker \
+            workers/pyne-worker \
+            workers/pyne-agent-worker \
             || echo "::warning::Some submodules could not be initialized due to token permissions. Continuing."
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
+
+      - name: Setup Node.js
+        # Wrangler 4.159.0+ requires Node >=22.12.0. Bun runs the scripts,
+        # but this makes the supported floor explicit and exercised in CI.
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v5

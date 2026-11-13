@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "how-hoox-works.mdx"
-description: "description: \"High-level overview of the pipeline turning a trade signal into an executed edge order.\"."
+description: 'description: "High-level overview of the pipeline turning a trade signal into an executed edge order.".'
 resource: "docs/enduser/concepts/how-hoox-works.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/how-hoox-works.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/enduser/concepts/how-hoox-works.mdx`.
 
 # Outline
 
-* 🗺️ The Execution Pipeline
-* 🔍 Detailed Pipeline Phase Analysis
-  * 1. Signal Arrival & Ingestion
-  * 2. Edge Firewall & Gateway Validation
-  * 3. Service Binding Order Routing
-  * 4. Exchange Execution & Cryptographic Signing
-  * 5. Persistent D1 Logging & Telemetry
-  * 6. User Notifications & Alerts
-  * 🔗 Next Steps
+- 🗺️ The Execution Pipeline
+- 🔍 Detailed Pipeline Phase Analysis
+  - 1. Signal Arrival & Ingestion
+  - 2. Edge Firewall & Gateway Validation
+  - 3. Service Binding Order Routing
+  - 4. Exchange Execution & Cryptographic Signing
+  - 5. Persistent D1 Logging & Telemetry
+  - 6. User Notifications & Alerts
+  - 🔗 Next Steps

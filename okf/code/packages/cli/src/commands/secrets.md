@@ -7,7 +7,7 @@ tags: [cli, code, commands, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src/commands/secrets"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — registerSecretsCommand
-* `secrets-command.test.ts`
-* `secrets-command.ts` — registerSecretsCommand
+- `index.ts` — registerSecretsCommand
+- `secrets-command.test.ts`
+- `secrets-command.ts` — registerSecretsCommand
 
 # Packages
 

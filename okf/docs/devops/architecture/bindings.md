@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "bindings.mdx"
-description: "description: \"Stub — the canonical Cloudflare Workers bindings registry lives at /docs/devops/bindings.\"."
+description: 'description: "Stub — the canonical Cloudflare Workers bindings registry lives at /docs/devops/bindings.".'
 resource: "docs/devops/architecture/bindings.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/bindings.mdx"
@@ -22,4 +22,4 @@ Repo path `docs/devops/architecture/bindings.mdx`.
 
 # Outline
 
-  * 🔗 Next Steps
+- 🔗 Next Steps

@@ -95,13 +95,7 @@ export interface PositionRow {
 
 type ModeFilter = "live" | "test" | "all";
 type SortField =
-  | "symbol"
-  | "exchange"
-  | "side"
-  | "size"
-  | "pnl"
-  | "leverage"
-  | "updatedAt";
+  "symbol" | "exchange" | "side" | "size" | "pnl" | "leverage" | "updatedAt";
 type SortDir = "asc" | "desc";
 
 const REFRESH_INTERVAL_MS = 30_000;

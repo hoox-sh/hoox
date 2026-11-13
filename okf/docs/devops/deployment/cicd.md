@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cicd.mdx"
-description: "description: \"How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare® edge…"
+description: 'description: "How to automate the Hoox deployment pipeline using GitHub Actions, including code style checks, TypeScript type-checking, Bun unit testing, and Cloudflare® edge…'
 resource: "docs/devops/deployment/cicd.mdx"
 tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/cicd.mdx"
@@ -22,8 +22,8 @@ Repo path `docs/devops/deployment/cicd.mdx`.
 
 # Outline
 
-* 🏗️ The Continuous Integration & Deployment Pipeline Flow
-* 📝 Complete GitHub Actions Workflow (deploy.yml)
-* 🔒 Managing Secrets & Variable Scopes
-* 🧪 Pipeline Caching & Concurrency Controls
-  * 🔗 Next Steps
+- 🏗️ The Continuous Integration & Deployment Pipeline Flow
+- 📝 Complete GitHub Actions Workflow (deploy.yml)
+- 🔒 Managing Secrets & Variable Scopes
+- 🧪 Pipeline Caching & Concurrency Controls
+  - 🔗 Next Steps

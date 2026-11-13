@@ -15,10 +15,7 @@ import {
 // --- Types ---
 
 export type SecretGroup =
-  | "Mesh (auto)"
-  | "Exchange API Keys"
-  | "Notifications"
-  | "Integrations";
+  "Mesh (auto)" | "Exchange API Keys" | "Notifications" | "Integrations";
 
 /** system = generated/synced by CLI; user = operator-supplied values */
 export type SecretKind = "system" | "user";
