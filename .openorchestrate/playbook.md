@@ -93,3 +93,5 @@ Fix a recurring failure in this order: setup, check, skill or rule, memory.
 ## Friday receipt
 
 For every routine: runs, passed, needed a human, repeated failures, cost per finished job. Keep, fix, or delete. Ask: would I notice if it disappeared tomorrow?
+
+- Command proofs need `--expect` or `--expect-exit`. `exit 0` alone is not proof. `--run` is blocked unless the seat's agent file allows shell.
