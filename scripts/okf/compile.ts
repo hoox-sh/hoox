@@ -16,6 +16,7 @@ import { createHash } from "node:crypto";
 import { posix } from "node:path";
 import type { InputFile } from "./io";
 import {
+  cmp,
   isRecord,
   parseYaml,
   PRODUCER,
@@ -862,6 +863,9 @@ function humanConcepts(existing: Map<string, string>): {
     }
     indexed.push({ path, title, description: oneLine(description, 180) });
   }
+  // `existing` iterates in filesystem order; sort so the bundle is identical
+  // on every machine (the index lists sections in this order).
+  indexed.sort((a, b) => cmp(a.path, b.path));
   return { keep, indexed };
 }
 
