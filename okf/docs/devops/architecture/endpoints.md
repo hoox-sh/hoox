@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "endpoints.mdx"
-description: "description: \"Architectural routing flow and service-binding topology for the Hoox microservice mesh, with the canonical endpoint directory living under the API reference.\"."
+description: 'description: "Architectural routing flow and service-binding topology for the Hoox microservice mesh, with the canonical endpoint directory living under the API reference.".'
 resource: "docs/devops/architecture/endpoints.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/endpoints.mdx"

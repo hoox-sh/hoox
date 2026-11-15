@@ -556,9 +556,12 @@ function mdDest(url: string): string {
   return /[()\s]/.test(url) ? `<${url}>` : url;
 }
 
+// Bullets are "-", not "*": prettier's markdown printer normalizes list
+// markers to "-", and the bundle is committed, so it must pass `prettier
+// --check` without a post-generation formatting pass.
 function linkList(dirs: string[], label: (dir: string) => string): string {
   return dirs
-    .map((dir) => `* [${label(dir)}](${mdDest(`/${moduleId(dir)}.md`)})`)
+    .map((dir) => `- [${label(dir)}](${mdDest(`/${moduleId(dir)}.md`)})`)
     .join("\n");
 }
 
@@ -582,11 +585,11 @@ function renderModule(mod: Module, now: string): string {
     const name = posix.basename(file.path);
     const exports =
       file.exports.length > 0 ? ` — ${file.exports.join(", ")}` : "";
-    lines.push(`* \`${name}\`${exports}`);
+    lines.push(`- \`${name}\`${exports}`);
   }
   if (mod.others.length > 0) {
     lines.push("", "# Other files", "");
-    for (const name of mod.others) lines.push(`* \`${name}\``);
+    for (const name of mod.others) lines.push(`- \`${name}\``);
   }
   if (mod.packages.length > 0) {
     lines.push(
@@ -642,8 +645,18 @@ function renderDoc(doc: DocConcept, now: string): string {
   ];
   if (doc.headings.length > 0) {
     lines.push("# Outline", "");
+    // Indent relative to the shallowest heading in this doc, and never deeper
+    // than one level below the previous item: prettier re-normalizes any other
+    // shape (e.g. a 2-space first item with no parent) on `--check`.
+    const baseDepth = Math.min(...doc.headings.map((heading) => heading.depth));
+    let prevLevel = -1;
     for (const heading of doc.headings) {
-      lines.push(`${heading.depth === 3 ? "  " : ""}* ${heading.text}`);
+      const level = Math.min(
+        Math.max(heading.depth - baseDepth, 0),
+        prevLevel + 1
+      );
+      lines.push(`${"  ".repeat(level)}- ${heading.text}`);
+      prevLevel = level;
     }
     lines.push("");
   }
@@ -710,7 +723,7 @@ function renderIndexes(
       lines.push("# Concepts", "");
       for (const concept of concepts) {
         lines.push(
-          `* [${concept.title}](${mdDest(posix.basename(concept.path))}) - ${concept.description}`
+          `- [${concept.title}](${mdDest(posix.basename(concept.path))}) - ${concept.description}`
         );
       }
       lines.push("");
@@ -721,7 +734,7 @@ function renderIndexes(
         const nestedConcept = all.find((item) => item.path === `${child}.md`);
         const blurb = nestedConcept?.description ?? "Nested concepts.";
         lines.push(
-          `* [${posix.basename(child)}](${mdDest(`${posix.basename(child)}/`)}) - ${blurb}`
+          `- [${posix.basename(child)}](${mdDest(`${posix.basename(child)}/`)}) - ${blurb}`
         );
       }
       lines.push("");
@@ -773,7 +786,7 @@ function renderRoot(dirs: Set<string>, all: Indexed[]): string {
     lines.push(`# ${name[0]?.toUpperCase()}${name.slice(1)}`, "");
     if (dirs.has(name)) {
       lines.push(
-        `* [${name}](${mdDest(`${name}/`)}) - ${blurbs[name] ?? "Concepts in this section."}`
+        `- [${name}](${mdDest(`${name}/`)}) - ${blurbs[name] ?? "Concepts in this section."}`
       );
     }
     const rooted = all.filter(
@@ -782,7 +795,7 @@ function renderRoot(dirs: Set<string>, all: Indexed[]): string {
     if (!dirs.has(name)) {
       for (const item of rooted) {
         lines.push(
-          `* [${item.title}](${mdDest(posix.basename(item.path))}) - ${item.description}`
+          `- [${item.title}](${mdDest(posix.basename(item.path))}) - ${item.description}`
         );
       }
     }
@@ -801,7 +814,7 @@ function renderLog(
   if (previous?.includes(`digest \`${digest}\``)) return previous;
   const day = now.slice(0, 10);
   const verb = previous ? "Update" : "Initialization";
-  const bullet = `* **${verb}**: Compiled ${modules} code modules and ${docs} documents (digest \`${digest}\`).`;
+  const bullet = `- **${verb}**: Compiled ${modules} code modules and ${docs} documents (digest \`${digest}\`).`;
   const kept = previous
     ? previous
         .replace(/\r\n/g, "\n")
@@ -809,7 +822,7 @@ function renderLog(
         .replace(/^# .+\n+/, "")
         .trim()
     : "";
-  const sections = [`## ${day}`, bullet];
+  const sections = [`## ${day}`, "", bullet];
   if (kept) sections.push("", kept);
   return `# Bundle update log\n\n${sections.join("\n")}\n`;
 }

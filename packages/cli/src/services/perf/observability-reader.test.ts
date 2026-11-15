@@ -47,8 +47,7 @@ const ALL_EVENTS = [
 
 const filteredQuery = mock((req: ObservabilityQueryRequest) => {
   const serviceFilter = req.parameters?.filters?.find((f) => f.value)?.value as
-    | string
-    | undefined;
+    string | undefined;
   const events = serviceFilter
     ? ALL_EVENTS.filter((e) => e.$metadata.service === serviceFilter)
     : ALL_EVENTS;

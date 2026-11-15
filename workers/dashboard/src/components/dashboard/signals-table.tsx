@@ -110,13 +110,7 @@ interface RecentSignal {
 
 type TimeRange = "7d" | "30d" | "90d" | "all";
 type SignalTypeFilter =
-  | "all"
-  | "BUY"
-  | "SELL"
-  | "NEUTRAL"
-  | "HOLD"
-  | "LONG"
-  | "SHORT";
+  "all" | "BUY" | "SELL" | "NEUTRAL" | "HOLD" | "LONG" | "SHORT";
 type SortField = "signal_count" | "symbol" | "avg_confidence" | "source";
 type SortDir = "asc" | "desc";
 type PageSize = 10 | 25 | 50;

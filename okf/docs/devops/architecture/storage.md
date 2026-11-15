@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "storage.mdx"
-description: "description: \"High-integrity architecture specifications for edge SQLite D1 databases, zero-egress R2 object stores, and eventually consistent KV cache namespaces.\"."
+description: 'description: "High-integrity architecture specifications for edge SQLite D1 databases, zero-egress R2 object stores, and eventually consistent KV cache namespaces.".'
 resource: "docs/devops/architecture/storage.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/storage.mdx"

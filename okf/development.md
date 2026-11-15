@@ -1,4 +1,5 @@
 ---
+okf_lock: human
 type: Guide
 title: Development
 description: Setup, checks, and the pre-commit hook.
@@ -41,5 +42,5 @@ repair them with:
 
 ## Related
 
-- [Architecture](architecture.md)
-- [Security](security.md)
+- [Architecture](/architecture.md)
+- [Security](/security.md)

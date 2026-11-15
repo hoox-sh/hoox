@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "email-signals.mdx"
-description: "description: \"Route trade signals into email-worker via Mailgun, Cloudflare® Email Routing, or an authenticated JSON post. There is no IMAP inbox poll.\"."
+description: 'description: "Route trade signals into email-worker via Mailgun, Cloudflare® Email Routing, or an authenticated JSON post. There is no IMAP inbox poll.".'
 resource: "docs/enduser/tutorials/email-signals.mdx"
 tags: [doc, docs, enduser, tutorials]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/tutorials/email-signals.mdx"

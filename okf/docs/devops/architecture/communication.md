@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "communication.mdx"
-description: "description: \"Detailed specification of Cloudflare Service Bindings, zero-overhead V8 isolate routing, and standard cross-worker auth middleware.\"."
+description: 'description: "Detailed specification of Cloudflare Service Bindings, zero-overhead V8 isolate routing, and standard cross-worker auth middleware.".'
 resource: "docs/devops/architecture/communication.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/communication.mdx"

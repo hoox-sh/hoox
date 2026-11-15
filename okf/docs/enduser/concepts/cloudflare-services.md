@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cloudflare-services.mdx"
-description: "description: \"How D1 edge-SQLite, KV, R2, Queues, Durable Objects, Vectorize, and Browser Rendering power our distributed edge monorepo.\"."
+description: 'description: "How D1 edge-SQLite, KV, R2, Queues, Durable Objects, Vectorize, and Browser Rendering power our distributed edge monorepo.".'
 resource: "docs/enduser/concepts/cloudflare-services.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/cloudflare-services.mdx"

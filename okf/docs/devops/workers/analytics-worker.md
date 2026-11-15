@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "analytics-worker.mdx"
-description: "title: \"analytics-worker Isolate Profile\"."
+description: 'title: "analytics-worker Isolate Profile".'
 resource: "docs/devops/workers/analytics-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/analytics-worker.mdx"
