@@ -7,12 +7,23 @@ import { McpServer } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import { advise } from "./advise.ts";
 import { findEntry } from "./catalog.ts";
+import { codeModeEnabled, registerCodeMode } from "./codemode/tools.ts";
+import type { CodeModeOptions } from "./codemode/tools.ts";
+import { describeCommand } from "./describe.ts";
 import { POLICY_TEXT, toolBlurb } from "./policy.ts";
 import { jsonResult } from "./result.ts";
 import { executeEntry } from "./runner.ts";
 import { inputSchemaFor } from "./schema.ts";
 import { snapshot } from "./snapshot.ts";
 import type { CatalogEntry } from "./types.ts";
+
+export interface HooxServerOptions {
+  /** Code Mode is opt-in and off unless HOOX_MCP_CODE_MODE=1. */
+  codeMode?: boolean;
+  codeModeLimits?: CodeModeOptions["limits"];
+  codeModeDeps?: CodeModeOptions["deps"];
+  codeModeHandlers?: CodeModeOptions["handlers"];
+}
 
 const TRIAGE = `Triage this Hoox checkout before changing anything.
 1. Call hoox_snapshot. Add remote=true when Cloudflare credentials are available.
@@ -27,13 +38,23 @@ const DEPLOY = `Prepare a Hoox deploy and stop before the mutation.
 4. Run the real deploy only after the user agrees, by calling hoox_deploy_all again with the confirm token.`;
 
 export function createHooxMcpServer(
-  catalog: readonly CatalogEntry[]
+  catalog: readonly CatalogEntry[],
+  options: HooxServerOptions = {}
 ): McpServer {
   const server = new McpServer({ name: "hoox", version: "0.15.0" });
   registerAdvanced(server, catalog);
   for (const entry of catalog) {
     if (!entry.action) continue;
     registerCommand(server, entry);
+  }
+  // Appended last so an unset flag produces a byte-identical tool list.
+  if (codeModeEnabled({ enabled: options.codeMode })) {
+    registerCodeMode(server, catalog, {
+      enabled: true,
+      limits: options.codeModeLimits,
+      deps: options.codeModeDeps,
+      handlers: options.codeModeHandlers,
+    });
   }
   registerResources(server, catalog);
   registerPrompts(server);
@@ -138,37 +159,8 @@ function registerAdvanced(
       },
     },
     async ({ command }) => {
-      const entry = findEntry(catalog, command);
-      if (!entry) {
-        const needle = command.trim().toLowerCase();
-        const close = catalog
-          .filter(
-            (item) =>
-              item.path.includes(needle) || item.toolName.includes(needle)
-          )
-          .slice(0, 8)
-          .map((item) => item.path);
-        return jsonResult(
-          { message: `Unknown command: ${command}`, close },
-          true
-        );
-      }
-      return jsonResult({
-        path: entry.path,
-        tool: entry.action ? entry.toolName : null,
-        risk: entry.risk,
-        action: entry.action,
-        long: entry.long,
-        destructive: entry.destructive,
-        local: entry.local,
-        secret_stdin: entry.secretStdin,
-        script_stdin: entry.scriptStdin,
-        aliases: entry.aliases,
-        summary: entry.summary,
-        description: entry.description,
-        args: entry.args,
-        options: entry.options,
-      });
+      const described = describeCommand(catalog, command);
+      return jsonResult(described.value, !described.ok);
     }
   );
 

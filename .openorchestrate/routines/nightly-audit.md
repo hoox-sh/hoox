@@ -34,6 +34,18 @@ else. That is the whole run.
 Write the new hash back when the audit finishes. An empty run costs one
 `git rev-parse` and one `git status`, not a full context reload.
 
+## Test
+
+`config.json` gives this routine a `testCommand`; a run is `passed` only when it
+exits 0. It asserts three things, cheaply and with no writes:
+
+1. `treeHash` appears **before** `## Prompt` in this file, so the gate is read
+   before anything else (a gate placed after the prompt is not a gate);
+2. if a state file exists it contains `treeHash`, otherwise the gate could never
+   match and the audit would go silent forever (absent file = first run);
+3. `oo board lint --json` reports `"ok": true`, which fails on any
+   `done-without-proof` card — the audit may not leave an unproven claim.
+
 ## Prompt
 
 ```text

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cli-commands.mdx"
-description: "description: \"Command tree, flags, and examples for the hoox CLI (0.16.0).\"."
+description: 'description: "Command tree, flags, and examples for the hoox CLI (0.16.0).".'
 resource: "docs/enduser/reference/cli-commands.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/cli-commands.mdx"

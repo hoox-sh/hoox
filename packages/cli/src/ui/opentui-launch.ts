@@ -115,7 +115,8 @@ export function shouldLaunchStartScreen(): boolean {
   if (process.env.HOOX_NO_LAUNCHER === "1") return false;
   if (process.env.CI === "1" || process.env.CI === "true") return false;
   if (process.env.TERM === "dumb") return false;
-  if (process.env.NO_COLOR) return false;
+  // NO_COLOR governs color output, not whether the launcher exists. The
+  // theme/formatters consult `isRichMode()` and strip color on their own.
   return Boolean(process.stdin.isTTY && process.stdout.isTTY);
 }
 

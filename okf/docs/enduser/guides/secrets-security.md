@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "secrets-security.mdx"
-description: "description: \"How to manage encrypted Cloudflare® Worker Secrets, secure Zero Trust service boundaries, and configure edge firewalls and IP allowlists.\"."
+description: 'description: "How to manage encrypted Cloudflare® Worker Secrets, secure Zero Trust service boundaries, and configure edge firewalls and IP allowlists.".'
 resource: "docs/enduser/guides/secrets-security.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/secrets-security.mdx"

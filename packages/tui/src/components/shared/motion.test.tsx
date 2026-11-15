@@ -61,8 +61,8 @@ describe("dotted HOOX mark", () => {
 
   it("renders braille dots", async () => {
     const out = await frame(<HooxMark size="sm" />, 24, 10);
-    expect(out).toContain("⣶");
-    expect(out).toContain("⢀");
+    expect(out).toContain("⣿");
+    expect(out).toContain("⢾");
   });
 
   it("renders the HO/OX wordmark with an uppercase tagline", async () => {

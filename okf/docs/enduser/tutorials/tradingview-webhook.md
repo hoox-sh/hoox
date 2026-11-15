@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "tradingview-webhook.mdx"
-description: "title: \"TradingView® Webhook Integration\"."
+description: 'title: "TradingView® Webhook Integration".'
 resource: "docs/enduser/tutorials/tradingview-webhook.mdx"
 tags: [doc, docs, enduser, tutorials]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/tutorials/tradingview-webhook.mdx"

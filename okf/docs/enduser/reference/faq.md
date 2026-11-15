@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "❓ Frequently Asked Questions (FAQ)"
-description: "description: \"Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.16.0.\"."
+description: 'description: "Install, secrets, DEX spots, testnet, deploy, and troubleshooting answers for Hoox 0.16.0.".'
 resource: "docs/enduser/reference/faq.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/faq.mdx"

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "design-system.mdx"
-description: "description: \"Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI.\"."
+description: 'description: "Dashboard OKLCH tokens, typography, and icon conventions for the Hoox operator UI.".'
 resource: "docs/devops/architecture/design-system.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/design-system.mdx"
