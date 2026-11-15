@@ -26,7 +26,7 @@ async function renderDashboard(): Promise<string> {
     width: 80,
     // Tall enough for service grid + alerts + stats without mid-line overwrite
     // when ViewHeader chrome + async kill-switch/model health settle.
-    height: 32,
+    height: 64,
     exitOnCtrlC: false,
   });
   await renderOnce();

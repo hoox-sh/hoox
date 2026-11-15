@@ -255,7 +255,13 @@ function LogsPane({
       </box>
 
       {/* Log entries in scrollable container */}
-      <scrollbox width="100%" flexGrow={1} border={false}>
+      <scrollbox
+        width="100%"
+        flexGrow={1}
+        flexBasis={0}
+        minHeight={0}
+        border={false}
+      >
         {displayedLogs.length === 0 ? (
           <text fg={Colors.muted} dim>
             No logs yet...

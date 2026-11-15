@@ -34,12 +34,6 @@ async function createTestRenderer() {
 }
 
 /** Clean up a renderer after test */
-function destroyRenderer(
-  renderer: Awaited<ReturnType<typeof createCliRenderer>>
-) {
-  renderer.destroy();
-}
-
 /** Build a mock WorkerInfo object with overrides */
 function makeWorker(overrides: Partial<WorkerInfo> = {}): WorkerInfo {
   return {
@@ -331,9 +325,12 @@ describe("ServiceManager", () => {
 
   // Clean up renderer after each test
   // (OpenTUI renderer holds the terminal; destroy releases it)
-  afterEach(() => {
+  afterEach(async () => {
     if (renderer) {
-      destroyRenderer(renderer);
+      const r = renderer;
+      renderer = undefined as unknown as typeof renderer;
+      r.destroy();
+      await r.closed;
     }
   });
 });

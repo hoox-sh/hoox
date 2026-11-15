@@ -448,7 +448,7 @@ export function SecretsViewer() {
                 />
               </box>
             ) : (
-              <scrollbox width="100%" flexGrow={1}>
+              <scrollbox width="100%" flexGrow={1} flexBasis={0} minHeight={0}>
                 {visibleSecrets.map((s) => (
                   <SecretRow
                     key={s.name}
