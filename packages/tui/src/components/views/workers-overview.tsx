@@ -245,8 +245,7 @@ export function WorkersOverview({ dialog }: WorkersOverviewProps = {}) {
           const raw = result.data as Record<string, unknown>;
           // CLI may return workers array, health object, or similar
           const rawWorkers = (raw.workers ?? raw.status ?? raw) as
-            | unknown[]
-            | Record<string, unknown>;
+            unknown[] | Record<string, unknown>;
           const parsed = Array.isArray(rawWorkers)
             ? rawWorkers
             : typeof rawWorkers === "object" && rawWorkers !== null

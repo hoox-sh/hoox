@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "Disclaimer"
-description: "Hoox (\"the Software\") is an open-source algorithmic trading and automation framework. By using, modifying, or distributing the Software, you (\"the User\") acknowledge and agree to…"
+description: 'Hoox ("the Software") is an open-source algorithmic trading and automation framework. By using, modifying, or distributing the Software, you ("the User") acknowledge and agree to…'
 resource: "DISCLAIMER.md"
 tags: [disclaimer, doc]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "DISCLAIMER.md"

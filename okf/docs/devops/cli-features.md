@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "cli-features.mdx"
-description: "description: \"Detailed specification of the Hoox Command-Line Interface, monorepo workspaces compilation, and task-management engines.\"."
+description: 'description: "Detailed specification of the Hoox Command-Line Interface, monorepo workspaces compilation, and task-management engines.".'
 resource: "docs/devops/cli-features.mdx"
 tags: [cli-features, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/cli-features.mdx"

@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T15:02:00Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/shared"

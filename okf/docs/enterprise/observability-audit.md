@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "Enterprise Observability & Audit"
-description: "title: \"Enterprise Observability & Audit\"."
+description: 'title: "Enterprise Observability & Audit".'
 resource: "docs/enterprise/observability-audit.mdx"
 tags: [doc, docs, enterprise, observability-audit]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enterprise/observability-audit.mdx"

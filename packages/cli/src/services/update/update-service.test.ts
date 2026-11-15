@@ -41,6 +41,26 @@ function createMockPrereqs(
   };
 }
 
+/**
+ * Replace global fetch with a canned npm-registry response for one test.
+ * `checkLatestVersion()` is network-bound; leaving it live makes these tests
+ * depend on registry reachability and on full-suite timing. Call the returned
+ * restore function in `finally`.
+ */
+function stubRegistryFetch(version: string): () => void {
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = mock(
+    async () =>
+      new Response(JSON.stringify({ version }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+  ) as unknown as typeof fetch;
+  return () => {
+    globalThis.fetch = origFetch;
+  };
+}
+
 describe("UpdateService", () => {
   afterEach(() => {
     mock.restore();
@@ -107,11 +127,16 @@ describe("UpdateService", () => {
         mockPrereqs as any,
         updateRunner
       );
+      const restoreFetch = stubRegistryFetch("4.1.0");
 
-      const result = await svc.checkAndPromptUpdate({ yes: true });
+      try {
+        const result = await svc.checkAndPromptUpdate({ yes: true });
 
-      expect(typeof result.updated).toBe("boolean");
-      expect(updateRunner).toHaveBeenCalled();
+        expect(typeof result.updated).toBe("boolean");
+        expect(updateRunner).toHaveBeenCalled();
+      } finally {
+        restoreFetch();
+      }
     });
 
     it("skips update when user declines the prompt", async () => {
@@ -181,9 +206,15 @@ describe("UpdateService", () => {
         mockPrereqs as any,
         updateRunner
       );
-      const result = await svc.checkAndPromptUpdate({ yes: true });
-      expect(result.updated).toBe(false);
-      expect(result.error).toContain("network error");
+      const restoreFetch = stubRegistryFetch("4.1.0");
+
+      try {
+        const result = await svc.checkAndPromptUpdate({ yes: true });
+        expect(result.updated).toBe(false);
+        expect(result.error).toContain("network error");
+      } finally {
+        restoreFetch();
+      }
     });
   });
 
@@ -256,13 +287,18 @@ describe("UpdateService", () => {
 
   describe("checkLatestVersion", () => {
     it("returns a version string or null", async () => {
-      const svc = new UpdateService();
-      const version = await svc.checkLatestVersion();
-      expect(version === null || typeof version === "string").toBe(true);
-      if (typeof version === "string") {
-        expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+      const restoreFetch = stubRegistryFetch("4.1.0");
+      try {
+        const svc = new UpdateService();
+        const version = await svc.checkLatestVersion();
+        expect(version === null || typeof version === "string").toBe(true);
+        if (typeof version === "string") {
+          expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+        }
+      } finally {
+        restoreFetch();
       }
-    }, 30000);
+    });
 
     it("returns null when registry responds non-ok", async () => {
       const origFetch = globalThis.fetch;
@@ -303,6 +339,26 @@ describe("UpdateService", () => {
         globalThis.fetch = origFetch;
       }
     });
+
+    it("bounds the registry request with a timeout signal", async () => {
+      const origFetch = globalThis.fetch;
+      let signal: AbortSignal | null | undefined;
+      globalThis.fetch = mock(
+        async (_input: RequestInfo | URL, init?: RequestInit) => {
+          signal = init?.signal;
+          return new Response(JSON.stringify({ version: "4.99.0" }), {
+            status: 200,
+          });
+        }
+      ) as unknown as typeof fetch;
+      try {
+        const svc = new UpdateService();
+        expect(await svc.checkLatestVersion()).toBe("4.99.0");
+        expect(signal).toBeInstanceOf(AbortSignal);
+      } finally {
+        globalThis.fetch = origFetch;
+      }
+    });
   });
 
   describe("default updateRunner", () => {
@@ -322,9 +378,14 @@ describe("UpdateService", () => {
       try {
         // After successful update, version check still returns 3.0.0 → unchanged
         const svc = new UpdateService(undefined, mockPrereqs as any);
-        const result = await svc.checkAndPromptUpdate({ yes: true });
-        expect(typeof result.updated).toBe("boolean");
-        expect(Bun.spawn).toHaveBeenCalled();
+        const restoreFetch = stubRegistryFetch("4.1.0");
+        try {
+          const result = await svc.checkAndPromptUpdate({ yes: true });
+          expect(typeof result.updated).toBe("boolean");
+          expect(Bun.spawn).toHaveBeenCalled();
+        } finally {
+          restoreFetch();
+        }
       } finally {
         (Bun as unknown as Record<string, unknown>).spawn = realSpawn;
       }

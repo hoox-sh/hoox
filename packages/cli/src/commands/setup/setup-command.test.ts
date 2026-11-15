@@ -63,6 +63,7 @@ describe("registerSetupCommand", () => {
     );
     // Patch prototype so the command's new SetupService() uses the mock
     const orig = SetupService.prototype.runAll;
+    const origAuth = SetupService.prototype.checkAuth;
     SetupService.prototype.runAll = runAll as unknown as typeof orig;
     const checkAuth = mock(() => Promise.resolve(true));
     SetupService.prototype.checkAuth =
@@ -83,6 +84,9 @@ describe("registerSetupCommand", () => {
       expect(runAll).not.toHaveBeenCalled();
     } finally {
       SetupService.prototype.runAll = orig;
+      // Restore checkAuth too: leaking this mock makes later files that call
+      // the real checkAuth() (e.g. setup-service.test.ts) see `true`.
+      SetupService.prototype.checkAuth = origAuth;
     }
   });
 

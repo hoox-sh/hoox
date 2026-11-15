@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🔒 Idempotency & Durable Objects"
-description: "description: \"Two-phase Durable Object reserve/commit/release so webhook retries cannot double-dispatch orders.\"."
+description: 'description: "Two-phase Durable Object reserve/commit/release so webhook retries cannot double-dispatch orders.".'
 resource: "docs/enduser/concepts/idempotency.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/idempotency.mdx"

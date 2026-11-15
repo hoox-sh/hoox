@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "overview.mdx"
-description: "description: \"High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models.\"."
+description: 'description: "High-level architectural blueprint of the Hoox trading ecosystem, detailing edge microservice layouts, and multi-layered security models.".'
 resource: "docs/devops/architecture/overview.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/overview.mdx"

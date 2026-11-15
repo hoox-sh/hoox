@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🛠️ Self-Healing & Repair"
-description: "description: \"Diagnose empty submodules, missing secrets, and broken bindings with hoox repair.\"."
+description: 'description: "Diagnose empty submodules, missing secrets, and broken bindings with hoox repair.".'
 resource: "docs/enduser/guides/repair.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/repair.mdx"

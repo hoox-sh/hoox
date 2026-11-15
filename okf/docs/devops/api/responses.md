@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "responses.mdx"
-description: "description: \"High-integrity JSON response templates, success envelopes, edge error codes, and shared error middleware specs.\"."
+description: 'description: "High-integrity JSON response templates, success envelopes, edge error codes, and shared error middleware specs.".'
 resource: "docs/devops/api/responses.mdx"
 tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/api/responses.mdx"

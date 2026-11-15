@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "data-flow.mdx"
-description: "description: \"Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.\"."
+description: 'description: "Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.".'
 resource: "docs/devops/architecture/data-flow.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/data-flow.mdx"
