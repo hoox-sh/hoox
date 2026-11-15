@@ -602,7 +602,7 @@ export function WorkersOverview({ dialog }: WorkersOverviewProps = {}) {
         <ViewHeader
           title="Workers"
           showDivider={false}
-          meta={<text fg={Colors.muted}>{workers.length} total</text>}
+          meta={<text fg={Colors.muted}>{`${workers.length} total`}</text>}
         />
 
         {/* Deploy progress */}
@@ -618,7 +618,13 @@ export function WorkersOverview({ dialog }: WorkersOverviewProps = {}) {
         )}
 
         {/* Scrollable 2-column card grid */}
-        <scrollbox width="100%" flexGrow={1} border={false}>
+        <scrollbox
+          width="100%"
+          flexGrow={1}
+          flexBasis={0}
+          minHeight={0}
+          border={false}
+        >
           <box flexDirection="column" gap={1}>
             {rows.map((row, rowIdx) => (
               <box key={rowIdx} flexDirection="row" gap={1}>

@@ -39,12 +39,6 @@ async function createTestRenderer() {
   });
 }
 
-function destroyRenderer(
-  renderer: Awaited<ReturnType<typeof createTestRenderer>>
-) {
-  renderer.destroy();
-}
-
 // ─── Test suite ─────────────────────────────────────────────────────────────
 
 describe("QueueDepthView", () => {
@@ -62,9 +56,12 @@ describe("QueueDepthView", () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     if (renderer) {
-      destroyRenderer(renderer);
+      const r = renderer;
+      renderer = undefined as unknown as typeof renderer;
+      r.destroy();
+      await r.closed;
     }
   });
 

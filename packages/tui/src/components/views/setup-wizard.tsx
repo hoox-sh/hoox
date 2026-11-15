@@ -1153,7 +1153,12 @@ export function SetupWizard({ dialog }: SetupWizardProps) {
               height={10}
               overflow="hidden"
             >
-              <scrollbox border={false} flexGrow={1}>
+              <scrollbox
+                border={false}
+                flexGrow={1}
+                flexBasis={0}
+                minHeight={0}
+              >
                 <text fg={Colors.foreground}>{deployLog || "Starting…\n"}</text>
               </scrollbox>
             </box>
@@ -1175,7 +1180,12 @@ export function SetupWizard({ dialog }: SetupWizardProps) {
               height={8}
               overflow="hidden"
             >
-              <scrollbox border={false} flexGrow={1}>
+              <scrollbox
+                border={false}
+                flexGrow={1}
+                flexBasis={0}
+                minHeight={0}
+              >
                 <text fg={Colors.error}>{deployLog}</text>
               </scrollbox>
             </box>
@@ -1315,7 +1325,7 @@ export function SetupWizard({ dialog }: SetupWizardProps) {
         </text>
 
         {/* Step Content (scrollbox for overflow) */}
-        <scrollbox flexGrow={1} border={false}>
+        <scrollbox flexGrow={1} flexBasis={0} minHeight={0} border={false}>
           {stepContent}
         </scrollbox>
 

@@ -309,7 +309,7 @@ function WorkerControlList({
       </box>
 
       {/* Scrollable worker list */}
-      <scrollbox width="100%" flexGrow={1}>
+      <scrollbox width="100%" flexGrow={1} flexBasis={0} minHeight={0}>
         {workers.length === 0 ? (
           <box padding={1} flexGrow={1}>
             <EmptyState
