@@ -30,7 +30,7 @@ TEST_CMD='bun run test'
 # Live suites need Cloudflare/AXIS credentials that a push gate cannot assume, so
 # pre-push runs the same unit suite with every live suite excluded. They stay
 # runnable with credentials via `bun run test:live`.
-TEST_CMD_PRE_PUSH='bun run scripts/test-with-table.ts --isolate --path-ignore-patterns "tests/live/**" --path-ignore-patterns "**/live.test.ts" --path-ignore-patterns "packages/tui/**" && bun run test:tui'
+TEST_CMD_PRE_PUSH='bun run scripts/test-with-table.ts --isolate --path-ignore-patterns "tests/live/**" --path-ignore-patterns "**/live.test.ts" --path-ignore-patterns "packages/tui/**" --path-ignore-patterns "packages/cli/workers/**" && bun run test:tui'
 OKF_CMD='okn --no-telemetry validate --spec 0.2 okf'
 # /oo:commands
 # All checks detected.

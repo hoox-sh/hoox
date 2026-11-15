@@ -34,6 +34,17 @@ else. That is the whole run.
 Write the new hash back when the sweep finishes. An empty run costs one `cat`
 and one `git status`, not a full context reload.
 
+## Test
+
+`config.json` gives this routine a `testCommand`; a run is `passed` only when it
+exits 0. It asserts three things, cheaply and with no writes:
+
+1. this file still contains the `boardHash` guard, so the gate is specified;
+2. if a state file exists it contains `boardHash`, otherwise the guard could
+   never match and the sweep would go silent forever (absent file = first run,
+   which is fine);
+3. `oo board lint --json` reports `"ok": true` — the board still lints.
+
 ## Prompt
 
 ```text

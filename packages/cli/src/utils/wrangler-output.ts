@@ -25,6 +25,7 @@ export function sanitizeWranglerOutput(raw: string, maxLines = 4): string {
   const lines = raw
     .replace(/\r\n/g, "\n")
     .split("\n")
+    // eslint-disable-next-line no-control-regex -- ESC (\u001b) is the ANSI prefix we strip
     .map((l) => l.replace(/\u001b\[[0-9;]*m/g, "").trimEnd())
     .map((l) => l.trim())
     .filter((l) => l.length > 0)

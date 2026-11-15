@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "testing.mdx"
-description: "title: \"Testing Framework & QA Standards\"."
+description: 'title: "Testing Framework & QA Standards".'
 resource: "docs/devops/development/testing.mdx"
 tags: [development, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/development/testing.mdx"

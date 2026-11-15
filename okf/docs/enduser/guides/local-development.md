@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "local-development.mdx"
-description: "description: \"How to run, hot-reload, and test Hoox workers locally using native wrangler runtimes or Docker Compose containers.\"."
+description: 'description: "How to run, hot-reload, and test Hoox workers locally using native wrangler runtimes or Docker Compose containers.".'
 resource: "docs/enduser/guides/local-development.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/local-development.mdx"

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "trade-worker.mdx"
-description: "description: \"Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers.\"."
+description: 'description: "Comprehensive engineering specification for the Hoox Trade Execution Worker, covering multi-exchange client architectures, HMAC signing, and D1 database ledgers.".'
 resource: "docs/devops/workers/trade-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/trade-worker.mdx"

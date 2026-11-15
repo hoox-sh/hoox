@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "endpoints.mdx"
-description: "description: \"Exhaustive HTTP REST API directory for the Hoox edge gateway, webhooks, analytics telemetry, and database queries.\"."
+description: 'description: "Exhaustive HTTP REST API directory for the Hoox edge gateway, webhooks, analytics telemetry, and database queries.".'
 resource: "docs/devops/api/endpoints.mdx"
 tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/api/endpoints.mdx"

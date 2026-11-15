@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "email-worker.mdx"
-description: "description: \"Engineering specification for the Hoox email parsing worker, covering Mailgun webhook ingestion, direct JSON signal parsing, KV-configured regex patterns, and…"
+description: 'description: "Engineering specification for the Hoox email parsing worker, covering Mailgun webhook ingestion, direct JSON signal parsing, KV-configured regex patterns, and…'
 resource: "docs/devops/workers/email-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/email-worker.mdx"

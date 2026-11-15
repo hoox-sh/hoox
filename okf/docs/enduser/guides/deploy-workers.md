@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🚀 Deploying to Production"
-description: "description: \"Deploy the worker mesh and dashboard with hoox deploy all --auto, then bind Telegram and KV.\"."
+description: 'description: "Deploy the worker mesh and dashboard with hoox deploy all --auto, then bind Telegram and KV.".'
 resource: "docs/enduser/guides/deploy-workers.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/deploy-workers.mdx"

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "dex-spot-swaps.mdx"
-description: "description: \"Route Uniswap V3 (Ethereum, Arbitrum) and Jupiter Swap V2 (Solana) through trade-worker signals. Setup, secrets, pair syntax, and test-flag limits.\"."
+description: 'description: "Route Uniswap V3 (Ethereum, Arbitrum) and Jupiter Swap V2 (Solana) through trade-worker signals. Setup, secrets, pair syntax, and test-flag limits.".'
 resource: "docs/enduser/guides/dex-spot-swaps.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/dex-spot-swaps.mdx"

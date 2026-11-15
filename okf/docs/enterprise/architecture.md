@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "HOOX Enterprise Architecture"
-description: "description: \"Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leveraging Workers for Platforms, Workflows, Logpush, AI Gateway, advanced security, and more for…"
+description: 'description: "Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leveraging Workers for Platforms, Workflows, Logpush, AI Gateway, advanced security, and more for…'
 resource: "docs/enterprise/architecture.mdx"
 tags: [architecture, doc, docs, enterprise]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enterprise/architecture.mdx"
