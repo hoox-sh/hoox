@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/views/config-editor"
@@ -18,10 +18,10 @@ okf_lock: generated
 
 # Files
 
-* `action-bar.tsx` — ActionBar
-* `code-editor.tsx` — CodeEditor, detectFileType, formatContent, tokenizeJsonLine, tokenizeTomlLine, validateSyntax
-* `file-tree.tsx` — FileTree, flattenTree
-* `types.ts` — ActivePane, FileNode, FileType, SyntaxErrorEntry, TokenSpan
+- `action-bar.tsx` — ActionBar
+- `code-editor.tsx` — CodeEditor, detectFileType, formatContent, tokenizeJsonLine, tokenizeTomlLine, validateSyntax
+- `file-tree.tsx` — FileTree, flattenTree
+- `types.ts` — ActivePane, FileNode, FileType, SyntaxErrorEntry, TokenSpan
 
 # Packages
 
@@ -29,4 +29,4 @@ okf_lock: generated
 
 # Used by
 
-* [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)
+- [packages/tui/src/components/views](/code/packages/tui/src/components/views.md)

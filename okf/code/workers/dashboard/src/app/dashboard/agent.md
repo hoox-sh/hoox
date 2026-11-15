@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app/dashboard/agent"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `metadata.ts` — metadata
-* `page.client.tsx` — AgentClient
-* `page.tsx` — AgentOverviewPage, dynamic, metadata, runtime
+- `metadata.ts` — metadata
+- `page.client.tsx` — AgentClient
+- `page.tsx` — AgentOverviewPage, dynamic, metadata, runtime
 
 # Packages
 
@@ -28,9 +28,9 @@ okf_lock: generated
 
 # Nested
 
-* [workers/dashboard/src/app/dashboard/agent/chat](/code/workers/dashboard/src/app/dashboard/agent/chat.md)
-* [workers/dashboard/src/app/dashboard/agent/models](/code/workers/dashboard/src/app/dashboard/agent/models.md)
-* [workers/dashboard/src/app/dashboard/agent/reasoning](/code/workers/dashboard/src/app/dashboard/agent/reasoning.md)
-* [workers/dashboard/src/app/dashboard/agent/risk](/code/workers/dashboard/src/app/dashboard/agent/risk.md)
-* [workers/dashboard/src/app/dashboard/agent/usage](/code/workers/dashboard/src/app/dashboard/agent/usage.md)
-* [workers/dashboard/src/app/dashboard/agent/vision](/code/workers/dashboard/src/app/dashboard/agent/vision.md)
+- [workers/dashboard/src/app/dashboard/agent/chat](/code/workers/dashboard/src/app/dashboard/agent/chat.md)
+- [workers/dashboard/src/app/dashboard/agent/models](/code/workers/dashboard/src/app/dashboard/agent/models.md)
+- [workers/dashboard/src/app/dashboard/agent/reasoning](/code/workers/dashboard/src/app/dashboard/agent/reasoning.md)
+- [workers/dashboard/src/app/dashboard/agent/risk](/code/workers/dashboard/src/app/dashboard/agent/risk.md)
+- [workers/dashboard/src/app/dashboard/agent/usage](/code/workers/dashboard/src/app/dashboard/agent/usage.md)
+- [workers/dashboard/src/app/dashboard/agent/vision](/code/workers/dashboard/src/app/dashboard/agent/vision.md)

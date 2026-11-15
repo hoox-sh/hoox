@@ -48,7 +48,7 @@ Nothing outside this domain. Send anything else to the Chief.
 
 ## Rung
 
-Your rung: **DRAFT**.
+Your rung: **AUTOPILOT**.
 
 Prepare the work. I approve it. Nothing leaves the team without me.
 

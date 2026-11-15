@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "HOOX Enterprise Architecture"
-description: "description: \"Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leveraging Workers for Platforms, Workflows, Logpush, AI Gateway, advanced security, and more for…"
+description: 'description: "Bleeding-edge architecture for HOOX on Cloudflare Enterprise, leveraging Workers for Platforms, Workflows, Logpush, AI Gateway, advanced security, and more for…'
 resource: "docs/enterprise/architecture.mdx"
 tags: [architecture, doc, docs, enterprise]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enterprise/architecture.mdx"
@@ -22,14 +22,14 @@ Repo path `docs/enterprise/architecture.mdx`.
 
 # Outline
 
-* Vision & Principles
-* Core Levers (Enterprise / Paid Unlocks)
-* High-Level Target Topology (Enterprise)
-* Key New / Evolved Components
-  * 1. Dispatch + User Workers (WfP)
-  * 2. Workflows Definitions
-  * 3. Enhanced DOs
-  * 4. Observability Pipeline
-  * 5. Security Hardening
-* Tenant Isolation Model
-* Migration & Coexistence
+- Vision & Principles
+- Core Levers (Enterprise / Paid Unlocks)
+- High-Level Target Topology (Enterprise)
+- Key New / Evolved Components
+  - 1. Dispatch + User Workers (WfP)
+  - 2. Workflows Definitions
+  - 3. Enhanced DOs
+  - 4. Observability Pipeline
+  - 5. Security Hardening
+- Tenant Isolation Model
+- Migration & Coexistence

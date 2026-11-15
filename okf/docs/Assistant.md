@@ -7,7 +7,7 @@ tags: [assistant, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/Assistant.md"
@@ -22,8 +22,8 @@ Repo path `docs/Assistant.md`.
 
 # Outline
 
-* Tone
-* Product context
-* Terminology
-* Citing sources
-* What NOT to do
+- Tone
+- Product context
+- Terminology
+- Citing sources
+- What NOT to do

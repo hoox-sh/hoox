@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "api-endpoints.mdx"
-description: "description: \"Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway.\"."
+description: 'description: "Public webhook, health, operator /v1 and /wallet proxy routes on the hoox gateway.".'
 resource: "docs/enduser/reference/api-endpoints.mdx"
 tags: [doc, docs, enduser, reference]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/reference/api-endpoints.mdx"
@@ -22,16 +22,16 @@ Repo path `docs/enduser/reference/api-endpoints.mdx`.
 
 # Outline
 
-* 🔒 Request headers
-* 🎯 1. Ingest trade signal webhook
-  * Request payload
-  * Response models
-* 🟢 2. System health check
-* 🛡️ 3. Operator plane (/v1/)
-* 💱 4. Wallet proxy (/wallet/)
-* 🚨 5. Standard platform errors
-  * A. 400 Bad Request
-  * B. 403 Forbidden (invalid apiKey or IP)
-  * C. 409 Conflict (duplicate idempotency key)
-  * D. 503 Service Unavailable (kill switch or missing DO)
-  * 🔗 Next Steps
+- 🔒 Request headers
+- 🎯 1. Ingest trade signal webhook
+  - Request payload
+  - Response models
+- 🟢 2. System health check
+- 🛡️ 3. Operator plane (/v1/)
+- 💱 4. Wallet proxy (/wallet/)
+- 🚨 5. Standard platform errors
+  - A. 400 Bad Request
+  - B. 403 Forbidden (invalid apiKey or IP)
+  - C. 409 Conflict (duplicate idempotency key)
+  - D. 503 Service Unavailable (kill switch or missing DO)
+  - 🔗 Next Steps

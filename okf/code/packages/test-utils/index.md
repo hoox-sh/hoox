@@ -2,4 +2,4 @@
 
 # Concepts
 
-* [packages/test-utils/src](src.md) - @hoox/test-utils — public entry point.
+- [packages/test-utils/src](src.md) - @hoox/test-utils — public entry point.

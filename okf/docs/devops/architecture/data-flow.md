@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "data-flow.mdx"
-description: "description: \"Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.\"."
+description: 'description: "Comprehensive data routing, transaction sequence diagrams, time-series metrics pipelines, and global storage mapping.".'
 resource: "docs/devops/architecture/data-flow.mdx"
 tags: [architecture, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/architecture/data-flow.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/devops/architecture/data-flow.mdx`.
 
 # Outline
 
-* 1. Webhook to Trade Execution Flow (High-Speed Path)
-* 1b. Operator wallet proxy (/wallet/)
-* 2. Autonomous AI Risk Monitoring Flow (Cron Cycle)
-* 3. PDF Portfolio Report Rendering Flow
-* 4. Exchange ↔ D1 position reconciliation
-* 5. Observability & Time-Series Analytics Flow
-* 6. Pine strategy bar-close → trade-worker
-* 💾 7. Global Data Persistence Mapping
-  * 🔗 Next Steps
+- 1. Webhook to Trade Execution Flow (High-Speed Path)
+- 1b. Operator wallet proxy (/wallet/)
+- 2. Autonomous AI Risk Monitoring Flow (Cron Cycle)
+- 3. PDF Portfolio Report Rendering Flow
+- 4. Exchange ↔ D1 position reconciliation
+- 5. Observability & Time-Series Analytics Flow
+- 6. Pine strategy bar-close → trade-worker
+- 💾 7. Global Data Persistence Mapping
+  - 🔗 Next Steps

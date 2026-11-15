@@ -2,4 +2,4 @@
 
 # Concepts
 
-* [packages/tui/src/services/cli-bridge](cli-bridge.md) - CliBridge — Spawns the hoox CLI binary and returns structured results.
+- [packages/tui/src/services/cli-bridge](cli-bridge.md) - CliBridge — Spawns the hoox CLI binary and returns structured results.

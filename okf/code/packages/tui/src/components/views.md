@@ -7,7 +7,7 @@ tags: [code, components, packages, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/tui/src/components/views"
@@ -18,38 +18,38 @@ okf_lock: generated
 
 # Files
 
-* `ai-chat.test.tsx`
-* `ai-chat.tsx` — AiChatView, MAX_MESSAGE_CHARS, MAX_STORED_MESSAGES, sanitizeChatMessage
-* `config-editor.test.tsx`
-* `config-editor.tsx` — ActivePane, CONFIG_TREE_BLUEPRINT, ConfigEditor, FileNode, FileType, MAX_CONFIG_FILE_BYTES, MAX_EDITOR_DISPLAY_LINES, SyntaxErrorEntry, TokenSpan, detectFileType, flattenTree, formatContent
-* `dashboard.test.tsx`
-* `dashboard.tsx` — DashboardView, DashboardViewProps
-* `db-query.test.tsx`
-* `db-query.tsx` — DbQueryView, MAX_HISTORY, MAX_VISIBLE_ROWS, compareCells, formatCell, sanitizeCellText
-* `edge-topology.test.tsx`
-* `edge-topology.tsx` — EdgeTopology, MAX_FLOWS_PREVIEW, resolveGraphMetadataPath
-* `kv-viewer.test.tsx`
-* `kv-viewer.tsx` — KvViewer, MAX_VISIBLE_KEYS, filterKvKeys, sanitizeKvValue
-* `logs-viewer.test.tsx`
-* `logs-viewer.tsx` — LogsViewer, MAX_VISIBLE_LOGS, applyLogFilters, sanitizeLogText
-* `queue-depth.test.tsx`
-* `queue-depth.tsx` — QueueDepthView, sortQueuesByPressure
-* `secrets-viewer.test.tsx`
-* `secrets-viewer.tsx` — MAX_VISIBLE_SECRETS, SecretsViewer, filterSecrets
-* `service-manager.test.tsx`
-* `service-manager.tsx` — ServiceManager, ServiceManagerProps
-* `settings.test.tsx`
-* `settings.tsx` — SettingsView, SettingsViewProps
-* `setup-wizard.test.tsx`
-* `setup-wizard.tsx` — SetupWizard, SetupWizardProps, maskSecret, redactWizardSecrets, validateApiKey, validateEmail, validateUrl
-* `trade-monitor.test.tsx`
-* `trade-monitor.tsx` — MAX_VISIBLE_TRADES, TRADE_RING_BUFFER_CAP, TradeMonitor, calcLatency, sanitizeTerminalText, selectVisibleTrades
-* `worker-detail.test.tsx`
-* `worker-detail.tsx` — WorkerDetail, redactConfigEntries
-* `worker-settings.test.tsx`
-* `worker-settings.tsx` — WorkerSettingsView
-* `workers-overview.test.tsx`
-* `workers-overview.tsx` — WorkersOverview, WorkersOverviewProps
+- `ai-chat.test.tsx`
+- `ai-chat.tsx` — AiChatView, MAX_MESSAGE_CHARS, MAX_STORED_MESSAGES, sanitizeChatMessage
+- `config-editor.test.tsx`
+- `config-editor.tsx` — ActivePane, CONFIG_TREE_BLUEPRINT, ConfigEditor, FileNode, FileType, MAX_CONFIG_FILE_BYTES, MAX_EDITOR_DISPLAY_LINES, SyntaxErrorEntry, TokenSpan, detectFileType, flattenTree, formatContent
+- `dashboard.test.tsx`
+- `dashboard.tsx` — DashboardView, DashboardViewProps
+- `db-query.test.tsx`
+- `db-query.tsx` — DbQueryView, MAX_HISTORY, MAX_VISIBLE_ROWS, compareCells, formatCell, sanitizeCellText
+- `edge-topology.test.tsx`
+- `edge-topology.tsx` — EdgeTopology, MAX_FLOWS_PREVIEW, resolveGraphMetadataPath
+- `kv-viewer.test.tsx`
+- `kv-viewer.tsx` — KvViewer, MAX_VISIBLE_KEYS, filterKvKeys, sanitizeKvValue
+- `logs-viewer.test.tsx`
+- `logs-viewer.tsx` — LogsViewer, MAX_VISIBLE_LOGS, applyLogFilters, sanitizeLogText
+- `queue-depth.test.tsx`
+- `queue-depth.tsx` — QueueDepthView, sortQueuesByPressure
+- `secrets-viewer.test.tsx`
+- `secrets-viewer.tsx` — MAX_VISIBLE_SECRETS, SecretsViewer, filterSecrets
+- `service-manager.test.tsx`
+- `service-manager.tsx` — ServiceManager, ServiceManagerProps
+- `settings.test.tsx`
+- `settings.tsx` — SettingsView, SettingsViewProps
+- `setup-wizard.test.tsx`
+- `setup-wizard.tsx` — SetupWizard, SetupWizardProps, maskSecret, redactWizardSecrets, validateApiKey, validateEmail, validateUrl
+- `trade-monitor.test.tsx`
+- `trade-monitor.tsx` — MAX_VISIBLE_TRADES, TRADE_RING_BUFFER_CAP, TradeMonitor, calcLatency, sanitizeTerminalText, selectVisibleTrades
+- `worker-detail.test.tsx`
+- `worker-detail.tsx` — WorkerDetail, redactConfigEntries
+- `worker-settings.test.tsx`
+- `worker-settings.tsx` — WorkerSettingsView
+- `workers-overview.test.tsx`
+- `workers-overview.tsx` — WorkersOverview, WorkersOverviewProps
 
 # Packages
 
@@ -57,20 +57,20 @@ okf_lock: generated
 
 # Depends on
 
-* [packages/tui/src](/code/packages/tui/src.md)
-* [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
-* [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
-* [packages/tui/src/components/views/config-editor](/code/packages/tui/src/components/views/config-editor.md)
-* [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
-* [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
-* [packages/tui/src/services](/code/packages/tui/src/services.md)
-* [packages/tui/src/services/cli-bridge](/code/packages/tui/src/services/cli-bridge.md)
+- [packages/tui/src](/code/packages/tui/src.md)
+- [packages/tui/src/components/shared](/code/packages/tui/src/components/shared.md)
+- [packages/tui/src/components/ui](/code/packages/tui/src/components/ui.md)
+- [packages/tui/src/components/views/config-editor](/code/packages/tui/src/components/views/config-editor.md)
+- [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
+- [packages/tui/src/hooks](/code/packages/tui/src/hooks.md)
+- [packages/tui/src/services](/code/packages/tui/src/services.md)
+- [packages/tui/src/services/cli-bridge](/code/packages/tui/src/services/cli-bridge.md)
 
 # Used by
 
-* [packages/tui/src](/code/packages/tui/src.md)
+- [packages/tui/src](/code/packages/tui/src.md)
 
 # Nested
 
-* [packages/tui/src/components/views/config-editor](/code/packages/tui/src/components/views/config-editor.md)
-* [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)
+- [packages/tui/src/components/views/config-editor](/code/packages/tui/src/components/views/config-editor.md)
+- [packages/tui/src/components/views/dashboard](/code/packages/tui/src/components/views/dashboard.md)

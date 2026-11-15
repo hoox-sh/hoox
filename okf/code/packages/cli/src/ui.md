@@ -7,7 +7,7 @@ tags: [cli, code, packages, ui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-12T01:22:04Z
 sources:
   - id: tree
     resource: "packages/cli/src/ui"
@@ -18,14 +18,15 @@ okf_lock: generated
 
 # Files
 
-* `banner.test.ts`
-* `banner.ts` — BANNER_VARIANTS, BannerVariant, DISCLAIMER, animateBanner, renderBanner, renderBannerHorizon, renderBannerLogo, renderBannerMinimal, renderBannerSignal, renderCompactBanner, renderLegacy
-* `catalog.test.ts`
-* `catalog.ts` — COMMAND_GROUPS, CommandGroupId, LONG_RUNNING_COMMANDS, LauncherCatalog, LauncherGroup, LauncherItem, buildLauncherCatalog, commandBlurb, firstLine, groupIdForCommand, groupTitle, isLongRunning
-* `index.ts` — animateBanner, buildLauncherCatalog, renderBanner, renderBannerLogo, renderCompactBanner, resolveLauncherEntry, runInteractiveTUI, shouldLaunchStartScreen
-* `menu.ts` — runInteractiveTUI
-* `opentui-launch.test.ts`
-* `opentui-launch.ts` — LauncherResult, resolveLauncherEntry, runOpenTuiLauncher, shouldLaunchStartScreen
+- `banner.test.ts`
+- `banner.ts` — BANNER_VARIANTS, BannerVariant, DISCLAIMER, animateBanner, renderBanner, renderBannerHorizon, renderBannerLogo, renderBannerMinimal, renderBannerSignal, renderCompactBanner, renderLegacy
+- `catalog.test.ts`
+- `catalog.ts` — COMMAND_GROUPS, CommandGroupId, LONG_RUNNING_COMMANDS, LauncherCatalog, LauncherGroup, LauncherItem, buildLauncherCatalog, commandBlurb, firstLine, groupIdForCommand, groupTitle, isLongRunning
+- `index.ts` — animateBanner, buildLauncherCatalog, renderBanner, renderBannerLogo, renderCompactBanner, resolveLauncherEntry, runInteractiveTUI, shouldLaunchStartScreen
+- `menu.test.ts`
+- `menu.ts` — runInteractiveTUI
+- `opentui-launch.test.ts`
+- `opentui-launch.ts` — LauncherResult, resolveLauncherEntry, runOpenTuiLauncher, shouldLaunchStartScreen
 
 # Packages
 

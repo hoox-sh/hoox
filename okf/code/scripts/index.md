@@ -2,4 +2,4 @@
 
 # Concepts
 
-* [scripts/okf](okf.md) - OKF bundle pipeline.
+- [scripts/okf](okf.md) - OKF bundle pipeline.

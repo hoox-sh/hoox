@@ -7,7 +7,7 @@ tags: [cli, code, packages]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "packages/cli/src"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `index.ts` — CLIError, ExitCode, FormatOptions, GeneratedKeys, ProgressCallback, ProgressEvent, SecretResult, SetupOptions, SetupResult, SetupService, SetupStepResult, formatError
+- `index.ts` — CLIError, ExitCode, FormatOptions, GeneratedKeys, ProgressCallback, ProgressEvent, SecretResult, SetupOptions, SetupResult, SetupService, SetupStepResult, formatError
 
 # Packages
 
@@ -26,5 +26,5 @@ okf_lock: generated
 
 # Nested
 
-* [packages/cli/src/ui](/code/packages/cli/src/ui.md)
-* [packages/cli/src/utils](/code/packages/cli/src/utils.md)
+- [packages/cli/src/ui](/code/packages/cli/src/ui.md)
+- [packages/cli/src/utils](/code/packages/cli/src/utils.md)

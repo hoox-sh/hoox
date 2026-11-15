@@ -6,28 +6,28 @@ okf_version: "0.2"
 
 # Playbooks
 
-* [playbooks](playbooks/) - How to read this bundle and where HOOX keeps its map.
+- [playbooks](playbooks/) - How to read this bundle and where HOOX keeps its map.
 
 # Code
 
-* [code](code/) - Compiled map of source modules, imports, and exports.
+- [code](code/) - Compiled map of source modules, imports, and exports.
 
 # Docs
 
-* [docs](docs/) - Outlines of the product documentation.
+- [docs](docs/) - Outlines of the product documentation.
 
 # Repository
 
-* [repository](repository/) - README, contributing, security, and package notes.
+- [repository](repository/) - README, contributing, security, and package notes.
 
 # Architecture
 
-* [Architecture](architecture.md) - The project shape and the OpenOrchestrate team.
+- [Architecture](architecture.md) - The project shape and the OpenOrchestrate team.
 
 # Development
 
-* [Development](development.md) - Setup, checks, and the pre-commit hook.
+- [Development](development.md) - Setup, checks, and the pre-commit hook.
 
 # Security
 
-* [Security](security.md) - Permission model, gates, and secret handling.
+- [Security](security.md) - Permission model, gates, and secret handling.

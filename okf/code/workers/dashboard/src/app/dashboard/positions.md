@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app/dashboard/positions"
@@ -18,9 +18,9 @@ okf_lock: generated
 
 # Files
 
-* `metadata.ts` — metadata
-* `page.client.tsx` — PositionsClient
-* `page.tsx` — PositionsPage, dynamic, metadata, runtime
+- `metadata.ts` — metadata
+- `page.client.tsx` — PositionsClient
+- `page.tsx` — PositionsPage, dynamic, metadata, runtime
 
 # Packages
 

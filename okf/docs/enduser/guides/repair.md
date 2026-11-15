@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "🛠️ Self-Healing & Repair"
-description: "description: \"Diagnose empty submodules, missing secrets, and broken bindings with hoox repair.\"."
+description: 'description: "Diagnose empty submodules, missing secrets, and broken bindings with hoox repair.".'
 resource: "docs/enduser/guides/repair.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/repair.mdx"
@@ -22,12 +22,12 @@ Repo path `docs/enduser/guides/repair.mdx`.
 
 # Outline
 
-* 1. Running the 5-Step System Diagnostics
-* 2. Targeted Component Repairs
-  * Repair Command Quick Reference
-* 3. Full System Interactive Rebuild
-  * The Rebuild Sequence
-* 4. Common Troubleshooting Scenarios
-* 5. Emergency Decision Tree
-  * Pro Tips
-  * 🔗 Next Steps
+- 1. Running the 5-Step System Diagnostics
+- 2. Targeted Component Repairs
+  - Repair Command Quick Reference
+- 3. Full System Interactive Rebuild
+  - The Rebuild Sequence
+- 4. Common Troubleshooting Scenarios
+- 5. Emergency Decision Tree
+  - Pro Tips
+  - 🔗 Next Steps

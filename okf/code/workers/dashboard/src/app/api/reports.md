@@ -7,7 +7,7 @@ tags: [app, code, dashboard, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/app/api/reports"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `route.ts` — GET, ReportDTO, dynamic, runtime
+- `route.ts` — GET, ReportDTO, dynamic, runtime
 
 # Packages
 
@@ -26,5 +26,5 @@ okf_lock: generated
 
 # Nested
 
-* [workers/dashboard/src/app/api/reports/download](/code/workers/dashboard/src/app/api/reports/download.md)
-* [workers/dashboard/src/app/api/reports/regenerate](/code/workers/dashboard/src/app/api/reports/regenerate.md)
+- [workers/dashboard/src/app/api/reports/download](/code/workers/dashboard/src/app/api/reports/download.md)
+- [workers/dashboard/src/app/api/reports/regenerate](/code/workers/dashboard/src/app/api/reports/regenerate.md)

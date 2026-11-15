@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "mcp.mdx"
-description: "description: \"Drive every hoox CLI command from an MCP client, with a confirm gate, redaction, snapshot, and next-step advice.\"."
+description: 'description: "Drive every hoox CLI command from an MCP client, with a confirm gate, redaction, snapshot, and next-step advice.".'
 resource: "docs/devops/mcp.mdx"
 tags: [devops, doc, docs, mcp]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/mcp.mdx"
@@ -22,7 +22,7 @@ Repo path `docs/devops/mcp.mdx`.
 
 # Outline
 
-* Command tools
-* Five operator features
-* Confirm gate
-* Refused commands
+- Command tools
+- Five operator features
+- Confirm gate
+- Refused commands

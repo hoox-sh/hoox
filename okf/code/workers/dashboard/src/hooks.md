@@ -7,7 +7,7 @@ tags: [code, dashboard, hooks, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "workers/dashboard/src/hooks"
@@ -18,7 +18,7 @@ okf_lock: generated
 
 # Files
 
-* `use-mobile.ts` — useIsMobile
+- `use-mobile.ts` — useIsMobile
 
 # Packages
 

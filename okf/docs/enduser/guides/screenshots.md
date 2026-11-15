@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "screenshots.mdx"
-description: "description: \"Screenshots and short GIFs of the HOOX CLI, TUI, and dashboard — every primary view, command group, and page.\"."
+description: 'description: "Screenshots and short GIFs of the HOOX CLI, TUI, and dashboard — every primary view, command group, and page.".'
 resource: "docs/enduser/guides/screenshots.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-10T14:53:51Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/screenshots.mdx"
@@ -22,6 +22,6 @@ Repo path `docs/enduser/guides/screenshots.mdx`.
 
 # Outline
 
-* CLI
-* TUI
-* Dashboard
+- CLI
+- TUI
+- Dashboard
