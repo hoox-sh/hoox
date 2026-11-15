@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "configuration.mdx"
-description: "description: \"Master reference for environment variables, Cloudflare® secrets, wrangler V8 profiles, and dynamic KV runtime manifests.\"."
+description: 'description: "Master reference for environment variables, Cloudflare® secrets, wrangler V8 profiles, and dynamic KV runtime manifests.".'
 resource: "docs/enduser/getting-started/configuration.mdx"
 tags: [doc, docs, enduser, getting-started]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/getting-started/configuration.mdx"

@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "tui.mdx"
-description: "description: \"High-integrity architecture specifications, Zustand store configurations, and connection state machines of the Hoox Terminal UI.\"."
+description: 'description: "High-integrity architecture specifications, Zustand store configurations, and connection state machines of the Hoox Terminal UI.".'
 resource: "docs/devops/tui.mdx"
 tags: [devops, doc, docs, tui]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/tui.mdx"

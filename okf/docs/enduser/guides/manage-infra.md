@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "manage-infra.mdx"
-description: "description: \"How to provision and manage Cloudflare® D1 databases, KV namespaces, R2 buckets, Queues, and Vectorize indexes using hoox infra.\"."
+description: 'description: "How to provision and manage Cloudflare® D1 databases, KV namespaces, R2 buckets, Queues, and Vectorize indexes using hoox infra.".'
 resource: "docs/enduser/guides/manage-infra.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/manage-infra.mdx"

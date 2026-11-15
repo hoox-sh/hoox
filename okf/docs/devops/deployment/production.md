@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "production.mdx"
-description: "description: \"High-integrity production deployment guide, covering API token configurations, custom routes mapping, and edge isolate hardening strategies.\"."
+description: 'description: "High-integrity production deployment guide, covering API token configurations, custom routes mapping, and edge isolate hardening strategies.".'
 resource: "docs/devops/deployment/production.mdx"
 tags: [deployment, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/deployment/production.mdx"

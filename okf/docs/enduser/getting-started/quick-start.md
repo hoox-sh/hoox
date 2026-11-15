@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "quick-start.mdx"
-description: "description: \"Install the CLI, run hoox onboard, deploy the edge mesh, and fire a simulated trade webhook in under 5 minutes.\"."
+description: 'description: "Install the CLI, run hoox onboard, deploy the edge mesh, and fire a simulated trade webhook in under 5 minutes.".'
 resource: "docs/enduser/getting-started/quick-start.mdx"
 tags: [doc, docs, enduser, getting-started]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/getting-started/quick-start.mdx"

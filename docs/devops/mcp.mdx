@@ -61,6 +61,25 @@ Read-only commands run immediately. Mutating commands return `confirm_token` and
 
 Set `HOOX_MCP_ALLOW_MUTATIONS=1` only for a trusted local process that should skip the token.
 
+## Code Mode
+
+Set `HOOX_MCP_CODE_MODE=1` to add two tools, `search` and `execute`, each taking one `code` string that must be a JavaScript async arrow function. The flag is off by default and every existing tool stays registered, so an unset flag produces a byte-identical tool list.
+
+- `search` runs the code against a compact `catalog` array (`path`, `tool`, `risk`, `summary`, `destructive`, `local`, `action`, `args`, `flags`) and returns only what the code selects. Full argument schemas never enter the model context.
+- `execute` runs the code against `hoox.run(pathOrTool, args)`, `hoox.describe(path)`, `hoox.advise()`, `hoox.snapshot()`, and `hoox.policy()`, so several calls can be composed and only the needed data returned.
+
+`execute` is not a policy bypass. Every `hoox.run` uses the same `executeEntry` path as the direct tool: the same input schema, the same risk classification, and the same confirm-token flow. A destructive command without a token returns the identical `confirmation_required` message and spawns nothing. Tokens are interchangeable between the two surfaces.
+
+Per-call limits are 20 seconds, 50 `hoox.*` calls, 20,000 code characters, and 200,000 result characters.
+
+### Sandbox boundary
+
+Code Mode runs in a separate process under bubblewrap: `--unshare-all` (no network), `--clearenv` (only `PATH`, `HOME`, `TMPDIR`, `LANG`, `NO_COLOR`), read-only binds of the Bun binary, the harness file, and the shared libraries, a private tmpfs root, `--die-with-parent`, `--new-session`, and `--cap-drop ALL`. The repository and home directory are not mounted, so `redact.ts`'s protected values are unreachable and writes are discarded with the process.
+
+It is not a V8 isolate, not `node:vm`, and not a seccomp filter. `node:vm` inside the child removes `process`, `Bun`, `require`, and `fetch`, but that is capability shaping; the namespace is the boundary. The server also re-validates every call the child makes.
+
+Without bubblewrap, `execute` fails closed. `HOOX_MCP_CODE_MODE_SANDBOX=subprocess` opts into a weaker mode with a cleared environment but host filesystem reads still possible.
+
 ## Refused commands
 
 These need a terminal or they do not exit:

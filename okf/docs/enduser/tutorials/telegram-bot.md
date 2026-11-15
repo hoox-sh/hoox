@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "telegram-bot.mdx"
-description: "description: \"How to provision a secure Telegram Bot via BotFather, bind credentials, deploy webhooks, and execute commands.\"."
+description: 'description: "How to provision a secure Telegram Bot via BotFather, bind credentials, deploy webhooks, and execute commands.".'
 resource: "docs/enduser/tutorials/telegram-bot.mdx"
 tags: [doc, docs, enduser, tutorials]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/tutorials/telegram-bot.mdx"

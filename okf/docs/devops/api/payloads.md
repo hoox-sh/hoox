@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "payloads.mdx"
-description: "description: \"High-integrity JSON request payload specifications, TypeScript interfaces, and validation rules across Hoox microservices.\"."
+description: 'description: "High-integrity JSON request payload specifications, TypeScript interfaces, and validation rules across Hoox microservices.".'
 resource: "docs/devops/api/payloads.mdx"
 tags: [api, devops, doc, docs]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/api/payloads.mdx"

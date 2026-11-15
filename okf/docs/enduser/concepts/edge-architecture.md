@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "⚡ Edge-First Architecture"
-description: "description: \"Why V8 isolates and Cloudflare® Workers cut order-path latency versus a single VPS.\"."
+description: 'description: "Why V8 isolates and Cloudflare® Workers cut order-path latency versus a single VPS.".'
 resource: "docs/enduser/concepts/edge-architecture.mdx"
 tags: [concepts, doc, docs, enduser]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/concepts/edge-architecture.mdx"

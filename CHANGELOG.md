@@ -13,6 +13,38 @@ published dependency of the CLI and the TUI.
 
 ## [Unreleased]
 
+## [0.20.0] — 2026-11-13
+
+Opt-in MCP Code Mode, test-discovery and stale-id fixes, and a CI hardening pass.
+
+### Added
+
+- **MCP Code Mode** (`hoox-mcp`): opt-in `search`/`execute` tools over the tool catalog — a sandboxed code-execution harness (`packages/mcp/src/codemode/`) with a catalog `describe` surface, an e2e script, unit tests, and docs (`docs/devops/mcp.mdx`, `packages/mcp/README.md`). Gated and proofed; off unless explicitly enabled. (1bc7bb04)
+- `SECRET_ENV_NAMES` in the MCP redaction list now covers the missing secret names. (f17fcc22)
+- Planning doc for the wrangler TS config migration. (7adee96f)
+
+### Fixed
+
+- Cloudflare fixtures and `graph-metadata.json` now point at the recreated `trade-data-db` instead of the stale database id. (741692b0)
+- bun test discovery is scoped away from the stale cli pack artifact, so `bun test` no longer picks up the packed output. (f33817e5)
+- Update-service tests no longer call the live npm registry. (16bb625f)
+- Menu: reset the exit code after a failed menu command; pass menu command argv without whitespace splitting; the interactive launcher stays eligible under `NO_COLOR`. (ffb02273, c153a744, 24bc78de)
+- Restored a leaked setup mock and documented the control regex. (b2e4ed1a)
+- Formatting/CI hygiene: prettier kept out of submodule trees and generated strict JSON, okf now emits prettier-compatible markdown/yaml, and a repo test guards `.prettierignore` against submodule drift. (4b7da11b, 242b8fe8, 0fe19545, b3dabd28, a4feb058)
+
+### Changed
+
+- CI: Node floor raised to 22, all 11 submodules are checked out in CI, and wrangler is pinned. (97323cb3)
+- Deps: `pyne-worker` and `pyne-agent-worker` bumped. (a2ece7bd)
+
+### Packages
+
+| Package                | Version |
+| ---------------------- | ------- |
+| `@hoox-sh/hoox-cli`    | 0.20.0  |
+| `@hoox-sh/hoox-tui`    | 0.6.1   |
+| `@hoox-sh/hoox-shared` | 1.7.0   |
+
 ## [0.19.1] - 2026-11-04
 
 Mechanical, terminal-native CLI pass: static chrome, no background fills, and a foreground-adaptive dotted mark.

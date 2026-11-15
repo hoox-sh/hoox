@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "d1-worker.mdx"
-description: "description: \"Comprehensive engineering specification for the Hoox D1 SQLite Database Proxy Worker, covering SQL query interfaces, batch operations, and dashboard statistics…"
+description: 'description: "Comprehensive engineering specification for the Hoox D1 SQLite Database Proxy Worker, covering SQL query interfaces, batch operations, and dashboard statistics…'
 resource: "docs/devops/workers/d1-worker.mdx"
 tags: [devops, doc, docs, workers]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/devops/workers/d1-worker.mdx"

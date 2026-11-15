@@ -1,13 +1,13 @@
 ---
 type: "Document"
 title: "tui.mdx"
-description: "description: \"Master reference for the full-screen terminal operations cockpit, keyboard shortcuts, view registries, and resilience engines.\"."
+description: 'description: "Master reference for the full-screen terminal operations cockpit, keyboard shortcuts, view registries, and resilience engines.".'
 resource: "docs/enduser/guides/tui.mdx"
 tags: [doc, docs, enduser, guides]
 status: stable
 generated:
   by: process:axis-okf/1
-  at: 2026-11-08T16:29:02Z
+  at: 2026-11-11T22:31:35Z
 sources:
   - id: tree
     resource: "docs/enduser/guides/tui.mdx"
