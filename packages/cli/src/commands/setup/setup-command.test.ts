@@ -17,7 +17,9 @@ function makeSpinner() {
   };
 }
 
-function installClackSpies(opts?: { confirm?: boolean | symbol }) {
+function installClackSpies(opts?: {
+  confirm?: boolean | typeof clack.CANCEL_SYMBOL;
+}) {
   spyOn(clack, "intro").mockImplementation(() => {});
   spyOn(clack, "outro").mockImplementation(() => {});
   spyOn(clack, "note").mockImplementation(() => {});
@@ -26,7 +28,7 @@ function installClackSpies(opts?: { confirm?: boolean | symbol }) {
     opts?.confirm === undefined ? true : opts.confirm
   );
   spyOn(clack, "isCancel").mockImplementation(
-    (v: unknown): v is symbol => typeof v === "symbol"
+    (v: unknown): v is typeof clack.CANCEL_SYMBOL => typeof v === "symbol"
   );
   spyOn(clack, "spinner").mockImplementation(() => makeSpinner() as any);
   spyOn(clack.log, "info").mockImplementation(() => {});

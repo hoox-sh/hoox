@@ -1224,9 +1224,7 @@ describe("registerDeployCommand", () => {
       const { spyOn } = await import("bun:test");
       spyOn(clack, "confirm").mockImplementation(async () => false);
       spyOn(clack, "isCancel").mockImplementation(
-        ((_v: unknown): _v is symbol => false) as (
-          value: unknown
-        ) => value is symbol
+        (_v: unknown): _v is typeof clack.CANCEL_SYMBOL => false
       );
 
       const origRollback = CloudflareService.prototype.versionsRollback;

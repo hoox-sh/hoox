@@ -59,7 +59,7 @@ function captureStreams(): {
 // Clack spies
 // ---------------------------------------------------------------------------
 
-const CANCEL = Symbol.for("clack.cancel");
+const CANCEL: typeof clack.CANCEL_SYMBOL = clack.CANCEL_SYMBOL;
 let simulateCancel = false;
 let confirmSequence: boolean[] = [true];
 let confirmIdx = 0;
@@ -77,30 +77,34 @@ function installClackSpies(): void {
   spyOn(clack, "cancel").mockImplementation((msg?: string) => {
     cancelMessages.push(msg ?? "");
   });
-  spyOn(clack, "confirm").mockImplementation(async () => {
-    if (simulateCancel) return CANCEL;
-    const v =
-      confirmIdx < confirmSequence.length
-        ? confirmSequence[confirmIdx]
-        : confirmSequence[confirmSequence.length - 1];
-    confirmIdx++;
-    return v ?? false;
-  });
-  spyOn(clack, "password").mockImplementation(async () => {
-    if (simulateCancel) return CANCEL;
-    return passwordValue;
-  });
+  spyOn(clack, "confirm").mockImplementation(
+    async (): Promise<boolean | typeof clack.CANCEL_SYMBOL> => {
+      if (simulateCancel) return CANCEL;
+      const v =
+        confirmIdx < confirmSequence.length
+          ? confirmSequence[confirmIdx]
+          : confirmSequence[confirmSequence.length - 1];
+      confirmIdx++;
+      return v ?? false;
+    }
+  );
+  spyOn(clack, "password").mockImplementation(
+    async (): Promise<string | typeof clack.CANCEL_SYMBOL> => {
+      if (simulateCancel) return CANCEL;
+      return passwordValue;
+    }
+  );
   spyOn(clack, "text").mockImplementation(
-    async (opts: { defaultValue?: string }) => {
+    async (opts: {
+      defaultValue?: string;
+    }): Promise<string | typeof clack.CANCEL_SYMBOL> => {
       if (simulateCancel) return CANCEL;
       return textValue || opts.defaultValue || "";
     }
   );
   spyOn(clack, "isCancel").mockImplementation(
-    (value: unknown): value is symbol =>
-      simulateCancel ||
-      (typeof value === "symbol" &&
-        Symbol.keyFor(value as symbol) === "clack.cancel")
+    (value: unknown): value is typeof clack.CANCEL_SYMBOL =>
+      simulateCancel || value === clack.CANCEL_SYMBOL
   );
   spyOn(clack.log, "step").mockImplementation((msg?: string) => {
     logSteps.push(msg ?? "");
@@ -482,14 +486,15 @@ describe("env command", () => {
       let call = 0;
       mock.restore();
       installClackSpies();
-      spyOn(clack, "password").mockImplementation(async () => {
-        call++;
-        return call === 1 ? CANCEL : passwordValue;
-      });
+      spyOn(clack, "password").mockImplementation(
+        async (): Promise<string | typeof clack.CANCEL_SYMBOL> => {
+          call++;
+          return call === 1 ? CANCEL : passwordValue;
+        }
+      );
       spyOn(clack, "isCancel").mockImplementation(
-        (value: unknown): value is symbol =>
-          typeof value === "symbol" &&
-          Symbol.keyFor(value as symbol) === "clack.cancel"
+        (value: unknown): value is typeof clack.CANCEL_SYMBOL =>
+          value === clack.CANCEL_SYMBOL
       );
 
       const { cap } = await runEnv(["init"]);

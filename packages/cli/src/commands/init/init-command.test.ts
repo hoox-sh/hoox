@@ -169,7 +169,7 @@ function installClackSpies(): void {
     }) => {
       captured.passwordMessages.push(opts.message);
       counters.password++;
-      if (simulateCancel) return Symbol.for("clack.cancel");
+      if (simulateCancel) return clack.CANCEL_SYMBOL;
       if (customPasswordResponder) return customPasswordResponder(opts.message);
       return responses.password ?? defaultResponses.password;
     }
@@ -185,7 +185,7 @@ function installClackSpies(): void {
       captured.textMessages.push(opts.message);
       counters.text++;
       return simulateCancel
-        ? Symbol.for("clack.cancel")
+        ? clack.CANCEL_SYMBOL
         : (responses.text ?? defaultResponses.text);
     }
   );
@@ -199,7 +199,7 @@ function installClackSpies(): void {
       captured.multiselectMessages.push(opts.message);
       counters.multiselect++;
       return simulateCancel
-        ? Symbol.for("clack.cancel")
+        ? clack.CANCEL_SYMBOL
         : (responses.multiselect ?? defaultResponses.multiselect);
     }
   );
@@ -212,7 +212,7 @@ function installClackSpies(): void {
       captured.selectMessages.push(opts.message);
       counters.select++;
       return simulateCancel
-        ? Symbol.for("clack.cancel")
+        ? clack.CANCEL_SYMBOL
         : (responses.select ?? defaultResponses.select);
     }
   );
@@ -222,7 +222,7 @@ function installClackSpies(): void {
       const idx = counters.confirm++;
       const seq = responses.confirmSequence ?? defaultResponses.confirmSequence;
       const val = idx < seq.length ? seq[idx] : seq[seq.length - 1];
-      if (simulateCancel) return Symbol.for("clack.cancel");
+      if (simulateCancel) return clack.CANCEL_SYMBOL;
       return val ?? false;
     }
   );
@@ -236,7 +236,7 @@ function installClackSpies(): void {
       for (const [key, fn] of Object.entries(fields)) {
         if (simulateCancel) {
           if (groupOpts?.onCancel) groupOpts.onCancel();
-          return Symbol.for("clack.cancel");
+          return clack.CANCEL_SYMBOL;
         }
         const val = await fn();
         results[key] =
@@ -250,12 +250,8 @@ function installClackSpies(): void {
     }
   );
   spyOn(clack, "isCancel").mockImplementation(
-    (value: unknown): value is symbol => {
-      return (
-        simulateCancel ||
-        (typeof value === "symbol" &&
-          Symbol.keyFor(value as symbol) === "clack.cancel")
-      );
+    (value: unknown): value is typeof clack.CANCEL_SYMBOL => {
+      return simulateCancel || value === clack.CANCEL_SYMBOL;
     }
   );
   spyOn(clack, "cancel").mockImplementation((msg?: string) => {
